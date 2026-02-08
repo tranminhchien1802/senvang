@@ -4,6 +4,7 @@ const cors = require('cors');
 const session = require('express-session');
 const path = require('path');
 require('dotenv').config();
+const config = require('./config/config');
 
 const app = express();
 
@@ -12,8 +13,8 @@ app.use(session({
   secret: process.env.SESSION_SECRET || 'default_session_secret',
   resave: false,
   saveUninitialized: false,
-  cookie: { 
-    secure: process.env.NODE_ENV === 'production' ? true : false, 
+  cookie: {
+    secure: process.env.NODE_ENV === 'production' ? true : false,
     maxAge: 24 * 60 * 60 * 1000 // 24 hours
   }
 }));
@@ -24,12 +25,13 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // CORS configuration
-app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? [process.env.CLIENT_URL || 'https://yourdomain.com'] 
-    : ['http://localhost:5173', 'http://localhost:3000'],
+const corsOptions = {
+  origin: process.env.NODE_ENV === 'production'
+    ? [process.env.CLIENT_URL || 'https://yourdomain.com', 'https://*.vercel.app']
+    : ['http://localhost:5173', 'http://localhost:3000', 'http://localhost:4173'],
   credentials: true
-}));
+};
+app.use(cors(corsOptions));
 
 // Alternative CORS setup if needed
 app.use((req, res, next) => {
@@ -54,7 +56,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 // Kết nối MongoDB
 const connectDB = async () => {
   try {
-    await mongoose.connect(process.env.MONGODB_URI, {
+    await mongoose.connect(process.env.MONGODB_URI || config.mongoUri, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
@@ -74,9 +76,14 @@ app.use('/api/admin', require('./routers/Admin'));
 app.use('/api/orders', require('./routers/Order'));
 app.use('/api/banners', require('./routers/banners'));
 
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.json({ status: 'OK', timestamp: new Date().toISOString() });
+});
+
 // Test route
 app.get('/', (req, res) => {
-  res.json({ message: 'Backend hoạt động!' });
+  res.json({ message: 'Backend hoạt động!', version: '1.0.0' });
 });
 
 // Handle 404
@@ -90,12 +97,13 @@ app.use((err, req, res, next) => {
   res.status(500).json({ message: 'Lỗi server nội bộ', error: process.env.NODE_ENV === 'development' ? err.message : {} });
 });
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || config.port;
 const server = app.listen(PORT, () => {
   const address = server.address();
   const host = address.address === '::' ? 'localhost' : address.address;
   const protocol = process.env.NODE_ENV === 'production' ? 'https' : 'http';
   console.log(`🚀 Server chạy tại ${protocol}://${host}:${address.port}`);
+  console.log(`🌍 Backend URL: ${protocol}://${host}:${address.port}`);
 });
 
 // Graceful shutdown
@@ -112,3 +120,5 @@ process.on('SIGINT', () => {
     console.log('Process terminated');
   });
 });
+
+module.exports = app;
