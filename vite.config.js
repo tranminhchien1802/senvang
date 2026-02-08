@@ -19,6 +19,16 @@ export default defineConfig({
       overlay: false // Tắt overlay lỗi để không làm phiền khi phát triển
     }
   },
+  preview: {
+    // Khi chạy preview, proxy tới backend
+    proxy: {
+      '/api': {
+        target: process.env.BACKEND_URL || 'http://localhost:5000',
+        changeOrigin: true,
+        secure: false,
+      },
+    },
+  },
   build: {
     // Cấu hình để đảm bảo dữ liệu được cập nhật nhanh
     manifest: true,

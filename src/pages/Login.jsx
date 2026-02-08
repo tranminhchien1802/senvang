@@ -28,7 +28,7 @@ const Login = () => {
 
       if (isRegister) {
         // Try backend registration first
-        const backendUrl = 'http://localhost:5000/api/users/register';
+        const backendUrl = `${process.env.BACKEND_URL || 'http://localhost:5000'}/api/users/register`;
         
         try {
           const response = await fetch(backendUrl, {
@@ -75,7 +75,7 @@ const Login = () => {
         }
       } else {
         // Try backend login first
-        const backendUrl = 'http://localhost:5000/api/users/login';
+        const backendUrl = `${process.env.BACKEND_URL || 'http://localhost:5000'}/api/users/login`;
         
         try {
           const response = await fetch(backendUrl, {

@@ -256,7 +256,7 @@ function App() {
         } />
         <Route path="/auth/success" element={<AuthSuccess />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/login*" element={<Login />} />
+        <Route path="/login/*" element={<Login />} />
       </Routes>
     </Router>
     </GoogleOAuthProvider>
