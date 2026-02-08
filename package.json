@@ -10,8 +10,8 @@
     "build:backend": "cd my-backend && npm run build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "start": "concurrently \"npm run serve\" \"cd my-backend && npm run start\"",
-    "serve": "vite preview"
+    "start": "vite preview",
+    "vercel-build": "vite build"
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",

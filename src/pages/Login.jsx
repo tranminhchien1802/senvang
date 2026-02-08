@@ -28,26 +28,14 @@ const Login = () => {
 
       if (isRegister) {
         // Try backend registration first
-        const backendUrl = `${process.env.BACKEND_URL || 'http://localhost:5000'}/api/users/register`;
-        
         try {
-          const response = await fetch(backendUrl, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ name, email, password, phone }),
-          });
+          const data = await import('../utils/api').then(api => 
+            api.default.post('/users/register', { name, email, password, phone })
+          );
 
-          const data = await response.json();
-
-          if (response.ok) {
-            // Backend registration successful
-            alert('Đăng ký thành công! Vui lòng kiểm tra email để xác nhận.');
-            setIsRegister(false); // Switch to login form
-          } else {
-            throw new Error(data.message || 'Lỗi đăng ký');
-          }
+          // Backend registration successful
+          alert('Đăng ký thành công! Vui lòng kiểm tra email để xác nhận.');
+          setIsRegister(false); // Switch to login form
         } catch (backendError) {
           // Fallback to localStorage registration
           const users = JSON.parse(localStorage.getItem('users')) || [];
@@ -75,50 +63,38 @@ const Login = () => {
         }
       } else {
         // Try backend login first
-        const backendUrl = `${process.env.BACKEND_URL || 'http://localhost:5000'}/api/users/login`;
-        
         try {
-          const response = await fetch(backendUrl, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ email, password }),
-          });
+          const data = await import('../utils/api').then(api => 
+            api.default.post('/users/login', { email, password })
+          );
 
-          const data = await response.json();
-
-          if (response.ok) {
-            // Backend login successful
-            localStorage.setItem('token', data.token);
-            if (data.user && data.user.name) {
-              localStorage.setItem('userName', data.user.name);
-            }
-            if (data.user && data.user.email) {
-              localStorage.setItem('userEmail', data.user.email);
-            }
-
-            // Store login activity in localStorage
-            const loginActivity = {
-              name: data.user?.name || email,
-              email: data.user?.email || email,
-              loginTime: new Date().toISOString(),
-              id: Date.now().toString(),
-              provider: 'email',
-              ip: 'local',
-              userAgent: navigator.userAgent
-            };
-
-            const existingActivities = JSON.parse(localStorage.getItem('loginActivities')) || [];
-            const updatedActivities = [loginActivity, ...existingActivities];
-            localStorage.setItem('loginActivities', JSON.stringify(updatedActivities));
-
-            window.dispatchEvent(new Event('userLoggedIn'));
-            alert('Đăng nhập thành công!');
-            navigate(redirect);
-          } else {
-            throw new Error(data.message || 'Lỗi đăng nhập');
+          // Backend login successful
+          localStorage.setItem('token', data.token);
+          if (data.user && data.user.name) {
+            localStorage.setItem('userName', data.user.name);
           }
+          if (data.user && data.user.email) {
+            localStorage.setItem('userEmail', data.user.email);
+          }
+
+          // Store login activity in localStorage
+          const loginActivity = {
+            name: data.user?.name || email,
+            email: data.user?.email || email,
+            loginTime: new Date().toISOString(),
+            id: Date.now().toString(),
+            provider: 'email',
+            ip: 'local',
+            userAgent: navigator.userAgent
+          };
+
+          const existingActivities = JSON.parse(localStorage.getItem('loginActivities')) || [];
+          const updatedActivities = [loginActivity, ...existingActivities];
+          localStorage.setItem('loginActivities', JSON.stringify(updatedActivities));
+
+          window.dispatchEvent(new Event('userLoggedIn'));
+          alert('Đăng nhập thành công!');
+          navigate(redirect);
         } catch (backendError) {
           // Check for admin login
           if ((email === 'chien180203@gmail.com' || email === 'ketoansenvang.net@gmail.com') && password === '123') {
