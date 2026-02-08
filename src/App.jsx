@@ -44,7 +44,7 @@ function App() {
   }, []);
 
   return (
-    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID || import.meta.env.VITE_REACT_APP_GOOGLE_CLIENT_ID || "937635642814-9h3k7st6fojq02qvaicof52tqng6he97.apps.googleusercontent.com"}>
+    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID || import.meta.env.VITE_REACT_APP_GOOGLE_CLIENT_ID}>
       <UpdateServicesData />
       <DataSync />
       <Router>

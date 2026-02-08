@@ -6,23 +6,38 @@ import { jwtDecode } from 'jwt-decode';
 const GoogleLoginButton = ({ onLoginSuccess, onLoginFailure }) => {
   const handleSuccess = async (credentialResponse) => {
     try {
-      // Decode the credential to access Google user info in frontend if needed
+      // First, decode the credential to access Google user info in frontend if needed
       const googleUserData = jwtDecode(credentialResponse.credential);
 
       // Log Google user data for debugging (optional)
       console.log('Google user data:', googleUserData);
 
+      // Send the credential to backend for verification
+      const response = await fetch('/api/auth/verify', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ credential: credentialResponse.credential }),
+      });
+
+      const result = await response.json();
+
+      if (!result.success) {
+        throw new Error(result.error || 'Authentication failed');
+      }
+
       // Store user data locally for frontend use
       const userData = {
-        id: googleUserData.sub,
-        name: googleUserData.name,
-        email: googleUserData.email,
-        picture: googleUserData.picture
+        id: result.user.id,
+        name: result.user.name,
+        email: result.user.email,
+        picture: result.user.picture
       };
 
       // Store user data in localStorage
       localStorage.setItem('user', JSON.stringify(userData));
-      localStorage.setItem('token', credentialResponse.credential); // Store the credential as token
+      localStorage.setItem('token', result.token); // Store the backend-generated token
 
       // Store user name for display in header
       if (userData.name) {
@@ -34,8 +49,8 @@ const GoogleLoginButton = ({ onLoginSuccess, onLoginFailure }) => {
 
       // Store login activity in localStorage
       const loginActivity = {
-        name: googleUserData.name,
-        email: googleUserData.email,
+        name: result.user.name,
+        email: result.user.email,
         loginTime: new Date().toISOString(),
         id: Date.now().toString(),
         provider: 'google',
@@ -53,7 +68,7 @@ const GoogleLoginButton = ({ onLoginSuccess, onLoginFailure }) => {
       localStorage.setItem('loginActivities', JSON.stringify(updatedActivities));
 
       // Check if the user is an admin
-      const isAdmin = googleUserData.email === 'chien180203@gmail.com' || googleUserData.email === 'ketoansenvang.net@gmail.com';
+      const isAdmin = result.user.email === 'chien180203@gmail.com' || result.user.email === 'ketoansenvang.net@gmail.com';
       if (isAdmin) {
         localStorage.setItem('adminToken', 'local-admin-token-' + Date.now());
       }

@@ -12,7 +12,9 @@
     "preview": "vite preview",
     "start": "vite preview",
     "vercel-build": "vite build",
-    "postinstall": "cd my-backend && npm install"
+    "postinstall": "cd my-backend && npm install",
+    "check-config": "node check-config.js",
+    "predeploy": "npm run check-config"
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",
