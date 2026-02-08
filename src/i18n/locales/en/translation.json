@@ -1,0 +1,185 @@
+{
+  "common": {
+    "contact": "Contact",
+    "about": "About",
+    "services": "Services",
+    "home": "Home",
+    "support": "Support",
+    "send": "Send",
+    "cancel": "Cancel",
+    "close": "Close",
+    "more": "See more",
+    "viewServices": "View Services",
+    "contactConsultation": "Contact Consultation"
+  },
+  "header": {
+    "title": "Golden Accounting",
+    "home": "Home",
+    "accountingServices": "Services",
+    "supply": "Other Services",
+    "about": "About Us",
+    "contact": "Contact"
+  },
+  "footer": {
+    "aboutUs": "ABOUT US",
+    "companyName": "Golden Accounting Company",
+    "address": "Address: 16th Floor, TTC Building, 19 Duy Tan Street, Cau Giay, Hanoi.",
+    "hotline": "Hotline: (024) 7308 2424",
+    "email": "Email: info@goldenaccounting.vn",
+    "license": "License No.: 0101234567 issued by Department of Planning and Investment",
+    "information": "INFORMATION",
+    "connect": "CONNECT WITH US",
+    "quickSupport": "QUICK SUPPORT",
+    "copyright": "Copyright belongs to Golden Accounting"
+  },
+  "homepage": {
+    "heroTitle": "CORE VALUES",
+    "heroDescription": "Easy – Effective – Quality. Dedicated and professional accompanying your business development.",
+    "coreValues": "CORE VALUES",
+    "dedication": "DEDICATION",
+    "dedicationDesc": "With dedication and professionalism, GOLDEN ACCOUNTING always accompanies the development of your business in every business activity, from basic legal procedures to complex financial strategies.",
+    "trust": "TRUST",
+    "trustDesc": "As an asset value throughout the business process, we commit to information security, compliance with laws and ensuring accuracy and transparency in all services provided.",
+    "quality": "QUALITY",
+    "qualityDesc": "Quality is our honor. GOLDEN ACCOUNTING continuously improves processes and enhances professional knowledge to bring the perfect service to customers.",
+    "whyChoose": "Why businesses choose Golden Accounting?",
+    "solution": "COMPREHENSIVE SOLUTION",
+    "benefits": {
+      "costOptimization": "Optimize business costs: Minimize personnel costs and operate cumbersome accounting systems.",
+      "security": "Absolute security: Commitment to financial data security with ISO standard storage processes.",
+      "support247": "24/7 support: Expert team ready to answer all legal and tax issues.",
+      "accuracy": "Accurate & timely: Accurate financial reports, submitted on schedule according to law."
+    },
+    "impressiveNumbers": "IMPRESSIVE NUMBERS",
+    "experience": "Years of experience",
+    "experienceValue": "15+",
+    "customers": "Trusted customers",
+    "customersValue": "3500+",
+    "satisfaction": "Customer satisfaction",
+    "satisfactionValue": "99%",
+    "experts": "Professional experts",
+    "expertsValue": "100+",
+    "accountingServices": "PROFESSIONAL ACCOUNTING SERVICES",
+    "comprehensiveSolution": "Comprehensive business solutions: Establishment, Accounting, Tax, Website Design and Legal Consulting",
+    "businessFormation": "BUSINESS FORMATION",
+    "consultingFeatures": {
+      "dedication": "1-1 CONSULTATION WITHOUT WAITING",
+      "understanding": "PROPERLY UNDERSTANDING KEY POINTS",
+      "professional": "PROFESSIONAL TRACKING OF EVERY PROGRESS"
+    },
+    "businessFields": "KEY BUSINESS AREAS",
+    "serviceTypes": {
+      "businessRegistration": "BUSINESS REGISTRATION",
+      "taxAccounting": "TAX & ACCOUNTING",
+      "websiteDesign": "WEBSITE DESIGN",
+      "marketing": "MARKETING & COMMUNICATION & WEBSITE"
+    },
+    "serviceDescriptions": {
+      "businessRegistration": "Complete package of documents and procedures for new business registration, changing business registration content (increasing capital, changing business type, changing address/company name, adding/withdrawing business lines).",
+      "taxAccounting": "Support strategic tax planning, review and advise on applying preferential policies, minimize violation risks, and represent clients when working with tax authorities.",
+      "websiteDesign": "Analyze requirements, business objectives, and target users to provide the optimal website structure and functionality.",
+      "marketing": "Producing core communication content."
+    },
+    "coreValuesTitle": "OUR VALUES AND STORY",
+    "introStory": "INTRODUCTION STORY",
+    "uniqueFeatures": "NOTABLE UNIQUE FEATURES",
+    "valueDescriptions": {
+      "dedication": "With dedicated and professional spirit, we always accompany our clients, striving to create sustainable value for every task.",
+      "trust": "Always fulfill responsibilities properly, ensure work quality and quickly resolve arising issues.",
+      "quality": "Quality is our honor, implementing work requirements correctly and adhering to all agreed terms, bringing satisfaction to customers."
+    },
+    "introStoryItems": {
+      "standard": "Maintaining standards and ensuring accuracy amid the complexity of accounting books",
+      "responsibility": "Working with customers to spread social responsibility, contributing to bringing more smiles to Vietnamese children",
+      "culture": "Creating culture in startup, building sincere and loyal relationships"
+    },
+    "uniqueFeatureItems": {
+      "top1": "Top 1 consulting unit with the strongest core expertise",
+      "weekendSupport": "Consultation on Saturdays, Sundays & holidays"
+    },
+    "coreValues": {
+      "dedication": "DEDICATION",
+      "trust": "TRUST",
+      "quality": "QUALITY"
+    },
+    "coreValueDescriptions": {
+      "dedication": "With dedication and professional spirit, we always accompany customers, striving to create sustainable value for every task.",
+      "trust": "As an asset value throughout the business process, always fulfill responsibilities properly, ensure work quality and quickly resolve arising issues.",
+      "quality": "Quality is our honor, implementing work requirements correctly and adhering to all agreed terms, bringing satisfaction to customers."
+    },
+    "services": {
+      "pageTitle": "BUSINESS ESTABLISHMENT AND OPERATIONS SERVICES",
+      "mainFields": "KEY BUSINESS ACTIVITY AREAS",
+      "packagesTitle": "PRICING OF ESTABLISHMENT PACKAGES",
+      "introText": "We provide flexible service packages to suit different startup business scales and needs, ensuring reasonable costs and high effectiveness.",
+      "packageNames": {
+        "package1": "PACKAGE 1",
+        "package2": "PACKAGE 2",
+        "package3": "PACKAGE 3",
+        "package4": "PACKAGE 4",
+        "package5": "PACKAGE 5",
+        "package6": "PACKAGE 6"
+      },
+      "serviceTypes": {
+        "businessRegistration": "BUSINESS REGISTRATION",
+        "taxAccounting": "TAX & ACCOUNTING",
+        "marketing": "MARKETING & COMMUNICATION & WEBSITE",
+        "consulting": "KNOWLEDGE AND STRATEGIC CONSULTING"
+      },
+      "serviceDescriptions": {
+        "businessRegistration": "Complete package of documents and procedures for new business registration, changing business registration content (increasing capital, changing business type, changing address/company name, adding/withdrawing business lines).",
+        "taxAccounting": "Support strategic tax planning, review and advise on applying preferential policies, minimize violation risks, and represent clients when working with tax authorities.",
+        "marketing": "Analyze requirements, business objectives, and target users to provide the optimal website structure and functionality. Producing core communication content.",
+        "consulting": "Provide in-depth knowledge and core expertise consulting, helping businesses master legal compliance and operate effectively."
+      },
+      "subServices": {
+        "businessRegistration": {
+          "national": "Establish companies nationwide",
+          "branches": "Establish branches, warehouses, representative offices",
+          "fdi": "Establish FDI investment registration projects",
+          "changes": "Change business registration content",
+          "fdiChanges": "Change FDI investment registration"
+        },
+        "taxAccounting": {
+          "filing": "Tax filing, Complete accounting books and records",
+          "settlement": "Corporate income tax and personal income tax settlement",
+          "insurance": "Social insurance & labor",
+          "foreignTax": "Personal income tax calculation for foreigners",
+          "analysis": "Corporate financial data analysis, Develop corporate cash flow scenarios"
+        },
+        "marketing": {
+          "logoDesign": "Logo design, Logo registration and protection",
+          "webDesign": "Website design",
+          "commerceRegister": "Ministry of Commerce website registration"
+        },
+        "consulting": {
+          "top1": "Core expertise consulting (Top 1)",
+          "weekend": "Consultation on Saturdays, Sundays & holidays",
+          "naming": "Company naming consultation to build digital assets & brand value"
+        }
+      }
+    }
+  },
+  "forms": {
+    "fullName": "Full Name",
+    "email": "Email",
+    "phone": "Phone Number",
+    "message": "Message",
+    "submit": "Send Request",
+    "placeholder": {
+      "fullName": "Enter your full name",
+      "email": "Enter your email address",
+      "phone": "Enter your phone number",
+      "message": "Describe your request"
+    }
+  },
+  "contact": {
+    "title": "Contact Us",
+    "subtitle": "Leave your information, we will call back immediately!",
+    "info": "Contact information"
+  },
+  "contactForm": {
+    "success": "Sent successfully! We will contact you as soon as possible.",
+    "error": "An error occurred, please try again later."
+  }
+}

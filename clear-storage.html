@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Clear Local Storage</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            text-align: center;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        button {
+            background-color: #D4AF37;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        button:hover {
+            background-color: #b8942f;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            display: none;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Xóa Dữ Liệu Dịch Vụ Thiết Kế Web</h1>
+        <p>Trang này sẽ xóa dữ liệu dịch vụ thiết kế web khỏi localStorage để cập nhật phiên bản mới nhất.</p>
+        
+        <button onclick="clearLocalStorage()">Xóa Dữ Liệu Web Design</button>
+        <button onclick="reloadPage()">Tải Lại Trang</button>
+        
+        <div id="result" class="result"></div>
+    </div>
+
+    <script>
+        function clearLocalStorage() {
+            try {
+                // Remove web design services from localStorage
+                localStorage.removeItem('webDesignServices');
+                
+                // Also remove related keys that might contain old data
+                localStorage.removeItem('thiet-ke-webServices');
+                
+                // Show success message
+                const resultDiv = document.getElementById('result');
+                resultDiv.innerHTML = '<p>✅ Đã xóa dữ liệu dịch vụ thiết kế web khỏi localStorage!</p>' +
+                                    '<p>Vui lòng tải lại trang để thấy cập nhật mới nhất.</p>';
+                resultDiv.className = 'result success';
+                
+                console.log('Web design services cleared from localStorage');
+            } catch (error) {
+                console.error('Error clearing localStorage:', error);
+                alert('Lỗi khi xóa dữ liệu: ' + error.message);
+            }
+        }
+        
+        function reloadPage() {
+            window.location.href = '/';
+        }
+    </script>
+</body>
+</html>

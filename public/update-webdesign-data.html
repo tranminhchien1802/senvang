@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cập Nhật Dữ Liệu Dịch Vụ Thiết Kế Web</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .info-box {
+            background: #e8f4fd;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            border-left: 4px solid #2196F3;
+        }
+        button {
+            background: #D4AF37;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            display: block;
+            margin: 20px auto;
+        }
+        button:hover {
+            background: #b8942f;
+        }
+        .status {
+            text-align: center;
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .success {
+            background: #dff0d8;
+            color: #3c763d;
+            border: 1px solid #d6e9c6;
+        }
+        .error {
+            background: #f2dede;
+            color: #a94442;
+            border: 1px solid #ebccd1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>CẬP NHẬT DỮ LIỆU DỊCH VỤ THIẾT KẾ WEB</h1>
+        
+        <div class="info-box">
+            <p><strong>Mục đích:</strong> Cập nhật dữ liệu dịch vụ thiết kế web với các thuật ngữ chính xác (responsive thay vì repo)</p>
+            <p><strong>Lưu ý:</strong> Sau khi cập nhật, vui lòng kiểm tra lại trang web và trang quản trị</p>
+        </div>
+        
+        <button onclick="updateWebDesignData()">CẬP NHẬT DỮ LIỆU THIẾT KẾ WEB</button>
+        
+        <div id="status" class="status" style="display: none;"></div>
+    </div>
+
+    <script>
+        function updateWebDesignData() {
+            try {
+                // Dữ liệu mới cho Thiết Kế Web (webDesignServices) với "responsive" thay vì "repo"
+                const newWebDesignServices = [
+                    {
+                        id: 'web1',
+                        title: 'GÓI 1: WEB GIỚI THIỆU',
+                        price: '3.000.000đ',
+                        description: 'Gói website giới thiệu cơ bản cho doanh nghiệp',
+                        features: [
+                            'Thiết kế web giới thiệu doanh nghiệp',
+                            'Responsive - tương thích di động',
+                            'Tối ưu SEO cơ bản',
+                            'Tích hợp form liên hệ',
+                            'Hỗ trợ kỹ thuật 3 tháng'
+                        ],
+                        suitableFor: 'Doanh nghiệp mới, cá nhân kinh doanh',
+                        timeComplete: '5-7 ngày',
+                        isPopular: true
+                    },
+                    {
+                        id: 'web2',
+                        title: 'GÓI 2: WEB GIỚI THIỆU + QUẢN TRỊ',
+                        price: '4.000.000đ',
+                        description: 'Gói website giới thiệu có trang quản trị',
+                        features: [
+                            'Thiết kế web giới thiệu doanh nghiệp',
+                            'Trang quản trị nội dung',
+                            'Tự cập nhật nội dung dễ dàng',
+                            'Tối ưu SEO nâng cao',
+                            'Hỗ trợ kỹ thuật 6 tháng'
+                        ],
+                        suitableFor: 'Doanh nghiệp vừa và nhỏ',
+                        timeComplete: '7-10 ngày',
+                        isPopular: false
+                    },
+                    {
+                        id: 'web3',
+                        title: 'GÓI 3: WEB GIỚI THIỆU + RESPONSIVE',
+                        price: '6.000.000đ',
+                        description: 'Gói website giới thiệu tương thích responsive',
+                        features: [
+                            'Thiết kế web giới thiệu doanh nghiệp',
+                            'Responsive - tương thích mọi thiết bị',
+                            'Tối ưu trải nghiệm người dùng',
+                            'Tích hợp mạng xã hội',
+                            'Hỗ trợ kỹ thuật 12 tháng'
+                        ],
+                        suitableFor: 'Doanh nghiệp muốn hiện diện chuyên nghiệp',
+                        timeComplete: '10-12 ngày',
+                        isPopular: true
+                    },
+                    {
+                        id: 'web4',
+                        title: 'GÓI 4: WEB GIỚI THIỆU + ADMIN + RESPONSIVE',
+                        price: '7.000.000đ',
+                        description: 'Gói website giới thiệu đầy đủ tính năng',
+                        features: [
+                            'Thiết kế web giới thiệu doanh nghiệp',
+                            'Trang quản trị nội dung',
+                            'Responsive - tương thích mọi thiết bị',
+                            'Tích hợp form liên hệ, chat',
+                            'Tự cập nhật nội dung dễ dàng',
+                            'Hỗ trợ kỹ thuật trọn đời'
+                        ],
+                        suitableFor: 'Doanh nghiệp chuyên nghiệp',
+                        timeComplete: '12-15 ngày',
+                        isPopular: false
+                    },
+                    {
+                        id: 'web5',
+                        title: 'GÓI TƯ VẤN',
+                        price: 'Liên hệ tư vấn',
+                        description: 'Gói tư vấn thiết kế web theo yêu cầu đặc biệt',
+                        features: [
+                            'Tư vấn lựa chọn gói phù hợp',
+                            'Phân tích yêu cầu chi tiết',
+                            'Thiết kế theo yêu cầu đặc biệt',
+                            'Tích hợp tính năng tùy chỉnh',
+                            'Hỗ trợ kỹ thuật trọn đời'
+                        ],
+                        suitableFor: 'Doanh nghiệp có yêu cầu đặc biệt',
+                        timeComplete: 'Thỏa thuận',
+                        isPopular: false
+                    }
+                ];
+
+                // Cập nhật dữ liệu vào localStorage
+                localStorage.setItem('webDesignServices', JSON.stringify(newWebDesignServices));
+
+                // Cập nhật featuredServices với các dịch vụ phổ biến
+                const featuredServices = JSON.parse(localStorage.getItem('featuredServices')) || [];
+                const updatedFeaturedServices = [
+                    ...featuredServices.filter(service => 
+                        !['web1', 'web2', 'web3', 'web4', 'web5'].includes(service.id)
+                    ),
+                    ...newWebDesignServices.filter(service => service.isPopular)
+                ];
+                localStorage.setItem('featuredServices', JSON.stringify(updatedFeaturedServices));
+                
+                document.getElementById('status').innerHTML = '<p class="success">CẬP NHẬT DỮ LIỆU THIẾT KẾ WEB THÀNH CÔNG!</p><p>Đã cập nhật các gói dịch vụ với thuật ngữ "responsive" thay vì "repo".</p>';
+                document.getElementById('status').style.display = 'block';
+                
+                console.log('Dữ liệu dịch vụ thiết kế web đã được cập nhật vào localStorage!');
+                console.log('Các gói đã được cập nhật: GÓI 3: WEB GIỚI THIỆU + RESPONSIVE, GÓI 4: WEB GIỚI THIỆU + ADMIN + RESPONSIVE');
+            } catch (error) {
+                console.error('Lỗi khi cập nhật dữ liệu:', error);
+                document.getElementById('status').innerHTML = '<p class="error">LỖI KHI CẬP NHẬT DỮ LIỆU: ' + error.message + '</p>';
+                document.getElementById('status').style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>

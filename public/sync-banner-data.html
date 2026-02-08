@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đồng Bộ Banner</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .info-box {
+            background: #e8f4fd;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            border-left: 4px solid #2196F3;
+        }
+        button {
+            background: #D4AF37;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            display: block;
+            margin: 20px auto;
+        }
+        button:hover {
+            background: #b8942f;
+        }
+        .status {
+            text-align: center;
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .success {
+            background: #dff0d8;
+            color: #3c763d;
+            border: 1px solid #d6e9c6;
+        }
+        .error {
+            background: #f2dede;
+            color: #a94442;
+            border: 1px solid #ebccd1;
+        }
+        .banner-list {
+            margin-top: 20px;
+        }
+        .banner-item {
+            background: #f8f9fa;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-left: 4px solid #D4AF37;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>ĐỒNG BỘ BANNER TỪ WEB VÀO ADMIN</h1>
+        
+        <div class="info-box">
+            <p><strong>Mục đích:</strong> Cập nhật dữ liệu banner từ các nguồn vào hệ thống quản lý</p>
+            <p><strong>Lưu ý:</strong> Dữ liệu sẽ được đồng bộ vào localStorage để bạn có thể quản lý trong admin</p>
+        </div>
+        
+        <button onclick="syncBannerData()">ĐỒNG BỘ BANNER NGAY</button>
+        
+        <div id="status" class="status" style="display: none;"></div>
+        
+        <div id="bannerList" class="banner-list" style="display: none;">
+            <h3>Danh sách banner hiện tại:</h3>
+            <div id="bannersContainer"></div>
+        </div>
+    </div>
+
+    <script>
+        function syncBannerData() {
+            try {
+                // Dữ liệu banner mẫu từ trang chủ
+                const bannerData = [
+                    {
+                        id: 1,
+                        title: "DỊCH VỤ KẾ TOÁN CHUYÊN NGHIỆP",
+                        description: "Hơn 10 năm kinh nghiệm đồng hành cùng 5000+ doanh nghiệp khởi sự thành công. Chúng tôi mang đến sự an tâm tuyệt đối về pháp lý và tài chính.",
+                        buttonText: "Xem Các Dịch Vụ",
+                        buttonLink: "/dich-vu",
+                        image: "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                    },
+                    {
+                        id: 2,
+                        title: "THÀNH LẬP DOANH NGHIỆP",
+                        description: "Dễ dàng – Hiệu quả – Chất lượng. Đồng hành tận tâm và chuyên nghiệp cùng sự phát triển doanh nghiệp của bạn ngay từ những viên gạch đầu tiên.",
+                        buttonText: "Liên Hệ Tư Vấn",
+                        buttonLink: "/lien-he",
+                        image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=2015&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                    },
+                    {
+                        id: 3,
+                        title: "GIẢI PHÁP TÀI CHÍNH TOÀN DIỆN",
+                        description: "Tư vấn chiến lược thuế, quản lý kế toán chuyên nghiệp, hỗ trợ pháp lý doanh nghiệp trọn đời.",
+                        buttonText: "Tìm Hiểu Thêm",
+                        buttonLink: "/",
+                        image: "https://images.unsplash.com/photo-1554224155-6d04cb21cd6c?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                    }
+                ];
+
+                // Lấy banner hiện tại từ localStorage nếu có
+                const existingBanners = JSON.parse(localStorage.getItem('banners')) || [];
+                
+                // Kết hợp banner mới với banner hiện tại (tránh trùng lặp theo ID)
+                const combinedBanners = [...existingBanners];
+                
+                bannerData.forEach(newBanner => {
+                    const exists = combinedBanners.some(banner => banner.id === newBanner.id);
+                    if (!exists) {
+                        combinedBanners.push(newBanner);
+                    }
+                });
+
+                // Lưu vào localStorage
+                localStorage.setItem('banners', JSON.stringify(combinedBanners));
+                
+                // Cập nhật bannerSlides cũng để đảm bảo tương thích
+                localStorage.setItem('bannerSlides', JSON.stringify(combinedBanners));
+
+                document.getElementById('status').innerHTML = '<p class="success">ĐỒNG BỘ BANNER THÀNH CÔNG!</p><p>' + combinedBanners.length + ' banner đã được cập nhật vào hệ thống quản lý.</p>';
+                document.getElementById('status').style.display = 'block';
+                
+                // Hiển thị danh sách banner
+                displayBannerList(combinedBanners);
+                
+                console.log('Dữ liệu banner đã được đồng bộ vào localStorage!');
+                console.log('Bạn có thể quản lý chúng trong trang Quản Lý Banner');
+            } catch (error) {
+                console.error('Lỗi khi đồng bộ dữ liệu banner:', error);
+                document.getElementById('status').innerHTML = '<p class="error">LỖI KHI ĐỒNG BỘ BANNER: ' + error.message + '</p>';
+                document.getElementById('status').style.display = 'block';
+            }
+        }
+
+        function displayBannerList(banners) {
+            const container = document.getElementById('bannersContainer');
+            container.innerHTML = '';
+            
+            banners.forEach(banner => {
+                const bannerDiv = document.createElement('div');
+                bannerDiv.className = 'banner-item';
+                bannerDiv.innerHTML = `
+                    <strong>${banner.title}</strong><br>
+                    <small>ID: ${banner.id}</small><br>
+                    <em>${banner.description}</em><br>
+                    <small>Nút: "${banner.buttonText}" → ${banner.buttonLink}</small>
+                `;
+                container.appendChild(bannerDiv);
+            });
+            
+            document.getElementById('bannerList').style.display = 'block';
+        }
+
+        // Hiển thị banner hiện tại khi trang tải
+        window.onload = function() {
+            const currentBanners = JSON.parse(localStorage.getItem('banners')) || [];
+            if (currentBanners.length > 0) {
+                displayBannerList(currentBanners);
+            }
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đồng Bộ Dữ Liệu Sản Phẩm</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .info-box {
+            background: #e8f4fd;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            border-left: 4px solid #2196F3;
+        }
+        button {
+            background: #D4AF37;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            display: block;
+            margin: 20px auto;
+        }
+        button:hover {
+            background: #b8942f;
+        }
+        .status {
+            text-align: center;
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .success {
+            background: #dff0d8;
+            color: #3c763d;
+            border: 1px solid #d6e9c6;
+        }
+        .error {
+            background: #f2dede;
+            color: #a94442;
+            border: 1px solid #ebccd1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>ĐỒNG BỘ DỮ LIỆU SẢN PHẨM</h1>
+        
+        <div class="info-box">
+            <p><strong>Mục đích:</strong> Cập nhật dữ liệu sản phẩm từ các trang web vào hệ thống quản lý</p>
+            <p><strong>Lưu ý:</strong> Dữ liệu sẽ được đồng bộ vào localStorage để bạn có thể quản lý trong admin</p>
+        </div>
+        
+        <button onclick="syncProductData()">ĐỒNG BỘ DỮ LIỆU NGAY</button>
+        
+        <div id="status" class="status" style="display: none;"></div>
+    </div>
+
+    <script>
+        function syncProductData() {
+            try {
+                // Dữ liệu từ trang Đăng Ký Kinh Doanh
+                const businessRegistrationServices = [
+                    {
+                        id: 1,
+                        name: 'GÓI STARTED',
+                        description: 'Dịch vụ thành lập doanh nghiệp cơ bản cho doanh nghiệp mới',
+                        price: '1.570.000đ',
+                        features: [
+                            'Ủy quyền',
+                            'Hồ sơ đăng ký kinh doanh',
+                            'Bố cáo thành lập',
+                            'ĐKKD & MST',
+                            'Dấu tròn'
+                        ],
+                        suitableFor: 'Doanh nghiệp mới thành lập',
+                        timeToComplete: 'Trọn gói 3-5 ngày',
+                        popular: true,
+                        status: 'active'
+                    },
+                    {
+                        id: 2,
+                        name: 'GÓI STANDARD',
+                        description: 'Dịch vụ thành lập doanh nghiệp với các tiện ích mở rộng',
+                        price: '3.239.000đ',
+                        features: [
+                            'Gói STARTED',
+                            'Khai thuế ban đầu',
+                            'Token 12 tháng',
+                            'Bảng hiệu',
+                            'Dấu tên'
+                        ],
+                        suitableFor: 'Doanh nghiệp vừa và nhỏ',
+                        timeToComplete: 'Trọn gói 5-7 ngày',
+                        popular: false,
+                        status: 'active'
+                    },
+                    {
+                        id: 3,
+                        name: 'GÓI BUSINESS',
+                        description: 'Gói dịch vụ hoàn chỉnh cho doanh nghiệp mới thành lập',
+                        price: '4.699.000đ',
+                        features: [
+                            'Gói STANDARD',
+                            'Mở tài khoản ngân hàng',
+                            '300 số hóa đơn'
+                        ],
+                        suitableFor: 'Doanh nghiệp muốn dịch vụ trọn gói',
+                        timeToComplete: 'Trọn gói 7-10 ngày',
+                        popular: true,
+                        status: 'active'
+                    },
+                    {
+                        id: 4,
+                        name: 'THAY ĐỔI 1 NỘI DUNG',
+                        description: 'Dịch vụ thay đổi đăng ký kinh doanh 1 nội dung',
+                        price: '1.570.000đ',
+                        features: [
+                            'Thay đổi 1 nội dung ĐKKD',
+                            'Hoàn tất thủ tục pháp lý',
+                            'Nhận kết quả sau 3-5 ngày'
+                        ],
+                        suitableFor: 'Doanh nghiệp cần thay đổi thông tin',
+                        timeToComplete: 'Trọn gói 3-5 ngày',
+                        popular: false,
+                        status: 'active'
+                    },
+                    {
+                        id: 5,
+                        name: 'THAY ĐỔI 2-4 NỘI DUNG',
+                        description: 'Dịch vụ thay đổi đăng ký kinh doanh từ 2 đến 4 nội dung',
+                        price: '1.770.000đ - 2.150.000đ',
+                        features: [
+                            'Thay đổi từ 2-4 nội dung ĐKKD',
+                            'Hoàn tất thủ tục pháp lý',
+                            'Nhận kết quả sau 5-7 ngày'
+                        ],
+                        suitableFor: 'Doanh nghiệp cần thay đổi nhiều thông tin',
+                        timeToComplete: 'Trọn gói 5-7 ngày',
+                        popular: false,
+                        status: 'active'
+                    },
+                    {
+                        id: 6,
+                        name: 'NỘI DUNG THAY ĐỔI',
+                        description: 'Dịch vụ thay đổi các nội dung ĐKKD: Tên công ty, địa chỉ, vốn điều lệ, ngành nghề, người đại diện, thành viên góp vốn, chuyển đổi loại hình DN',
+                        price: 'Liên hệ tư vấn',
+                        features: [
+                            'Tên công ty',
+                            'Địa chỉ',
+                            'Vốn điều lệ',
+                            'Ngành nghề',
+                            'Người đại diện',
+                            'Thành viên góp vốn',
+                            'Chuyển đổi loại hình DN'
+                        ],
+                        suitableFor: 'Doanh nghiệp cần thay đổi nhiều thông tin',
+                        timeToComplete: 'Tùy nội dung thay đổi',
+                        popular: false,
+                        status: 'active'
+                    }
+                ];
+
+                // Dữ liệu từ trang Kế Toán Doanh Nghiệp
+                const accountingServices = [
+                    {
+                        id: 'ktdn1',
+                        name: 'KẾ TOÁN TM DỊCH VỤ',
+                        description: 'Dịch vụ kế toán cho doanh nghiệp thương mại dịch vụ',
+                        price: '1.500.000đ',
+                        features: [
+                            'Kê khai thuế GTGT hàng tháng/quý',
+                            'Kê khai thuế TNCN cuối năm',
+                            'Lập báo cáo tài chính',
+                            'Quyết toán thuế cuối năm',
+                            'Tư vấn kế toán miễn phí'
+                        ],
+                        suitableFor: 'Doanh nghiệp thương mại dịch vụ',
+                        timeComplete: 'Trọn gói 1 năm',
+                        popular: true,
+                        isPopular: true,
+                        status: 'active'
+                    },
+                    {
+                        id: 'ktdn2',
+                        name: 'KẾ TOÁN THI CÔNG XÂY DỰNG',
+                        description: 'Dịch vụ kế toán cho doanh nghiệp thi công xây dựng',
+                        price: '2.500.000đ',
+                        features: [
+                            'Kê khai thuế GTGT hàng tháng/quý',
+                            'Kê khai thuế TNCN cuối năm',
+                            'Lập báo cáo tài chính',
+                            'Quyết toán thuế cuối năm',
+                            'Tư vấn kế toán miễn phí'
+                        ],
+                        suitableFor: 'Doanh nghiệp thi công xây dựng',
+                        timeComplete: 'Trọn gói 1 năm',
+                        popular: false,
+                        isPopular: false,
+                        status: 'active'
+                    },
+                    {
+                        id: 'ktdn3',
+                        name: 'KẾ TOÁN GIA CÔNG SẢN XUẤT',
+                        description: 'Dịch vụ kế toán cho doanh nghiệp gia công sản xuất',
+                        price: '3.000.000đ',
+                        features: [
+                            'Kê khai thuế GTGT hàng tháng/quý',
+                            'Kê khai thuế TNCN cuối năm',
+                            'Lập báo cáo tài chính',
+                            'Quyết toán thuế cuối năm',
+                            'Tư vấn kế toán miễn phí'
+                        ],
+                        suitableFor: 'Doanh nghiệp gia công sản xuất',
+                        timeComplete: 'Trọn gói 1 năm',
+                        popular: true,
+                        isPopular: true,
+                        status: 'active'
+                    },
+                    {
+                        id: 'ktdn4',
+                        name: 'LÀM LẠI SỔ SÁCH KẾ TOÁN',
+                        description: 'Dịch vụ làm lại sổ sách kế toán cho doanh nghiệp',
+                        price: '1.200.000đ',
+                        features: [
+                            'Kiểm tra sổ sách hiện tại',
+                            'Lập lại chứng từ kế toán',
+                            'Cập nhật sổ sách theo quy định',
+                            'Tư vấn xử lý sai sót'
+                        ],
+                        suitableFor: 'Doanh nghiệp cần làm lại sổ sách',
+                        timeComplete: 'Tùy theo tình trạng sổ sách',
+                        popular: false,
+                        isPopular: false,
+                        status: 'active'
+                    },
+                    {
+                        id: 'ktdn5',
+                        name: 'BÁO CÁO TÀI CHÍNH NĂM',
+                        description: 'Dịch vụ lập báo cáo tài chính năm cho doanh nghiệp',
+                        price: '3.500.000đ',
+                        features: [
+                            'Lập báo cáo tài chính năm',
+                            'Kiểm toán nội bộ',
+                            'Tư vấn tài chính',
+                            'Hỗ trợ giải trình với cơ quan thuế'
+                        ],
+                        suitableFor: 'Doanh nghiệp cần báo cáo tài chính năm',
+                        timeComplete: 'Theo quy định',
+                        popular: false,
+                        isPopular: false,
+                        status: 'active'
+                    },
+                    {
+                        id: 'ktdn6',
+                        name: 'BỔ NHIỆM KẾ TOÁN TRƯỞNG',
+                        description: 'Dịch vụ bổ nhiệm kế toán trưởng',
+                        price: '4.000.000đ',
+                        features: [
+                            'Tư vấn pháp lý kế toán',
+                            'Đại diện làm việc với cơ quan thuế',
+                            'Hỗ trợ chuyên môn kế toán',
+                            'Quản lý hồ sơ kế toán'
+                        ],
+                        suitableFor: 'Doanh nghiệp cần bổ nhiệm kế toán trưởng',
+                        timeComplete: 'Trọn gói 1 năm',
+                        popular: false,
+                        isPopular: false,
+                        status: 'active'
+                    },
+                    {
+                        id: 'ktdn7',
+                        name: 'ĐĂNG KÝ BHXH',
+                        description: 'Dịch vụ đăng ký bảo hiểm xã hội cho doanh nghiệp',
+                        price: '1.050.000đ - 1.550.000đ',
+                        features: [
+                            'Tư vấn chính sách BHXH',
+                            'Làm thủ tục đăng ký BHXH',
+                            'Theo dõi quá trình xử lý',
+                            'Hỗ trợ giải đáp thắc mắc'
+                        ],
+                        suitableFor: 'Doanh nghiệp cần đăng ký BHXH',
+                        timeComplete: 'Tùy số lượng nhân sự',
+                        popular: false,
+                        isPopular: false,
+                        status: 'active'
+                    }
+                ];
+
+                // Dữ liệu từ trang Thuế Hộ Kinh Doanh
+                const taxServices = [
+                    {
+                        id: 1,
+                        name: 'KHAI THUẾ TRẮNG (KHÔNG PHÁT SINH)',
+                        description: 'Dịch vụ báo cáo thuế định kỳ cho hộ kinh doanh không có phát sinh',
+                        price: '800.000đ',
+                        features: [
+                            'Kê khai thuế GTGT hàng quý',
+                            'Kê khai thuế TNCN cuối năm',
+                            'Lập báo cáo tài chính',
+                            'Tư vấn thuế miễn phí'
+                        ],
+                        suitableFor: 'Hộ kinh doanh không có phát sinh',
+                        timeToComplete: 'Theo kỳ',
+                        popular: true,
+                        status: 'active'
+                    },
+                    {
+                        id: 2,
+                        name: 'KHAI THUẾ CÓ PHÁT SINH HÓA ĐƠN',
+                        description: 'Dịch vụ báo cáo thuế định kỳ cho hộ kinh doanh có phát sinh hóa đơn',
+                        price: '1.500.000đ',
+                        features: [
+                            'Kê khai thuế GTGT hàng quý',
+                            'Kê khai thuế TNCN cuối năm',
+                            'Lập báo cáo tài chính',
+                            'Tư vấn thuế miễn phí'
+                        ],
+                        suitableFor: 'Hộ kinh doanh có phát sinh hóa đơn',
+                        timeToComplete: 'Theo kỳ',
+                        popular: true,
+                        status: 'active'
+                    },
+                    {
+                        id: 3,
+                        name: 'KHAI THUẾ TNCN TỪ LƯƠNG',
+                        description: 'Dịch vụ khai thuế thu nhập cá nhân từ tiền lương',
+                        price: '1.500.000đ - 2.500.000đ',
+                        features: [
+                            'Kê khai thuế TNCN từ tiền lương',
+                            'Tư vấn chính sách thuế',
+                            'Hỗ trợ hoàn thuế nếu có',
+                            'Lưu trữ hồ sơ 3 năm'
+                        ],
+                        suitableFor: 'Cá nhân có thu nhập từ tiền lương',
+                        timeToComplete: 'Theo năm',
+                        popular: false,
+                        status: 'active'
+                    },
+                    {
+                        id: 4,
+                        name: 'HOÀN THUẾ TNCN TỪ LƯƠNG',
+                        description: 'Dịch vụ hoàn thuế thu nhập cá nhân từ tiền lương',
+                        price: '1.500.000đ - 2.500.000đ',
+                        features: [
+                            'Tư vấn hoàn thuế TNCN',
+                            'Làm thủ tục hoàn thuế',
+                            'Theo dõi tiến độ hoàn thuế',
+                            'Hỗ trợ giải trình với cơ quan thuế'
+                        ],
+                        suitableFor: 'Cá nhân cần hoàn thuế TNCN từ tiền lương',
+                        timeToComplete: 'Tùy hồ sơ',
+                        popular: false,
+                        status: 'active'
+                    },
+                    {
+                        id: 5,
+                        name: 'THUẾ TNCN TỪ CHUYỂN NHƯỢNG VỐN',
+                        description: 'Dịch vụ khai thuế thu nhập cá nhân từ chuyển nhượng vốn',
+                        price: '700.000đ - 750.000đ',
+                        features: [
+                            'Tư vấn thuế TNCN từ chuyển nhượng vốn',
+                            'Làm thủ tục khai thuế',
+                            'Hỗ trợ hoàn tất nghĩa vụ thuế',
+                            'Giải thích quy trình cho khách hàng'
+                        ],
+                        suitableFor: 'Cá nhân có thu nhập từ chuyển nhượng vốn',
+                        timeToComplete: 'Theo kỳ',
+                        popular: false,
+                        status: 'active'
+                    },
+                    {
+                        id: 6,
+                        name: 'XỬ LÝ SỰ CỐ - KHÔI PHỤC MST BỊ KHÓA',
+                        description: 'Dịch vụ xử lý sự cố và khôi phục mã số thuế bị khóa',
+                        price: 'Liên hệ tư vấn',
+                        features: [
+                            'Tư vấn nguyên nhân khóa MST',
+                            'Hướng dẫn xử lý sự cố',
+                            'Hỗ trợ khôi phục MST',
+                            'Tư vấn tránh khóa MST trong tương lai'
+                        ],
+                        suitableFor: 'Doanh nghiệp/mã số thuế bị khóa',
+                        timeToComplete: 'Tùy mức độ sự cố',
+                        popular: false,
+                        status: 'active'
+                    }
+                ];
+
+                // Dữ liệu từ trang Thiết Kế Web
+                const webDesignServices = [
+                    {
+                        id: 'web1',
+                        name: 'GÓI 1: WEB GIỚI THIỆU',
+                        description: 'Gói website giới thiệu cơ bản cho doanh nghiệp',
+                        price: '3.000.000đ',
+                        features: [
+                            'Thiết kế web giới thiệu doanh nghiệp',
+                            'Responsive - tương thích di động',
+                            'Tối ưu SEO cơ bản',
+                            'Tích hợp form liên hệ',
+                            'Hỗ trợ kỹ thuật 3 tháng'
+                        ],
+                        suitableFor: 'Doanh nghiệp mới, cá nhân kinh doanh',
+                        timeToComplete: '5-7 ngày',
+                        popular: true,
+                        isPopular: true,
+                        status: 'active'
+                    },
+                    {
+                        id: 'web2',
+                        name: 'GÓI 2: WEB GIỚI THIỆU + QUẢN TRỊ',
+                        description: 'Gói website giới thiệu có trang quản trị',
+                        price: '4.000.000đ',
+                        features: [
+                            'Thiết kế web giới thiệu doanh nghiệp',
+                            'Trang quản trị nội dung',
+                            'Tự cập nhật nội dung dễ dàng',
+                            'Tối ưu SEO nâng cao',
+                            'Hỗ trợ kỹ thuật 6 tháng'
+                        ],
+                        suitableFor: 'Doanh nghiệp vừa và nhỏ',
+                        timeToComplete: '7-10 ngày',
+                        popular: false,
+                        isPopular: false,
+                        status: 'active'
+                    },
+                    {
+                        id: 'web3',
+                        name: 'GÓI 3: WEB GIỚI THIỆU + RESPONSIVE',
+                        description: 'Gói website giới thiệu tương thích responsive',
+                        price: '6.000.000đ',
+                        features: [
+                            'Thiết kế web giới thiệu doanh nghiệp',
+                            'Responsive - tương thích mọi thiết bị',
+                            'Tối ưu trải nghiệm người dùng',
+                            'Tích hợp mạng xã hội',
+                            'Hỗ trợ kỹ thuật 12 tháng'
+                        ],
+                        suitableFor: 'Doanh nghiệp muốn hiện diện chuyên nghiệp',
+                        timeToComplete: '10-12 ngày',
+                        popular: true,
+                        isPopular: true,
+                        status: 'active'
+                    },
+                    {
+                        id: 'web4',
+                        name: 'GÓI 4: WEB GIỚI THIỆU + ADMIN + RESPONSIVE',
+                        description: 'Gói website giới thiệu đầy đủ tính năng',
+                        price: '7.000.000đ',
+                        features: [
+                            'Thiết kế web giới thiệu doanh nghiệp',
+                            'Trang quản trị nội dung',
+                            'Responsive - tương thích mọi thiết bị',
+                            'Tích hợp form liên hệ, chat',
+                            'Tự cập nhật nội dung dễ dàng',
+                            'Hỗ trợ kỹ thuật trọn đời'
+                        ],
+                        suitableFor: 'Doanh nghiệp chuyên nghiệp',
+                        timeToComplete: '12-15 ngày',
+                        popular: false,
+                        isPopular: false,
+                        status: 'active'
+                    },
+                    {
+                        id: 'web5',
+                        name: 'GÓI TƯ VẤN',
+                        description: 'Gói tư vấn thiết kế web theo yêu cầu đặc biệt',
+                        price: 'Liên hệ tư vấn',
+                        features: [
+                            'Tư vấn lựa chọn gói phù hợp',
+                            'Phân tích yêu cầu chi tiết',
+                            'Thiết kế theo yêu cầu đặc biệt',
+                            'Tích hợp tính năng tùy chỉnh',
+                            'Hỗ trợ kỹ thuật trọn đời'
+                        ],
+                        suitableFor: 'Doanh nghiệp có yêu cầu đặc biệt',
+                        timeToComplete: 'Thỏa thuận',
+                        popular: false,
+                        isPopular: false,
+                        status: 'active'
+                    }
+                ];
+
+                // Cập nhật dữ liệu vào localStorage
+                localStorage.setItem('businessRegistrationServices', JSON.stringify(businessRegistrationServices));
+                localStorage.setItem('accountingServices', JSON.stringify(accountingServices));
+                localStorage.setItem('taxServices', JSON.stringify(taxServices));
+                localStorage.setItem('webDesignServices', JSON.stringify(webDesignServices));
+
+                // Cập nhật featuredServices với các dịch vụ phổ biến
+                const featuredServices = [
+                    ...businessRegistrationServices.filter(service => service.popular),
+                    ...accountingServices.filter(service => service.isPopular),
+                    ...taxServices.filter(service => service.popular),
+                    ...webDesignServices.filter(service => service.isPopular)
+                ];
+                localStorage.setItem('featuredServices', JSON.stringify(featuredServices));
+
+                // Cập nhật dữ liệu vào các khóa tương ứng cho ProductServiceManager
+                localStorage.setItem('dang-ky-kinh-doanhServices', JSON.stringify(businessRegistrationServices));
+                localStorage.setItem('ke-toan-doanh-nghiepServices', JSON.stringify(accountingServices));
+                localStorage.setItem('thue-ho-kinh-doanhServices', JSON.stringify(taxServices));
+                localStorage.setItem('thiet-ke-webServices', JSON.stringify(webDesignServices));
+                
+                document.getElementById('status').innerHTML = '<p class="success">ĐỒNG BỘ DỮ LIỆU THÀNH CÔNG!</p><p>Dữ liệu từ các trang web đã được cập nhật vào hệ thống quản lý.</p>';
+                document.getElementById('status').style.display = 'block';
+                
+                console.log('Dữ liệu sản phẩm đã được đồng bộ vào localStorage!');
+                console.log('Bạn có thể quản lý chúng trong trang Quản Lý Sản Phẩm Dịch Vụ');
+            } catch (error) {
+                console.error('Lỗi khi đồng bộ dữ liệu:', error);
+                document.getElementById('status').innerHTML = '<p class="error">LỖI KHI ĐỒNG BỘ DỮ LIỆU: ' + error.message + '</p>';
+                document.getElementById('status').style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>

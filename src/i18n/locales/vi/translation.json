@@ -1,0 +1,138 @@
+{
+  "common": {
+    "contact": "Liên Hệ",
+    "about": "Giới Thiệu",
+    "services": "Dịch Vụ",
+    "home": "Trang Chủ",
+    "support": "Hỗ Trợ",
+    "send": "Gửi",
+    "cancel": "Hủy",
+    "close": "Đóng",
+    "more": "Xem thêm",
+    "viewServices": "Xem Các Dịch Vụ",
+    "contactConsultation": "Liên Hệ Tư Vấn"
+  },
+  "header": {
+    "title": "Kế Toán Sen Vàng",
+    "home": "Trang Chủ",
+    "accountingServices": "Dịch Vụ",
+    "supply": "Dịch Vụ Khác",
+    "about": "Giới Thiệu",
+    "contact": "Liên Hệ"
+  },
+  "footer": {
+    "aboutUs": "VỀ CHÚNG TÔI",
+    "companyName": "CÔNG TY CỔ PHẦN GIẢI PHÁP DOANH NGHIỆP SEN VÀNG",
+    "address": "Địa chỉ: 25/91 Nguyễn Bỉnh Khiêm, Phường Sài Gòn, Hồ Chí Minh",
+    "hotline": "Hotline: 0317557086",
+    "email": "Email: info@ketoansenvang.vn",
+    "license": "Mã số thuế: 0317557086",
+    "bankAccount": "Số tài khoản: 688696896 Mở tại Ngân Hàng MB bank - CN Đông Sài Gòn",
+    "information": "THÔNG TIN",
+    "connect": "KẾT NỐI VỚI CHÚNG TÔI",
+    "quickSupport": "HỖ TRỢ NHANH",
+    "copyright": "Bản quyền thuộc về Kế Toán Sen Vàng"
+  },
+  "homepage": {
+    "heroTitle": "GIÁ TRỊ CỐT LÕI",
+    "heroDescription": "Dễ dàng – Hiệu quả – Chất lượng. Tận tâm và chuyên nghiệp đồng hành cùng sự phát triển của doanh nghiệp bạn.",
+    "coreValues": "GIÁ TRỊ CỐT LÕI",
+    "dedication": "TẬN TÂM",
+    "dedicationDesc": "Với tinh thần tận tâm và chuyên nghiệp, KẾ TOÁN SEN VÀNG luôn đồng hành cùng sự phát triển của doanh nghiệp bạn trong mọi hoạt động kinh doanh, từ những thủ tục pháp lý cơ bản đến các chiến lược tài chính phức tạp.",
+    "trust": "UY TÍN",
+    "trustDesc": "Là giá trị tài sản trong suốt quá trình kinh doanh, chúng tôi cam kết bảo mật thông tin, tuân thủ đúng pháp luật và đảm bảo tính chính xác, minh bạch trong mọi dịch vụ cung cấp.",
+    "quality": "CHẤT LƯỢNG",
+    "qualityDesc": "Chất lượng là vinh dự của chúng tôi. KẾ TOÁN SEN VÀNG không ngừng cải tiến quy trình, nâng cao kiến thức chuyên môn để mang đến dịch vụ hoàn hảo nhất cho khách hàng.",
+    "whyChoose": "Vì sao doanh nghiệp chọn Kế toán Sen Vàng?",
+    "solution": "GIẢI PHÁP TOÀN DIỆN",
+    "benefits": {
+      "costOptimization": "Tối ưu chi phí doanh nghiệp: Giảm thiểu chi phí nhân sự và vận hành bộ máy kế toán cồng kềnh.",
+      "security": "Bảo mật tuyệt đối: Cam kết bảo mật dữ liệu tài chính với quy trình lưu trữ chuẩn ISO.",
+      "support247": "Hỗ trợ 24/7: Đội ngũ chuyên gia sẵn sàng giải đáp mọi vướng mắc pháp lý và thuế.",
+      "accuracy": "Chính xác & Kịp thời: Báo cáo tài chính chuẩn xác, nộp đúng hạn định pháp luật.",
+      "impressiveNumbers": "NHỮNG CON SỐ ẤN TƯỢNG",
+      "experienceValue": "15+",
+      "experience": "Năm kinh nghiệm",
+      "customersValue": "3500+",
+      "customers": "Khách hàng tin dùng",
+      "satisfactionValue": "99%",
+      "satisfaction": "Khách hàng hài lòng",
+      "expertsValue": "100+",
+      "experts": "Chuyên gia nhân sự"
+    }
+  },
+  "forms": {
+    "fullName": "Họ và tên",
+    "email": "Email",
+    "phone": "Số điện thoại",
+    "message": "Nội dung",
+    "submit": "Gửi yêu cầu",
+    "placeholder": {
+      "fullName": "Nhập họ và tên của bạn",
+      "email": "Nhập địa chỉ email",
+      "phone": "Nhập số điện thoại",
+      "message": "Mô tả yêu cầu của bạn"
+    }
+  },
+  "contact": {
+    "title": "Liên Hệ Với Chúng Tôi",
+    "subtitle": "Để lại thông tin, chúng tôi sẽ gọi lại ngay!",
+    "info": "Thông tin liên hệ"
+  },
+  "contactForm": {
+    "success": "Gửi thành công! Chúng tôi sẽ liên hệ với bạn sớm nhất.",
+    "error": "Có lỗi xảy ra, vui lòng thử lại sau."
+  },
+  "services": {
+    "pageTitle": "DỊCH VỤ THÀNH LẬP VÀ VẬN HÀNH DOANH NGHIỆP",
+    "mainFields": "CÁC LĨNH VỰC HOẠT ĐỘNG CHỦ ĐẠO",
+    "packagesTitle": "PHẦN GIÁ CÁC GÓI THÀNH LẬP",
+    "introText": "Chúng tôi cung cấp các gói dịch vụ linh hoạt để phù hợp với quy mô và nhu cầu khác nhau của doanh nghiệp khởi nghiệp, đảm bảo chi phí hợp lý và hiệu quả cao.",
+    "packageNames": {
+      "package1": "GÓI 1",
+      "package2": "GÓI 2",
+      "package3": "GÓI 3",
+      "package4": "GÓI 4",
+      "package5": "GÓI 5",
+      "package6": "GÓI 6"
+    },
+    "serviceTypes": {
+      "businessRegistration": "ĐĂNG KÝ KINH DOANH",
+      "taxAccounting": "THUẾ & KẾ TOÁN",
+      "marketing": "TIẾP THỊ TRUYỀN THÔNG & WEBSITE",
+      "consulting": "KIẾN THỨC VÀ TƯ VẤN CHỦ ĐẠO"
+    },
+    "serviceDescriptions": {
+      "businessRegistration": "Thực hiện trọn gói hồ sơ và thủ tục đăng ký thành lập mới, thay đổi nội dung ĐKKD (tăng vốn, chuyển đổi loại hình, thay đổi địa chỉ/tên công ty, bổ sung/rút ngành nghề).",
+      "taxAccounting": "Hỗ trợ lập kế hoạch thuế chiến lược, rà soát và tư vấn áp dụng các chính sách ưu đãi, giảm thiểu rủi ro vi phạm, và đại diện làm việc với cơ quan thuế.",
+      "marketing": "Phân tích yêu cầu, mục tiêu kinh doanh, và đối tượng người dùng để đưa ra cấu trúc và chức năng website tối ưu nhất. Sản xuất nội dung truyền thông cốt lõi.",
+      "consulting": "Cung cấp kiến thức chuyên sâu và tư vấn nghiệp vụ vững vàng chủ đạo nhất, giúp doanh nghiệp nắm vững pháp lý và vận hành hiệu quả."
+    },
+    "subServices": {
+      "businessRegistration": {
+        "national": "Thành lập công ty toàn quốc",
+        "branches": "Thành lập chi nhánh, kho hàng, văn phòng đại diện",
+        "fdi": "Thành lập dự án đăng ký đầu tư vốn nước ngoài FDI",
+        "changes": "Thay đổi nội dung đăng ký kinh doanh",
+        "fdiChanges": "Thay đổi đăng ký đầu tư FDI"
+      },
+      "taxAccounting": {
+        "filing": "Khai báo thuế, Hoàn thiện sổ sách kế toán",
+        "settlement": "Quyết toán thuế TNDN – TNCN",
+        "insurance": "Bảo hiểm xã hội & lao động",
+        "foreignTax": "Tính thuế TNCN đối với người nước ngoài",
+        "analysis": "Phân tích dữ liệu tài chính DN, Xây dựng pháp án dòng tiền DN"
+      },
+      "marketing": {
+        "logoDesign": "Thiết kế logo, Đăng ký bảo hộ logo",
+        "webDesign": "Thiết kế website",
+        "commerceRegister": "Đăng ký website bộ công thương"
+      },
+      "consulting": {
+        "top1": "Tư vấn nghiệp vụ vững vàng chủ đạo nhất (Top 1)",
+        "weekend": "Tư vấn ngày Thứ 7, chủ nhật & nghỉ lễ",
+        "naming": "Tư vấn chọn tên công ty để hình thành tài sản số & giá trị thương hiệu"
+      }
+    }
+  }
+}
