@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { API_ENDPOINTS } from '../config/apiConfig';
 
 const AdminDashboard = () => {
   const [stats, setStats] = useState({
@@ -69,7 +70,7 @@ const AdminDashboard = () => {
           const adminToken = localStorage.getItem('adminToken') || localStorage.getItem('token');
 
           // Call backend API to send confirmation email
-          const response = await fetch('http://localhost:5000/api/admin/send-order-confirmation', {
+          const response = await fetch(API_ENDPOINTS.ADMIN.SEND_ORDER_CONFIRMATION, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -112,7 +113,7 @@ const AdminDashboard = () => {
       const adminToken = localStorage.getItem('adminToken') || localStorage.getItem('token');
 
       // Call backend API to send confirmation email
-      const response = await fetch('http://localhost:5000/api/admin/send-order-confirmation', {
+      const response = await fetch(API_ENDPOINTS.ADMIN.SEND_ORDER_CONFIRMATION, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

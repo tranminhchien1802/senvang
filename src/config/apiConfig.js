@@ -3,11 +3,21 @@ const getApiBaseUrl = () => {
   if (typeof window !== 'undefined') {
     // Client-side (browser)
     // Use relative paths for Vercel deployment
-    return '';
+    // Check if we're in production environment
+    const isProduction = window.location.hostname.includes('vercel.app') || 
+                        window.location.hostname.includes('ketoansenvang.net');
+    
+    if (isProduction) {
+      // For production, use relative path which will route to Vercel Functions
+      return '';
+    } else {
+      // For local development, use environment variable or default
+      return import.meta.env.VITE_API_URL || process.env.VITE_API_URL || '';
+    }
   } else {
     // Server-side (Node.js)
     // Use environment variable or default
-    return process.env.API_BASE_URL || process.env.BACKEND_URL || 'http://localhost:5000';
+    return process.env.API_BASE_URL || process.env.BACKEND_URL || '';
   }
 };
 
@@ -30,7 +40,8 @@ export const API_ENDPOINTS = {
   },
   ADMIN: {
     ORDERS: `${API_BASE_URL}/api/admin/orders`,
-    USERS: `${API_BASE_URL}/api/admin/users`
+    USERS: `${API_BASE_URL}/api/admin/users`,
+    SEND_ORDER_CONFIRMATION: `${API_BASE_URL}/api/admin/send-order-confirmation`
   },
   BANNERS: {
     GET_ALL: `${API_BASE_URL}/api/banners`,

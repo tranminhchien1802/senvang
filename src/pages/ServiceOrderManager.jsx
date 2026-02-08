@@ -60,7 +60,7 @@ const ServiceOrderManager = () => {
           }
 
           // Call backend API to send confirmation email
-          const response = await fetch('http://localhost:5000/api/admin/send-order-confirmation', {
+          const response = await fetch(API_ENDPOINTS.ADMIN.SEND_ORDER_CONFIRMATION, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -176,7 +176,7 @@ const ServiceOrderManager = () => {
       console.log("Transaction ID:", order.transactionId);
 
       // Call backend API to send confirmation email
-      const response = await fetch('http://localhost:5000/api/admin/send-order-confirmation', {
+      const response = await fetch(API_ENDPOINTS.ADMIN.SEND_ORDER_CONFIRMATION, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
