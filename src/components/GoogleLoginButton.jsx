@@ -13,6 +13,7 @@ const GoogleLoginButton = ({ onLoginSuccess, onLoginFailure }) => {
       console.log('Google user data:', googleUserData);
 
       // Send the credential to backend for verification
+      console.log('Sending credential to backend for verification...');
       const response = await fetch('/api/auth/verify', {
         method: 'POST',
         headers: {
@@ -21,7 +22,17 @@ const GoogleLoginButton = ({ onLoginSuccess, onLoginFailure }) => {
         body: JSON.stringify({ credential: credentialResponse.credential }),
       });
 
-      const result = await response.json();
+      console.log('Response status:', response.status);
+      const responseText = await response.text();
+      console.log('Raw response:', responseText);
+
+      let result;
+      try {
+        result = JSON.parse(responseText);
+      } catch (parseError) {
+        console.error('Failed to parse response JSON:', parseError);
+        throw new Error(`Failed to parse server response: ${responseText}`);
+      }
 
       if (!result.success) {
         throw new Error(result.error || 'Authentication failed');
@@ -78,6 +89,12 @@ const GoogleLoginButton = ({ onLoginSuccess, onLoginFailure }) => {
 
       // Dispatch custom event to notify other parts of the app about login
       window.dispatchEvent(new Event('userLoggedIn'));
+
+      // Store admin status
+      localStorage.setItem('isAdmin', isAdmin ? 'true' : 'false');
+      
+      // Redirect to homepage after successful login
+      window.location.href = '/';
 
       // Call success callback
       if (onLoginSuccess) {

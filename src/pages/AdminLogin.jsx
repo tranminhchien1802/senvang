@@ -1,5 +1,6 @@
 // File: src/pages/AdminLogin.jsx
 import React, { useState } from 'react';
+import { API_ENDPOINTS } from '../config/apiConfig';
 import { useNavigate, Link } from 'react-router-dom';
 
 const AdminLogin = () => {
@@ -14,7 +15,7 @@ const AdminLogin = () => {
 
     try {
       // Try backend login first
-      const response = await fetch('http://localhost:5000/api/admin/login', {
+      const response = await fetch(API_ENDPOINTS.ADMIN.LOGIN, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

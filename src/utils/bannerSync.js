@@ -1,13 +1,15 @@
 import axios from 'axios';
 
-const API_BASE_URL = (typeof process !== 'undefined' && process.env.REACT_APP_API_URL) ? process.env.REACT_APP_API_URL : 'http://localhost:5000/api';
+import { API_BASE_URL } from '../config/apiConfig';
+
+const BASE_API_URL = API_BASE_URL ? `${API_BASE_URL}/api` : '/api';
 
 /**
  * Sync banners from backend to localStorage
  */
 export const syncBannersFromBackend = async (token) => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/banners`, {  // Changed from /banners/active to /banners to get all banners
+    const response = await axios.get(`${BASE_API_URL}/banners`, {  // Changed from /banners/active to /banners to get all banners
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'

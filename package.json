@@ -14,7 +14,14 @@
     "vercel-build": "vite build",
     "postinstall": "cd my-backend && npm install",
     "check-config": "node check-config.js",
-    "predeploy": "npm run check-config"
+    "check-deploy": "node check-deploy-config.js",
+    "predeploy": "npm run check-config && npm run check-deploy",
+    "deploy:vercel": "vercel --prod",
+    "deploy:gh-pages": "npm run build && gh-pages -d dist",
+    "docker:build-frontend": "docker build -f Dockerfile.frontend -t senvang-frontend .",
+    "docker:build-backend": "docker build -f Dockerfile.backend -t senvang-backend .",
+    "docker:run-frontend": "docker run -p 3000:80 senvang-frontend",
+    "docker:run-backend": "docker run -p 5000:5000 senvang-backend"
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",

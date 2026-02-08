@@ -1,16 +1,10 @@
 // src/utils/api.js
-import config from '../config/api';
+import { API_BASE_URL } from '../config/apiConfig';
 
 class ApiClient {
   constructor() {
-    // Determine the API base URL based on environment
-    if (typeof window !== 'undefined') {
-      // Browser environment
-      this.baseURL = process.env.REACT_APP_API_URL || process.env.VITE_API_URL || '/api';
-    } else {
-      // Server environment
-      this.baseURL = process.env.API_URL || 'http://localhost:5000/api';
-    }
+    // Use centralized API configuration
+    this.baseURL = API_BASE_URL ? `${API_BASE_URL}/api` : '/api';
   }
 
   async request(endpoint, options = {}) {

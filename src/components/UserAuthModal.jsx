@@ -1,5 +1,6 @@
 // File: src/components/UserAuthModal.jsx
 import React, { useState } from 'react';
+import { API_ENDPOINTS } from '../config/apiConfig';
 import GoogleLoginButton from './GoogleLoginButton';
 
 const UserAuthModal = ({ isOpen, onClose, mode, onSwitchMode }) => {
@@ -26,8 +27,8 @@ const UserAuthModal = ({ isOpen, onClose, mode, onSwitchMode }) => {
 
       // Try backend authentication first
       const url = mode === 'register'
-        ? 'http://localhost:5000/api/users/register'
-        : 'http://localhost:5000/api/users/login';
+        ? API_ENDPOINTS.USERS.REGISTER
+        : API_ENDPOINTS.USERS.LOGIN;
 
       let response, data;
       let backendSuccess = false;

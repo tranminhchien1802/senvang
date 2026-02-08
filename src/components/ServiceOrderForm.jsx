@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { API_ENDPOINTS } from '../config/apiConfig';
 
 const ServiceOrderForm = ({ serviceName, servicePrice, onClose, onSubmit }) => {
   const [orderInfo, setOrderInfo] = useState({
@@ -41,7 +42,7 @@ const ServiceOrderForm = ({ serviceName, servicePrice, onClose, onSubmit }) => {
       };
 
       // Call backend API to create order (always call without token for public orders)
-      const response = await fetch('http://localhost:5000/api/orders/create', {
+      const response = await fetch(API_ENDPOINTS.ORDERS.CREATE, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

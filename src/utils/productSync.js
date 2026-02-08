@@ -1,14 +1,15 @@
 // utils/productSync.js
 import axios from 'axios';
+import { API_BASE_URL } from '../config/apiConfig';
 
-const API_BASE_URL = (typeof process !== 'undefined' && process.env.REACT_APP_API_URL) ? process.env.REACT_APP_API_URL : 'http://localhost:5000/api';
+const BASE_API_URL = API_BASE_URL ? `${API_BASE_URL}/api` : '/api';
 
 /**
  * Đồng bộ sản phẩm từ backend về localStorage
  */
 export const syncProductsFromBackend = async (token) => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/products`, {
+    const response = await axios.get(`${BASE_API_URL}/products`, {
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
@@ -68,7 +69,7 @@ export const syncProductsToBackend = async (token) => {
     ];
     
     // Lấy sản phẩm hiện tại từ backend
-    const response = await axios.get(`${API_BASE_URL}/products`, {
+    const response = await axios.get(`${BASE_API_URL}/products`, {
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
@@ -86,7 +87,7 @@ export const syncProductsToBackend = async (token) => {
         
         if (existingProduct) {
           // Cập nhật sản phẩm hiện tại
-          await axios.put(`${API_BASE_URL}/products/${existingProduct._id || existingProduct.id}`, localProduct, {
+          await axios.put(`${BASE_API_URL}/products/${existingProduct._id || existingProduct.id}`, localProduct, {
             headers: {
               'Authorization': `Bearer ${token}`,
               'Content-Type': 'application/json'
@@ -94,7 +95,7 @@ export const syncProductsToBackend = async (token) => {
           });
         } else {
           // Tạo mới sản phẩm
-          await axios.post(`${API_BASE_URL}/products`, localProduct, {
+          await axios.post(`${BASE_API_URL}/products`, localProduct, {
             headers: {
               'Authorization': `Bearer ${token}`,
               'Content-Type': 'application/json'
@@ -116,7 +117,7 @@ export const uploadProductImage = async (file, token) => {
     const formData = new FormData();
     formData.append('image', file);
 
-    const response = await axios.post(`${API_BASE_URL}/products/upload`, formData, {
+    const response = await axios.post(`${BASE_API_URL}/products/upload`, formData, {
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'multipart/form-data'
@@ -135,7 +136,7 @@ export const uploadProductImage = async (file, token) => {
  */
 export const saveProductToBackend = async (productData, token) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/products`, productData, {
+    const response = await axios.post(`${BASE_API_URL}/products`, productData, {
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
@@ -154,7 +155,7 @@ export const saveProductToBackend = async (productData, token) => {
  */
 export const updateProductInBackend = async (productId, productData, token) => {
   try {
-    const response = await axios.put(`${API_BASE_URL}/products/${productId}`, productData, {
+    const response = await axios.put(`${BASE_API_URL}/products/${productId}`, productData, {
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
@@ -173,7 +174,7 @@ export const updateProductInBackend = async (productId, productData, token) => {
  */
 export const deleteProductFromBackend = async (productId, token) => {
   try {
-    const response = await axios.delete(`${API_BASE_URL}/products/${productId}`, {
+    const response = await axios.delete(`${BASE_API_URL}/products/${productId}`, {
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
@@ -192,7 +193,7 @@ export const deleteProductFromBackend = async (productId, token) => {
  */
 export const getProductsByCategory = async (category, token) => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/products/category/${category}`, {
+    const response = await axios.get(`${BASE_API_URL}/products/category/${category}`, {
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
