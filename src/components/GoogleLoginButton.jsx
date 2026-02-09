@@ -2,6 +2,7 @@
 import React from 'react';
 import { GoogleLogin } from '@react-oauth/google';
 import { jwtDecode } from 'jwt-decode';
+import { API_ENDPOINTS } from '../config/apiConfig';
 
 const GoogleLoginButton = ({ onLoginSuccess, onLoginFailure }) => {
   const handleSuccess = async (credentialResponse) => {
@@ -14,7 +15,7 @@ const GoogleLoginButton = ({ onLoginSuccess, onLoginFailure }) => {
 
       // Send the credential to backend for verification
       console.log('Sending credential to backend for verification...');
-      const response = await fetch('/api/auth/verify', {
+      const response = await fetch(API_ENDPOINTS.AUTH.VERIFY, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

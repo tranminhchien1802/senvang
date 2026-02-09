@@ -32,7 +32,8 @@ export const API_ENDPOINTS = {
   AUTH: {
     LOGIN: `${API_BASE_URL}/api/auth/login`,
     REGISTER: `${API_BASE_URL}/api/auth/register`,
-    GOOGLE_CALLBACK: `${API_BASE_URL}/api/auth/google/callback`
+    GOOGLE_CALLBACK: `${API_BASE_URL}/api/auth/google/callback`,
+    VERIFY: `${API_BASE_URL}/api/auth/verify`
   },
   USERS: {
     PROFILE: `${API_BASE_URL}/api/users/profile`,
