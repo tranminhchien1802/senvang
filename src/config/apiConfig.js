@@ -11,7 +11,8 @@ const getApiBaseUrl = () => {
       // For production, use relative path which will route to Vercel Functions
       return '';
     } else {
-      // For local development, use environment variable or default
+      // For local development, use environment variable if available
+      // Otherwise use relative path to work with Vite proxy
       return import.meta.env.VITE_API_URL || '';
     }
   } else {
