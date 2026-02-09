@@ -35,8 +35,12 @@ const GoogleLoginButton = ({ onLoginSuccess, onLoginFailure }) => {
         throw new Error(`Failed to parse server response: ${responseText}`);
       }
 
-      if (!result.success) {
-        throw new Error(result.error || 'Authentication failed');
+      // Check if result has success property (for newer API responses)
+      if (result.msg && !result.token) {
+        // Handle older API response format
+        if (result.msg.includes('failed') || result.msg.includes('error')) {
+          throw new Error(result.msg || 'Authentication failed');
+        }
       }
 
       // Store user data locally for frontend use
