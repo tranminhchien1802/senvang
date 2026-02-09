@@ -12,7 +12,7 @@ const getApiBaseUrl = () => {
       return '';
     } else {
       // For local development, use environment variable or default
-      return import.meta.env.VITE_API_URL || process.env.VITE_API_URL || '';
+      return import.meta.env.VITE_API_URL || '';
     }
   } else {
     // Server-side (Node.js)
