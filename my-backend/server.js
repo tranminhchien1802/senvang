@@ -27,8 +27,14 @@ app.use(passport.session());
 // CORS configuration
 const corsOptions = {
   origin: process.env.NODE_ENV === 'production'
-    ? [process.env.CLIENT_URL || 'https://yourdomain.com', 'https://*.vercel.app']
-    : ['http://localhost:5173', 'http://localhost:3000', 'http://localhost:4173'],
+    ? [
+        process.env.CLIENT_URL || 'https://yourdomain.com', 
+        'https://*.vercel.app',
+        'https://senvang-olive.vercel.app',
+        'https://ketoansenvang.net',
+        'https://www.ketoansenvang.net'
+      ]
+    : ['http://localhost:5173', 'http://localhost:3000', 'http://localhost:4173', 'http://localhost:5174'],
   credentials: true
 };
 app.use(cors(corsOptions));
