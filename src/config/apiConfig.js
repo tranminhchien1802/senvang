@@ -4,7 +4,8 @@ const getApiBaseUrl = () => {
     // Client-side (browser)
     // Use environment variable if available (for production with external backend)
     // Otherwise use localhost for development
-    return import.meta.env.VITE_API_URL || (window.location.hostname === 'localhost' ? 'http://localhost:5000' : 'https://senvang-backend.onrender.com');
+    // NOTE: Replace with your actual Render backend URL
+    return import.meta.env.VITE_API_URL || (window.location.hostname === 'localhost' ? 'http://localhost:5000' : 'https://YOUR-RENDER-URL.onrender.com');
   } else {
     // Server-side (Node.js) - this shouldn't be reached in a typical React app
     // But fallback to Render backend URL for production
