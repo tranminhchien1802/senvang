@@ -88,7 +88,7 @@ const ServiceOrderForm = ({ serviceName, servicePrice, onClose, onSubmit }) => {
 
         if (emailJSConfigured) {
           // Create a simplified message to avoid duplication
-          const messageContent = `Xin chào,\n\nCó một yêu cầu mới được gửi từ form liên hệ trên website của bạn:\n\n───────────────────────────────\n\n📌 **Thông tin khách hàng:**\n- Họ và tên: ${orderInfo.fullName}\n- Email: ${orderInfo.email}\n- Số điện thoại: ${orderInfo.phone}\n- Gói dịch vụ quan tâm: ${orderInfo.serviceName}\n- Giá dịch vụ: ${orderInfo.servicePrice}\n- Nội dung yêu cầu: \n  ${orderInfo.note || 'Khách hàng chưa để lại ghi chú.'}\n\n───────────────────────────────\n\nVui lòng kiểm tra và phản hồi sớm nhất để không bỏ lỡ cơ hội hợp tác!`;
+          const messageContent = `Có yêu cầu tư vấn mới từ Website!\n\nThông tin khách hàng:\n\nHọ và tên: ${orderInfo.fullName}\n\nEmail: ${orderInfo.email}\n\nSố điện thoại: ${orderInfo.phone}\n\nGói dịch vụ: ${orderInfo.serviceName}\n\nGiá dịch vụ: ${orderInfo.servicePrice}\n\nNội dung yêu cầu: ${orderInfo.note || 'Khách hàng chưa để lại ghi chú.'}\n\nVui lòng phản hồi sớm cho khách hàng.`;
 
           const emailParams = {
             to_name: 'Quản trị viên', // Send to admin
