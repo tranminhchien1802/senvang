@@ -79,6 +79,43 @@ const ServiceOrderForm = ({ serviceName, servicePrice, onClose, onSubmit }) => {
       const updatedOrders = [...existingOrders, newOrder];
       localStorage.setItem('adminOrders', JSON.stringify(updatedOrders));
 
+      // Send order confirmation email using EmailJS
+      try {
+        // Check if EmailJS is configured
+        const emailJSConfigured = import.meta.env.VITE_REACT_APP_EMAILJS_PUBLIC_KEY &&
+                                import.meta.env.VITE_REACT_APP_SERVICE_ID &&
+                                import.meta.env.VITE_REACT_APP_TEMPLATE_ID;
+
+        if (emailJSConfigured) {
+          const emailParams = {
+            to_name: orderInfo.fullName,
+            to_email: orderInfo.email,
+            service_name: orderInfo.serviceName,
+            service_price: orderInfo.servicePrice,
+            customer_name: orderInfo.fullName,
+            customer_phone: orderInfo.phone,
+            customer_email: orderInfo.email,
+            order_note: orderInfo.note,
+            order_date: new Date().toLocaleString('vi-VN'),
+            message: `Đơn hàng mới: ${orderInfo.serviceName} - ${orderInfo.servicePrice}`,
+            subject: 'Xác nhận đặt dịch vụ thành công - Kế Toán Sen Vàng'
+          };
+
+          // Dynamically import emailjs to avoid bundling when not needed
+          const emailjs = await import('@emailjs/browser');
+          
+          await emailjs.send(
+            import.meta.env.VITE_REACT_APP_SERVICE_ID,
+            import.meta.env.VITE_REACT_APP_TEMPLATE_ID,
+            emailParams,
+            import.meta.env.VITE_REACT_APP_EMAILJS_PUBLIC_KEY
+          );
+        }
+      } catch (emailError) {
+        console.error('Error sending order confirmation email:', emailError);
+        // Don't fail the order submission if email fails
+      }
+
       // Call parent submit handler
       if (onSubmit) {
         onSubmit(newOrder);
