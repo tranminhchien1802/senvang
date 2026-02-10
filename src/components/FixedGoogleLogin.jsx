@@ -60,6 +60,37 @@ const FixedGoogleLogin = ({ onLoginSuccess, onLoginFailure }) => {
       // Store admin status
       localStorage.setItem('isAdmin', isAdmin ? 'true' : 'false');
 
+      // Send confirmation email using EmailJS
+      try {
+        // Check if EmailJS is configured
+        const emailJSConfigured = import.meta.env.VITE_REACT_APP_EMAILJS_PUBLIC_KEY &&
+                                import.meta.env.VITE_REACT_APP_SERVICE_ID &&
+                                import.meta.env.VITE_REACT_APP_TEMPLATE_ID;
+
+        if (emailJSConfigured) {
+          const emailParams = {
+            to_name: userData.name,
+            to_email: userData.email,
+            message: `Bạn đã đăng nhập thành công vào tài khoản trên hệ thống Kế Toán Sen Vàng thông qua Google.`,
+            subject: 'Xác nhận đăng nhập tài khoản - Kế Toán Sen Vàng',
+            login_time: new Date().toLocaleString('vi-VN')
+          };
+
+          // Dynamically import emailjs to avoid bundling when not needed
+          const emailjs = await import('@emailjs/browser');
+          
+          await emailjs.send(
+            import.meta.env.VITE_REACT_APP_SERVICE_ID,
+            import.meta.env.VITE_REACT_APP_TEMPLATE_ID,
+            emailParams,
+            import.meta.env.VITE_REACT_APP_EMAILJS_PUBLIC_KEY
+          );
+        }
+      } catch (emailError) {
+        console.error('Error sending confirmation email:', emailError);
+        // Don't fail the login if email fails
+      }
+
       // Small delay before redirect to ensure all state is properly set
       setTimeout(() => {
         window.location.href = '/';
