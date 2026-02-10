@@ -92,14 +92,6 @@ const ServiceOrderForm = ({ serviceName, servicePrice, onClose, onSubmit }) => {
 
           const emailParams = {
             to_name: 'Quản trị viên', // Send to admin
-            to_email: 'admin@ketoansenvang.com', // Admin email
-            service_name: orderInfo.serviceName,
-            service_price: orderInfo.servicePrice,
-            customer_name: orderInfo.fullName,
-            customer_phone: orderInfo.phone,
-            customer_email: orderInfo.email,
-            order_note: orderInfo.note,
-            order_date: new Date().toLocaleString('vi-VN'),
             message: messageContent,
             subject: 'Yêu cầu dịch vụ mới - Kế Toán Sen Vàng'
           };
