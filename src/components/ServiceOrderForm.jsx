@@ -91,7 +91,13 @@ const ServiceOrderForm = ({ serviceName, servicePrice, onClose, onSubmit }) => {
           const messageContent = `Có yêu cầu tư vấn mới từ Website!\n\nThông tin khách hàng:\n\nHọ và tên: ${orderInfo.fullName}\n\nEmail: ${orderInfo.email}\n\nSố điện thoại: ${orderInfo.phone}\n\nGói dịch vụ: ${orderInfo.serviceName}\n\nGiá dịch vụ: ${orderInfo.servicePrice}\n\nNội dung yêu cầu: ${orderInfo.note || 'Khách hàng chưa để lại ghi chú.'}\n\nVui lòng phản hồi sớm cho khách hàng.`;
 
           const emailParams = {
-            inquiry_message: `Có yêu cầu tư vấn mới từ Website!\n\nThông tin khách hàng:\n\nHọ và tên: ${orderInfo.fullName}\n\nEmail: ${orderInfo.email}\n\nSố điện thoại: ${orderInfo.phone}\n\nGói dịch vụ: ${orderInfo.serviceName}\n\nGiá dịch vụ: ${orderInfo.servicePrice}\n\nNội dung yêu cầu: ${orderInfo.note || 'Khách hàng chưa để lại ghi chú.'}\n\nVui lòng phản hồi sớm cho khách hàng.`,
+            to_name: 'Quản trị viên',
+            customer_name: orderInfo.fullName,
+            customer_email: orderInfo.email,
+            customer_phone: orderInfo.phone,
+            service_package: orderInfo.serviceName,
+            service_price: orderInfo.servicePrice,
+            request_content: orderInfo.note || 'Khách hàng chưa để lại ghi chú.',
             subject: 'Yêu cầu dịch vụ mới - Kế Toán Sen Vàng'
           };
 
