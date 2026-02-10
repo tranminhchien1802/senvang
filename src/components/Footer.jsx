@@ -127,7 +127,7 @@ const Footer = () => {
 
         {/* 1. Nút Zalo (Đã sửa để tránh lỗi COEP) */}
         <a
-          href={`https://zalo.me/${companyInfo.phone.replace(/\D/g, '')}`}
+          href={`https://zalo.me/+84${companyInfo.phone.replace(/\D/g, '').substring(1)}`}
           target="_blank"
           rel="noopener noreferrer"
           className="block w-14 h-14 rounded-full shadow-lg transition-all overflow-hidden bg-[#04C500] border-2 border-transparent hover:bg-[#03a803] flex items-center justify-center"
