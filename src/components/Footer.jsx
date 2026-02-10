@@ -10,25 +10,17 @@ const ZaloIcon = () => {
     return <i className="fab fa-zalo text-white text-2xl"></i>;
   }
 
-  // SVG logo Zalo chính xác
-  const ZaloSVGLogo = () => (
-    <svg 
-      width="24" 
-      height="24" 
-      viewBox="0 0 48 48" 
-      fill="none" 
-      xmlns="http://www.w3.org/2000/svg"
-      style={{ width: '24px', height: '24px' }}
-    >
-      <path d="M0 24C0 10.7452 10.7452 0 24 0C37.2548 0 48 10.7452 48 24C48 37.2548 37.2548 48 24 48C10.7452 48 0 37.2548 0 24Z" fill="#0068FF"/>
-      <path d="M10 24h4l3.5-5h2.5l-5 7h5v2h-7l-3.5-5h-2.5l5 7h-5v-2z M24 19a3 3 0 100 6 3 3 0 000-6zm0 8a5 5 0 110-10 5 5 0 010 10z M33 17h2v10h-2z M40 24a3 3 0 100 6 3 3 0 000-6zm0 8a5 5 0 110-10 5 5 0 010 10z" fill="white" transform="scale(0.8) translate(8,4)"/>
-    </svg>
-  );
-
   return (
-    <div className="flex items-center justify-center w-full h-full">
-      <ZaloSVGLogo />
-    </div>
+    <img 
+      src="/image/zalo.png" 
+      alt="Zalo" 
+      style={{ 
+        width: '100%', 
+        height: '100%', 
+        objectFit: 'contain'
+      }}
+      onError={() => setUseFallback(true)}
+    />
   );
 };
 
@@ -155,18 +147,18 @@ const Footer = () => {
           }
         `}</style>
 
-        {/* 1. Nút Zalo (Sử dụng logo Zalo với màu thương hiệu) */}
+        {/* 1. Nút Zalo (Sử dụng ảnh Zalo từ thư mục public) */}
         <a
           href={`https://zalo.me/+84${companyInfo.phone.replace(/\D/g, '').substring(1)}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="block w-14 h-14 rounded-full shadow-lg transition-all overflow-hidden bg-[#0068FF] border-2 border-transparent hover:bg-[#0056CC] flex items-center justify-center"
+          className="block w-14 h-14 rounded-full shadow-lg transition-all overflow-hidden bg-white border-2 border-transparent hover:bg-gray-100 flex items-center justify-center"
           style={{
             animation: 'quick-shake 3s infinite', // Rung mỗi 3 giây
             animationDelay: '0s' // Rung ngay
           }}
         >
-          {/* Logo Zalo với màu thương hiệu */}
+          {/* Logo Zalo từ thư mục public */}
           <ZaloIcon />
         </a>
 
