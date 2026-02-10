@@ -40,28 +40,18 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 
-// Additional headers for enhanced security and compatibility
-app.use((req, res, next) => {
-  // Set security headers
+// Import security headers middleware
+const securityHeaders = require('./middleware/securityHeaders');
+app.use(securityHeaders);
+
+// Handle preflight requests
+app.options('*', (req, res) => {
+  res.header('Access-Control-Allow-Origin', process.env.NODE_ENV === 'production' ? 
+    (process.env.CLIENT_URL || 'https://yourdomain.com') : '*');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, x-auth-token');
   res.header('Access-Control-Allow-Credentials', 'true');
-  
-  // Additional headers to handle COEP/COOP policies
-  if (process.env.NODE_ENV === 'production') {
-    res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
-    res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
-  } else {
-    // For development, use more permissive settings
-    res.setHeader('Cross-Origin-Embedder-Policy', 'unsafe-none');
-    res.setHeader('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
-  }
-  
-  if (req.method === 'OPTIONS') {
-    res.sendStatus(200);
-  } else {
-    next();
-  }
+  res.sendStatus(200);
 });
 
 app.use(express.json());
@@ -105,15 +95,15 @@ app.get('/', (req, res) => {
   res.json({ message: 'Backend hoạt động!', version: '1.0.0' });
 });
 
-// Route all non-API requests to index.html (for SPA)
+// Catch-all route for SPA - should come after all API routes
 app.get('*', (req, res) => {
-  if (req.path.startsWith('/api/')) {
-    // Let API routes handle normally
-    res.status(404).json({ message: 'Route không tồn tại' });
-  } else {
-    // Serve frontend for all other routes
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
-  }
+  // Serve frontend for all non-API routes
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// Handle 404 for API routes that don't exist
+app.use('/api/*', (req, res) => {
+  res.status(404).json({ message: 'API endpoint không tồn tại' });
 });
 
 // Error handling middleware
