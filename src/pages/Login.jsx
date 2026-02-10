@@ -244,6 +244,7 @@ const Login = () => {
                 }
               }}
               onLoginFailure={(error) => {
+                console.error('Google login error:', error);
                 alert('Đăng nhập bằng Google thất bại: ' + (error.message || 'Lỗi không xác định. Vui lòng thử lại.'));
               }}
             />

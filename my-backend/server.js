@@ -56,7 +56,10 @@ app.use((req, res, next) => {
 
 app.use(express.json());
 
-// Serve static files from public directory
+// Serve static files from public directory (for built frontend)
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Serve uploaded files
 app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 
 // Kết nối MongoDB
@@ -92,9 +95,15 @@ app.get('/', (req, res) => {
   res.json({ message: 'Backend hoạt động!', version: '1.0.0' });
 });
 
-// Handle 404
-app.use('*', (req, res) => {
-  res.status(404).json({ message: 'Route không tồn tại' });
+// Route all non-API requests to index.html (for SPA)
+app.get('*', (req, res) => {
+  if (req.path.startsWith('/api/')) {
+    // Let API routes handle normally
+    res.status(404).json({ message: 'Route không tồn tại' });
+  } else {
+    // Serve frontend for all other routes
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  }
 });
 
 // Error handling middleware
