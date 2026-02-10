@@ -73,7 +73,7 @@ const ServiceOrderForm = ({ serviceName, servicePrice, onClose, onSubmit }) => {
           // Create a simplified message to avoid duplication
           const messageContent = `Có yêu cầu tư vấn mới từ Website!\n\nThông tin khách hàng:\n\nHọ và tên: ${orderInfo.fullName}\n\nEmail: ${orderInfo.email}\n\nSố điện thoại: ${orderInfo.phone}\n\nGói dịch vụ: ${orderInfo.serviceName}\n\nGiá dịch vụ: ${orderInfo.servicePrice}\n\nNội dung yêu cầu: ${orderInfo.note || 'Khách hàng chưa để lại ghi chú.'}\n\nVui lòng phản hồi sớm cho khách hàng.`;
 
-          // Ensure all required fields are populated before sending
+          // Create a comprehensive message with all customer information
           const customerName = orderInfo.fullName || 'Không có tên';
           const customerEmail = orderInfo.email || 'Không có email';
           const customerPhone = orderInfo.phone || 'Không có số điện thoại';
@@ -82,13 +82,7 @@ const ServiceOrderForm = ({ serviceName, servicePrice, onClose, onSubmit }) => {
           const orderNote = orderInfo.note || 'Khách hàng chưa để lại ghi chú.';
 
           const emailParams = {
-            to_name: 'Quản trị viên',
-            customer_name: customerName,
-            customer_email: customerEmail,
-            customer_phone: customerPhone,
-            service_package: serviceName,
-            service_price: servicePrice,
-            request_content: orderNote,
+            message: `Có yêu cầu tư vấn mới từ Website!\n\nThông tin khách hàng:\n\nHọ và tên: ${customerName}\n\nEmail: ${customerEmail}\n\nSố điện thoại: ${customerPhone}\n\nGói dịch vụ: ${serviceName}\n\nGiá dịch vụ: ${servicePrice}\n\nNội dung yêu cầu: ${orderNote}\n\nVui lòng phản hồi sớm cho khách hàng.`,
             subject: 'Yêu cầu dịch vụ mới - Kế Toán Sen Vàng'
           };
 
