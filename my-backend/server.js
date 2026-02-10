@@ -57,7 +57,16 @@ app.options('*', (req, res) => {
 app.use(express.json());
 
 // Serve static files from public directory (for built frontend)
-app.use(express.static(path.join(__dirname, 'public')));
+// Add headers to static files to prevent COEP issues
+app.use(express.static(path.join(__dirname, 'public'), {
+  setHeaders: (res, filePath) => {
+    // For SVG files, set appropriate headers to avoid COEP issues
+    if (filePath.endsWith('.svg')) {
+      res.set('Cross-Origin-Resource-Policy', 'cross-origin');
+      res.set('Content-Security-Policy', "default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:; img-src 'self' data: https://*;");
+    }
+  }
+}));
 
 // Serve uploaded files
 app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));

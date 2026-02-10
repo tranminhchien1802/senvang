@@ -125,7 +125,7 @@ const Footer = () => {
           }
         `}</style>
 
-        {/* 1. Nút Zalo (Đã sửa link ảnh SVG chuẩn nét) */}
+        {/* 1. Nút Zalo (Đã sửa để tránh lỗi COEP) */}
         <a
           href={`https://zalo.me/${companyInfo.phone.replace(/\D/g, '')}`}
           target="_blank"
@@ -136,12 +136,8 @@ const Footer = () => {
             animationDelay: '0s' // Rung ngay
           }}
         >
-          {/* Logo Zalo SVG chuẩn */}
-          <img
-            src="https://upload.wikimedia.org/wikipedia/commons/9/91/Icon_of_Zalo.svg"
-            alt="Chat Zalo"
-            className="w-10 h-10 object-contain"
-          />
+          {/* Logo Zalo sử dụng Font Awesome thay thế để tránh lỗi COEP */}
+          <i className="fab fa-zalo text-green-600 text-2xl"></i>
         </a>
 
         {/* 2. Nút Gọi điện (Rung lắc lệch nhịp với Zalo) */}
