@@ -24,50 +24,77 @@ const { passport } = require('./config/passport');
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Import security headers and CORS middleware
+// Import security headers middleware
 const securityHeaders = require('./middleware/securityHeaders');
-const corsHandler = require('./middleware/corsHandler');
 app.use(securityHeaders);
-app.use(corsHandler);
 
-// Handle preflight requests
-app.options('*', (req, res) => {
-  // Use wildcard for development, check origin for production
-  if (process.env.NODE_ENV !== 'production') {
-    res.header('Access-Control-Allow-Origin', '*');
-  } else {
-    const origin = req.header('Origin');
+// Dynamic CORS configuration
+const cors = require('cors');
+const corsOptions = {
+  origin: function (origin, callback) {
+    // Allow all origins in development
+    if (process.env.NODE_ENV !== 'production') {
+      callback(null, true);
+      return;
+    }
+    
+    // Define allowed origins for production
     const allowedOrigins = [
       process.env.CLIENT_URL || 'https://yourdomain.com',
-      'https://*.vercel.app',
       'https://senvang-olive.vercel.app',
       'https://ketoansenvang.net',
       'https://www.ketoansenvang.net'
     ];
     
-    // Check if origin matches any allowed pattern
-    const isAllowed = allowedOrigins.some(pattern => {
-      if (pattern.includes('*')) {
-        // Handle wildcard patterns like 'https://*.vercel.app'
-        const regexPattern = new RegExp(pattern.replace(/\*/g, '.*'));
-        return regexPattern.test(origin);
-      }
-      return origin === pattern;
-    });
+    // Check if origin is in allowed list or ends with .vercel.app
+    const isAllowed = allowedOrigins.includes(origin) || 
+                     (origin && origin.endsWith('.vercel.app'));
     
-    if (isAllowed) {
-      res.header('Access-Control-Allow-Origin', origin);
-    } else {
-      // Fallback to first allowed origin if not matched
-      res.header('Access-Control-Allow-Origin', process.env.CLIENT_URL || 'https://yourdomain.com');
-    }
-  }
+    callback(null, isAllowed);
+  },
+  credentials: true,
+  optionsSuccessStatus: 200
+};
+app.use(cors(corsOptions));
+
+// Handle preflight requests - now handled by cors middleware
+// app.options('*', (req, res) => {
+//   // Use wildcard for development, check origin for production
+//   if (process.env.NODE_ENV !== 'production') {
+//     res.header('Access-Control-Allow-Origin', '*');
+//   } else {
+//     const origin = req.header('Origin');
+//     const allowedOrigins = [
+//       process.env.CLIENT_URL || 'https://yourdomain.com',
+//       'https://*.vercel.app',
+//       'https://senvang-olive.vercel.app',
+//       'https://ketoansenvang.net',
+//       'https://www.ketoansenvang.net'
+//     ];
+    
+//     // Check if origin matches any allowed pattern
+//     const isAllowed = allowedOrigins.some(pattern => {
+//       if (pattern.includes('*')) {
+//         // Handle wildcard patterns like 'https://*.vercel.app'
+//         const regexPattern = new RegExp(pattern.replace(/\*/g, '.*'));
+//         return regexPattern.test(origin);
+//       }
+//       return origin === pattern;
+//     });
+    
+//     if (isAllowed) {
+//       res.header('Access-Control-Allow-Origin', origin);
+//     } else {
+//       // Fallback to first allowed origin if not matched
+//       res.header('Access-Control-Allow-Origin', process.env.CLIENT_URL || 'https://yourdomain.com');
+//     }
+//   }
   
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, x-auth-token');
-  res.header('Access-Control-Allow-Credentials', 'true');
-  res.sendStatus(200);
-});
+//   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
+//   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, x-auth-token');
+//   res.header('Access-Control-Allow-Credentials', 'true');
+//   res.sendStatus(200);
+// });
 
 app.use(express.json());
 
