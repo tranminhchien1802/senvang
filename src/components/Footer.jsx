@@ -2,6 +2,25 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+// Component riêng cho icon Zalo để xử lý fallback
+const ZaloIcon = () => {
+  const [useFallback, setUseFallback] = useState(false);
+
+  if (useFallback) {
+    return <i className="fab fa-zalo text-white text-2xl"></i>;
+  }
+
+  return (
+    <img 
+      src="/image/zalo.png" 
+      alt="Zalo" 
+      className="w-8 h-8 object-contain"
+      onError={() => setUseFallback(true)}
+      style={{ filter: 'invert(100%) sepia(0%) saturate(7471%) hue-rotate(298deg) brightness(118%) contrast(100%)' }} // Đảo màu trắng nếu cần
+    />
+  );
+};
+
 const Footer = () => {
   const [isMobile, setIsMobile] = useState(false);
   const [companyInfo, setCompanyInfo] = useState({
@@ -125,7 +144,7 @@ const Footer = () => {
           }
         `}</style>
 
-        {/* 1. Nút Zalo (Đã sửa để tránh lỗi COEP) */}
+        {/* 1. Nút Zalo (Sử dụng ảnh Zalo từ thư mục public) */}
         <a
           href={`https://zalo.me/+84${companyInfo.phone.replace(/\D/g, '').substring(1)}`}
           target="_blank"
@@ -136,8 +155,8 @@ const Footer = () => {
             animationDelay: '0s' // Rung ngay
           }}
         >
-          {/* Logo Zalo sử dụng Font Awesome thay thế để tránh lỗi COEP */}
-          <i className="fab fa-zalo text-white text-2xl"></i>
+          {/* Logo Zalo sử dụng ảnh từ thư mục public để tránh lỗi COEP */}
+          <ZaloIcon />
         </a>
 
         {/* 2. Nút Gọi điện (Rung lắc lệch nhịp với Zalo) */}
