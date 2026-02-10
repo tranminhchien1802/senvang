@@ -10,23 +10,18 @@ const ZaloIcon = () => {
     return <i className="fab fa-zalo text-white text-2xl"></i>;
   }
 
-  // SVG logo Zalo đơn giản với chữ Z
+  // SVG logo Zalo chính xác
   const ZaloSVGLogo = () => (
     <svg 
-      xmlns="http://www.w3.org/2000/svg" 
-      viewBox="0 0 100 100"
       width="24" 
-      height="24"
+      height="24" 
+      viewBox="0 0 48 48" 
+      fill="none" 
+      xmlns="http://www.w3.org/2000/svg"
       style={{ width: '24px', height: '24px' }}
     >
-      {/* Nền tròn */}
-      <circle cx="50" cy="50" r="45" fill="white"/>
-      {/* Chữ Z cách điệu */}
-      <path 
-        d="M30,35 L70,35 L45,65 L70,65 L30,65 Z" 
-        fill="#0068FF" 
-        style={{ transform: 'scale(0.8)', transformOrigin: 'center' }}
-      />
+      <path d="M0 24C0 10.7452 10.7452 0 24 0C37.2548 0 48 10.7452 48 24C48 37.2548 37.2548 48 24 48C10.7452 48 0 37.2548 0 24Z" fill="#0068FF"/>
+      <path d="M10 24h4l3.5-5h2.5l-5 7h5v2h-7l-3.5-5h-2.5l5 7h-5v-2z M24 19a3 3 0 100 6 3 3 0 000-6zm0 8a5 5 0 110-10 5 5 0 010 10z M33 17h2v10h-2z M40 24a3 3 0 100 6 3 3 0 000-6zm0 8a5 5 0 110-10 5 5 0 010 10z" fill="white" transform="scale(0.8) translate(8,4)"/>
     </svg>
   );
 
