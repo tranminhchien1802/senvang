@@ -24,30 +24,81 @@ const { passport } = require('./config/passport');
 app.use(passport.initialize());
 app.use(passport.session());
 
-// CORS configuration - unified approach
-const corsOptions = {
-  origin: process.env.NODE_ENV === 'production'
-    ? [
-        process.env.CLIENT_URL || 'https://yourdomain.com',
-        'https://*.vercel.app',
-        'https://senvang-olive.vercel.app',
-        'https://ketoansenvang.net',
-        'https://www.ketoansenvang.net'
-      ]
-    : ['http://localhost:5173', 'http://localhost:3000', 'http://localhost:4173', 'http://localhost:5174'],
-  credentials: true,
-  optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
-};
-app.use(cors(corsOptions));
-
 // Import security headers middleware
 const securityHeaders = require('./middleware/securityHeaders');
 app.use(securityHeaders);
 
+// Dynamic CORS middleware for all requests
+app.use((req, res, next) => {
+  if (process.env.NODE_ENV !== 'production') {
+    res.header('Access-Control-Allow-Origin', '*');
+  } else {
+    const origin = req.header('Origin');
+    const allowedOrigins = [
+      process.env.CLIENT_URL || 'https://yourdomain.com',
+      'https://*.vercel.app',
+      'https://senvang-olive.vercel.app',
+      'https://ketoansenvang.net',
+      'https://www.ketoansenvang.net'
+    ];
+    
+    // Check if origin matches any allowed pattern
+    const isAllowed = allowedOrigins.some(pattern => {
+      if (pattern.includes('*')) {
+        // Handle wildcard patterns like 'https://*.vercel.app'
+        const regexPattern = new RegExp(pattern.replace(/\*/g, '.*'));
+        return regexPattern.test(origin);
+      }
+      return origin === pattern;
+    });
+    
+    if (isAllowed) {
+      res.header('Access-Control-Allow-Origin', origin);
+    } else {
+      // Fallback to first allowed origin if not matched
+      res.header('Access-Control-Allow-Origin', process.env.CLIENT_URL || 'https://yourdomain.com');
+    }
+  }
+  
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, x-auth-token');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  next();
+});
+
 // Handle preflight requests
 app.options('*', (req, res) => {
-  res.header('Access-Control-Allow-Origin', process.env.NODE_ENV === 'production' ? 
-    (process.env.CLIENT_URL || 'https://yourdomain.com') : '*');
+  // Use wildcard for development, check origin for production
+  if (process.env.NODE_ENV !== 'production') {
+    res.header('Access-Control-Allow-Origin', '*');
+  } else {
+    const origin = req.header('Origin');
+    const allowedOrigins = [
+      process.env.CLIENT_URL || 'https://yourdomain.com',
+      'https://*.vercel.app',
+      'https://senvang-olive.vercel.app',
+      'https://ketoansenvang.net',
+      'https://www.ketoansenvang.net'
+    ];
+    
+    // Check if origin matches any allowed pattern
+    const isAllowed = allowedOrigins.some(pattern => {
+      if (pattern.includes('*')) {
+        // Handle wildcard patterns like 'https://*.vercel.app'
+        const regexPattern = new RegExp(pattern.replace(/\*/g, '.*'));
+        return regexPattern.test(origin);
+      }
+      return origin === pattern;
+    });
+    
+    if (isAllowed) {
+      res.header('Access-Control-Allow-Origin', origin);
+    } else {
+      // Fallback to first allowed origin if not matched
+      res.header('Access-Control-Allow-Origin', process.env.CLIENT_URL || 'https://yourdomain.com');
+    }
+  }
+  
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, x-auth-token');
   res.header('Access-Control-Allow-Credentials', 'true');
