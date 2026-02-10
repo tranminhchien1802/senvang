@@ -28,43 +28,24 @@ app.use(passport.session());
 const securityHeaders = require('./middleware/securityHeaders');
 app.use(securityHeaders);
 
-// Enhanced CORS configuration
+// Enhanced CORS configuration for testing
+app.options('*', cors()); // Handle preflight requests
+
 const corsOptions = {
-  origin: function (origin, callback) {
-    // Allow all origins in development
-    if (process.env.NODE_ENV !== 'production') {
-      callback(null, true);
-      return;
-    }
-    
-    // For production, allow specific origins
-    // Check if NODE_ENV is properly set to 'production'
-    console.log('NODE_ENV:', process.env.NODE_ENV); // Debug log
-    console.log('Origin:', origin); // Debug log
-    
-    // Define allowed origins for production
-    const allowedOrigins = [
-      process.env.CLIENT_URL || 'https://yourdomain.com',
-      'https://senvang-olive.vercel.app',
-      'https://ketoansenvang.net',
-      'https://www.ketoansenvang.net'
-    ];
-    
-    // Check if origin is in allowed list or ends with .vercel.app
-    const isAllowed = allowedOrigins.includes(origin) || 
-                     (origin && origin.endsWith('.vercel.app'));
-    
-    console.log('Is origin allowed:', isAllowed); // Debug log
-    callback(null, isAllowed);
-  },
+  origin: true, // Allow all origins for testing
   credentials: true,
-  optionsSuccessStatus: 200,
-  // Additional headers to ensure proper CORS handling
-  preflightContinue: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization', 'x-auth-token']
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-auth-token']
 };
 app.use(cors(corsOptions));
+
+// COOP headers for Google OAuth popup
+app.use((req, res, next) => {
+  // Allow Google OAuth popup to communicate with parent window
+  res.setHeader("Cross-Origin-Opener-Policy", "same-origin-allow-popups");
+  res.setHeader("Cross-Origin-Embedder-Policy", "require-corp");
+  next();
+});
 
 app.use(express.json());
 
