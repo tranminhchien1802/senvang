@@ -11,19 +11,33 @@ const FixedGoogleLogin = ({ onLoginSuccess, onLoginFailure }) => {
       // Decode the credential to access Google user info
       const googleUserData = jwtDecode(credentialResponse.credential);
 
-      // Store user data locally for frontend use
+      // Send the Google credential to backend for verification and user creation
+      const response = await fetch(`${API_ENDPOINTS.AUTH.GOOGLE_LOGIN}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ credential: credentialResponse.credential })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.msg || 'Đăng nhập thất bại');
+      }
+
+      // Extract user data from response
       const userData = {
-        id: googleUserData.sub || Date.now().toString(),
-        name: googleUserData.name || googleUserData.email.split('@')[0],
-        email: googleUserData.email,
+        id: data.user.id,
+        name: data.user.name,
+        email: data.user.email,
       };
 
       // Store user data in localStorage
       localStorage.setItem('user', JSON.stringify(userData));
-      
-      // Use a temporary token for frontend-only authentication
-      const token = `temp_token_${Date.now()}_${userData.id}`;
-      localStorage.setItem('token', token);
+
+      // Store the JWT token from backend
+      localStorage.setItem('token', data.token);
 
       // Store user name for display in header
       if (userData.name) {
@@ -60,33 +74,30 @@ const FixedGoogleLogin = ({ onLoginSuccess, onLoginFailure }) => {
       // Store admin status
       localStorage.setItem('isAdmin', isAdmin ? 'true' : 'false');
 
-      // Send confirmation email using EmailJS
+      // Send confirmation email using EmailJS (only if configured)
       try {
-        // Check if EmailJS is configured
+        // Check if EmailJS is configured before importing
         const emailJSConfigured = import.meta.env.VITE_REACT_APP_EMAILJS_PUBLIC_KEY &&
-                                import.meta.env.VITE_REACT_APP_SERVICE_ID &&
-                                import.meta.env.VITE_REACT_APP_TEMPLATE_ID;
+                                  import.meta.env.VITE_REACT_APP_SERVICE_ID &&
+                                  import.meta.env.VITE_REACT_APP_TEMPLATE_ID;
 
         if (emailJSConfigured) {
+          // Import email utility function only if EmailJS is configured
+          const { sendEmailNotification } = await import('../utils/emailUtils');
+
           const emailParams = {
             to_name: userData.name,
             to_email: userData.email,
-            message: `Bạn đã đăng nhập thành công vào tài khoản trên hệ thống Kế Toán Sen Vàng thông qua Google.`,
+            message: `Bạn đã đăng nhập thành công vào tài khoản trên hệ thống Kế Toán Sen Vàng thông qua Google.\n\nChi tiết đăng nhập:\n- Họ tên: ${userData.name}\n- Email: ${userData.email}\n- Thời gian đăng nhập: ${new Date().toLocaleString('vi-VN')}\n\nNếu bạn không thực hiện đăng nhập này, vui lòng liên hệ với quản trị viên.`,
             subject: 'Xác nhận đăng nhập tài khoản - Kế Toán Sen Vàng',
             login_time: new Date().toLocaleString('vi-VN'),
             full_name: userData.name,
             email: userData.email
           };
 
-          // Dynamically import emailjs to avoid bundling when not needed
-          const emailjs = await import('@emailjs/browser');
-          
-          await emailjs.send(
-            import.meta.env.VITE_REACT_APP_SERVICE_ID,
-            import.meta.env.VITE_REACT_APP_TEMPLATE_ID,
-            emailParams,
-            import.meta.env.VITE_REACT_APP_EMAILJS_PUBLIC_KEY
-          );
+          await sendEmailNotification(emailParams);
+        } else {
+          console.log('EmailJS not configured, skipping confirmation email');
         }
       } catch (emailError) {
         console.error('Error sending confirmation email:', emailError);

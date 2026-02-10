@@ -86,23 +86,37 @@ const PurchaseModal = ({ isOpen, onClose, packageInfo, onPurchase }) => {
 
       if (typeof emailjs !== 'undefined' && serviceID && publicKey) {
         try {
-          // 1. Gửi email thông báo cho ADMIN
-          const adminTemplateParams = {
-            from_name: fullName,
-            from_email: email,
+          // Import email utility function
+          const { createEmailTemplate, sendEmailNotification } = await import('../utils/emailUtils');
+
+          // Create customer info object
+          const customerInfo = {
+            fullName: fullName,
+            email: email,
             phone: phone,
-            package_name: packageInfo.title,
-            package_price: packageInfo.price,
-            transaction_id: transactionId,
-            order_date: new Date().toLocaleString('vi-VN')
+            serviceName: packageInfo.title || '',
+            servicePrice: packageInfo.price || '',
+            note: 'Đặt mua gói dịch vụ'
           };
 
-          await emailjs.send(
-            serviceID,
-            templateID, // Đã thay bằng ID thật
-            adminTemplateParams,
-            publicKey
-          );
+          // Create email template
+          const emailMessage = createEmailTemplate(customerInfo);
+
+          // 1. Gửi email thông báo cho ADMIN
+          const adminTemplateParams = {
+            from_name: fullName || '',           // Ensure value is passed
+            from_email: email || '',             // Ensure value is passed
+            phone: phone || '',                 // Ensure value is passed
+            package_name: packageInfo.title || '', // Ensure value is passed
+            package_price: packageInfo.price || '', // Ensure value is passed
+            transaction_id: transactionId || '',
+            order_date: new Date().toLocaleString('vi-VN'),
+            note: 'Đặt mua gói dịch vụ',
+            message: emailMessage,
+            subject: 'Yêu cầu dịch vụ mới - Kế Toán Sen Vàng'
+          };
+
+          await sendEmailNotification(adminTemplateParams, templateID);
 
           console.log('Email notification sent to admin successfully');
         } catch (emailError) {

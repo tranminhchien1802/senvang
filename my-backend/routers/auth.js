@@ -18,12 +18,17 @@ const isGoogleConfigured = () => {
 // Google login
 router.get('/google', (req, res, next) => {
   if (!isGoogleConfigured()) {
+    console.log("Google OAuth not configured - missing environment variables");
     return res.status(400).json({
       msg: 'Google OAuth chưa được cấu hình. Vui lòng liên hệ quản trị viên để cập nhật GOOGLE_CLIENT_ID và GOOGLE_CLIENT_SECRET.'
     });
   }
 
-  passport.authenticate('google', { scope: ['profile', 'email'] })(req, res, next);
+  console.log("Initiating Google authentication with callback:", process.env.GOOGLE_CALLBACK_URL);
+  passport.authenticate('google', { 
+    scope: ['profile', 'email'],
+    callbackURL: process.env.GOOGLE_CALLBACK_URL || '/api/auth/google/callback'
+  })(req, res, next);
 });
 
 // Google callback (traditional method using passport.js with redirect)

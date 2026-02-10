@@ -10,6 +10,7 @@ const ServiceOrderForm = ({ serviceName, servicePrice, onClose, onSubmit }) => {
     servicePrice: servicePrice || '',
     note: ''
   });
+  const [isSubmitting, setIsSubmitting] = useState(false); // Thêm trạng thái loading
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -22,11 +23,115 @@ const ServiceOrderForm = ({ serviceName, servicePrice, onClose, onSubmit }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Ngăn gửi nhiều lần
+    if (isSubmitting) {
+      return;
+    }
+
+    // Bắt đầu trạng thái gửi
+    setIsSubmitting(true);
+
     // Validate required fields
     if (!orderInfo.fullName || !orderInfo.email || !orderInfo.phone) {
       alert('Vui lòng điền đầy đủ thông tin bắt buộc (Họ tên, Email, Số điện thoại)');
+      setIsSubmitting(false); // Reset trạng thái nếu có lỗi
       return;
     }
+
+    // Function to check if backend is available
+    const checkBackendAvailability = async () => {
+      try {
+        // Use a simple endpoint to check if backend is running
+        const baseUrl = typeof window !== 'undefined' ? 
+          (window.location.hostname === 'localhost' ? 'http://localhost:5000' : 'https://senvang-backend-production.up.railway.app') : 
+          '';
+        
+        const response = await fetch(`${baseUrl}/api/health`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        });
+        return response.ok;
+      } catch (error) {
+        console.log('Backend health check failed:', error.message);
+        return false;
+      }
+    };
+
+    // Fallback function to send email using EmailJS if backend is not available
+    const sendEmailNotificationFallback = async (type) => {
+      try {
+        // Check if EmailJS is configured
+        const emailJSConfigured = import.meta.env.VITE_REACT_APP_EMAILJS_PUBLIC_KEY &&
+                                  import.meta.env.VITE_REACT_APP_SERVICE_ID &&
+                                  import.meta.env.VITE_REACT_APP_TEMPLATE_ID;
+
+        if (emailJSConfigured) {
+          const { createEmailTemplate, sendEmailNotification } = await import('../utils/emailUtils');
+
+          // Create customer info object
+          const customerInfo = {
+            fullName: orderInfo.fullName,
+            email: orderInfo.email,
+            phone: orderInfo.phone,
+            serviceName: orderInfo.serviceName,
+            servicePrice: orderInfo.servicePrice,
+            note: orderInfo.note || 'Khách hàng chưa để lại ghi chú.'
+          };
+
+          if (type === 'admin') {
+            // Create email template for admin
+            const adminEmailMessage = createEmailTemplate(customerInfo);
+
+            // Prepare admin email parameters
+            const adminEmailParams = {
+              from_name: customerInfo.fullName,
+              from_email: customerInfo.email,
+              phone: customerInfo.phone,
+              service_name: customerInfo.serviceName,
+              service_price: customerInfo.servicePrice,
+              note: customerInfo.note,
+              message: adminEmailMessage,
+              subject: 'Yêu cầu dịch vụ mới - Kế Toán Sen Vàng',
+              to_name: 'Chiến Trần', // Admin name
+              to_email: 'chien180203@gmail.com' // Admin email
+            };
+
+            console.log('Sending admin notification via EmailJS fallback:', adminEmailParams); // Debug log
+
+            // Send admin notification email using utility function
+            await sendEmailNotification(adminEmailParams);
+          } else if (type === 'customer') {
+            // Create email template for customer confirmation
+            const customerEmailMessage = `Cảm ơn quý khách đã đặt dịch vụ tại Kế Toán Sen Vàng.\n\nThông tin đơn hàng:\n- Khách hàng: ${customerInfo.fullName}\n- Email: ${customerInfo.email}\n- Số điện thoại: ${customerInfo.phone}\n- Gói dịch vụ: ${customerInfo.serviceName}\n- Giá dịch vụ: ${customerInfo.servicePrice}\n- Ghi chú: ${customerInfo.note}\n\nChúng tôi sẽ liên hệ với quý khách trong thời gian sớm nhất để tiến hành xử lý đơn hàng.\n\nTrân trọng,\nĐội ngũ Kế Toán Sen Vàng`;
+
+            // Prepare customer email parameters
+            const customerEmailParams = {
+              from_name: 'Kế Toán Sen Vàng', // From business name
+              from_email: 'noreply@ketoansenvang.com', // From business email
+              phone: customerInfo.phone,
+              service_name: customerInfo.serviceName,
+              service_price: customerInfo.servicePrice,
+              note: customerInfo.note,
+              message: customerEmailMessage,
+              subject: `Xác nhận đơn hàng dịch vụ - ${orderInfo.serviceName}`,
+              to_name: orderInfo.fullName,
+              to_email: orderInfo.email
+            };
+
+            console.log('Sending customer confirmation via EmailJS fallback:', customerEmailParams); // Debug log
+
+            // Send customer confirmation email using utility function
+            await sendEmailNotification(customerEmailParams);
+          }
+        } else {
+          console.warn('EmailJS is not configured, cannot send email via fallback method');
+        }
+      } catch (emailError) {
+        console.error(`Error in EmailJS fallback for ${type}:`, emailError);
+      }
+    };
 
     try {
       // Create order object
@@ -62,45 +167,85 @@ const ServiceOrderForm = ({ serviceName, servicePrice, onClose, onSubmit }) => {
       const updatedOrders = [...existingOrders, newOrder];
       localStorage.setItem('adminOrders', JSON.stringify(updatedOrders));
 
-      // Send order confirmation email using EmailJS
-      try {
-        // Check if EmailJS is configured
-        const emailJSConfigured = import.meta.env.VITE_REACT_APP_EMAILJS_PUBLIC_KEY &&
-                                import.meta.env.VITE_REACT_APP_SERVICE_ID &&
-                                import.meta.env.VITE_REACT_APP_TEMPLATE_ID;
+      // Check if backend is available before sending admin notification
+      const isBackendAvailable = await checkBackendAvailability();
 
-        if (emailJSConfigured) {
-          // Create a simplified message to avoid duplication
-          const messageContent = `Có yêu cầu tư vấn mới từ Website!\n\nThông tin khách hàng:\n\nHọ và tên: ${orderInfo.fullName}\n\nEmail: ${orderInfo.email}\n\nSố điện thoại: ${orderInfo.phone}\n\nGói dịch vụ: ${orderInfo.serviceName}\n\nGiá dịch vụ: ${orderInfo.servicePrice}\n\nNội dung yêu cầu: ${orderInfo.note || 'Khách hàng chưa để lại ghi chú.'}\n\nVui lòng phản hồi sớm cho khách hàng.`;
-
-          // Create a comprehensive message with all customer information
-          const customerName = orderInfo.fullName || 'Không có tên';
-          const customerEmail = orderInfo.email || 'Không có email';
-          const customerPhone = orderInfo.phone || 'Không có số điện thoại';
-          const serviceName = orderInfo.serviceName || 'Không có tên dịch vụ';
-          const servicePrice = orderInfo.servicePrice || 'Không có giá';
-          const orderNote = orderInfo.note || 'Khách hàng chưa để lại ghi chú.';
-
-          const emailParams = {
-            message: `Có yêu cầu tư vấn mới từ Website!\n\nThông tin khách hàng:\n\nHọ và tên: ${customerName}\n\nEmail: ${customerEmail}\n\nSố điện thoại: ${customerPhone}\n\nGói dịch vụ: ${serviceName}\n\nGiá dịch vụ: ${servicePrice}\n\nNội dung yêu cầu: ${orderNote}\n\nVui lòng phản hồi sớm cho khách hàng.`,
-            subject: 'Yêu cầu dịch vụ mới - Kế Toán Sen Vàng'
+      if (isBackendAvailable) {
+        // Send admin notification email via backend API
+        try {
+          const adminNotificationData = {
+            customerEmail: 'chien180203@gmail.com', // Admin email
+            customerName: 'Chiến Trần', // Admin name
+            serviceName: `Yêu cầu dịch vụ mới: ${orderInfo.serviceName}`,
+            servicePrice: orderInfo.servicePrice,
+            transactionId: newOrder.transactionId
           };
 
-          console.log('Sending email with params:', emailParams); // Debug log
+          console.log('Sending admin notification via backend:', adminNotificationData); // Debug log
 
-          // Dynamically import emailjs to avoid bundling when not needed
-          const emailjs = await import('@emailjs/browser');
+          const response = await fetch(API_ENDPOINTS.EMAIL.SEND_CUSTOMER_ORDER_CONFIRMATION, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(adminNotificationData)
+          });
 
-          await emailjs.send(
-            import.meta.env.VITE_REACT_APP_SERVICE_ID,
-            import.meta.env.VITE_REACT_APP_TEMPLATE_ID,
-            emailParams,
-            import.meta.env.VITE_REACT_APP_EMAILJS_PUBLIC_KEY
-          );
+          if (!response.ok) {
+            const errorData = await response.json();
+            console.error('Error sending admin notification via backend:', errorData);
+          } else {
+            const result = await response.json();
+            console.log('Admin notification email sent successfully via backend:', result);
+          }
+        } catch (backendEmailError) {
+          console.warn('Error sending admin notification via backend:', backendEmailError.message);
+          // Try fallback to EmailJS if configured
+          await sendEmailNotificationFallback('admin');
         }
-      } catch (emailError) {
-        console.error('Error sending order confirmation email:', emailError);
-        // Don't fail the order submission if email fails
+      } else {
+        console.warn('Backend not available, trying fallback method for admin notification');
+        await sendEmailNotificationFallback('admin');
+      }
+
+      // Send customer confirmation email via backend API if available
+      if (isBackendAvailable) {
+        try {
+          // Prepare customer confirmation email data
+          const confirmationEmailData = {
+            customerEmail: orderInfo.email,
+            customerName: orderInfo.fullName,
+            serviceName: orderInfo.serviceName,
+            servicePrice: orderInfo.servicePrice,
+            transactionId: newOrder.transactionId
+          };
+
+          console.log('Sending customer confirmation email via backend:', confirmationEmailData); // Debug log
+
+          // Send customer confirmation email via backend API
+          const response = await fetch(API_ENDPOINTS.EMAIL.SEND_CUSTOMER_ORDER_CONFIRMATION, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(confirmationEmailData)
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            console.error('Error sending customer confirmation email:', errorData);
+          } else {
+            const result = await response.json();
+            console.log('Customer confirmation email sent successfully:', result);
+          }
+        } catch (backendEmailError) {
+          console.warn('Error sending customer confirmation email via backend:', backendEmailError.message);
+          // Try fallback to EmailJS if configured
+          await sendEmailNotificationFallback('customer');
+        }
+      } else {
+        console.warn('Backend not available, trying fallback method for customer confirmation');
+        await sendEmailNotificationFallback('customer');
       }
 
       // Call parent submit handler
@@ -113,6 +258,9 @@ const ServiceOrderForm = ({ serviceName, servicePrice, onClose, onSubmit }) => {
     } catch (error) {
       console.error('Error submitting order:', error);
       alert('Đã xảy ra lỗi khi xử lý đơn hàng. Vui lòng thử lại sau.');
+    } finally {
+      // Luôn reset trạng thái gửi, dù thành công hay thất bại
+      setIsSubmitting(false);
     }
   };
 
@@ -302,19 +450,20 @@ const ServiceOrderForm = ({ serviceName, servicePrice, onClose, onSubmit }) => {
             </button>
             <button
               type="submit"
-              className="px-6 py-2 bg-[#D4AF37] text-white font-bold rounded-lg hover:bg-[#b8942f] transition-colors"
+              disabled={isSubmitting}
+              className={`px-6 py-2 text-white font-bold rounded-lg transition-colors ${isSubmitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#D4AF37] hover:bg-[#b8942f]'}`}
               style={{
                 padding: '0.5rem 1.5rem',
-                backgroundColor: '#D4AF37',
+                backgroundColor: isSubmitting ? '#a0a0a0' : '#D4AF37',
                 color: '#fff',
                 fontWeight: 'bold',
                 borderRadius: '0.5rem',
                 border: 'none',
-                cursor: 'pointer',
+                cursor: isSubmitting ? 'not-allowed' : 'pointer',
                 transition: 'background-color 0.3s'
               }}
             >
-              ĐẶT DỊCH VỤ
+              {isSubmitting ? 'Đang xử lý...' : 'ĐẶT DỊCH VỤ'}
             </button>
           </div>
         </form>

@@ -67,27 +67,36 @@ const ContactForm = () => {
       // Cấu hình thông tin gửi mail
       const templateParams = {
         from_name: data.fullName,
+        from_email: data.email,
         phone: data.phone,
-        email: data.email,
-        message: data.message || 'Không có tin nhắn',
         to_email: 'chien180203@gmail.com', // Bạn có thể thay bằng email nhận
         reply_to: data.email,
         // Nội dung email chi tiết
-        email_content: `
-Họ và tên: ${data.fullName}
-Số điện thoại: ${data.phone}
-Email: ${data.email}
-Nội dung: ${data.message || 'Không có tin nhắn'}
-        `
+        message: `Có yêu cầu tư vấn mới từ Website!\n\nThông tin khách hàng:\n- Họ và tên: ${data.fullName}\n- Email: ${data.email}\n- Số điện thoại: ${data.phone}\n- Nội dung yêu cầu: ${data.message || 'Khách hàng chưa để lại ghi chú.'}\n\nVui lòng phản hồi sớm cho khách hàng.`,
+        subject: 'Yêu cầu dịch vụ mới - Kế Toán Sen Vàng'
       };
 
-      // ✅ CÁCH ĐÚNG CHO VITE: Dùng emailjs.send() với PUBLIC_KEY là tham số thứ 4
-      const response = await emailjs.send(
-        import.meta.env.VITE_REACT_APP_SERVICE_ID, // Service ID
-        import.meta.env.VITE_REACT_APP_TEMPLATE_ID, // Template ID
-        templateParams, // Dữ liệu gửi
-        import.meta.env.VITE_REACT_APP_EMAILJS_PUBLIC_KEY // ✅ PUBLIC KEY ở đây
-      );
+      // Import email utility function
+      const { createEmailTemplate, sendEmailNotification } = await import('../utils/emailUtils');
+
+      // Create customer info object
+      const customerInfo = {
+        fullName: data.fullName,
+        email: data.email,
+        phone: data.phone,
+        serviceName: 'Liên hệ tư vấn',
+        servicePrice: 'Liên hệ để biết giá',
+        note: data.message || 'Khách hàng chưa để lại ghi chú.'
+      };
+
+      // Create email template
+      const emailMessage = createEmailTemplate(customerInfo);
+
+      // Update templateParams with the message from createEmailTemplate
+      templateParams.message = emailMessage;
+
+      // Send email using utility function
+      const response = await sendEmailNotification(templateParams);
 
       console.log('SUCCESS!', response.status, response.text);
 

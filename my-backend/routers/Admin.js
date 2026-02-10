@@ -496,4 +496,145 @@ router.post('/send-order-confirmation', verifyAdmin, async (req, res) => {
   }
 });
 
+// Send customer order confirmation email (Public endpoint - no admin required)
+router.post('/send-customer-order-confirmation', async (req, res) => {
+  try {
+    const { customerEmail, customerName, serviceName, servicePrice, transactionId } = req.body;
+
+    // Validate required fields
+    if (!customerEmail || !customerName || !serviceName || !servicePrice || !transactionId) {
+      return res.status(400).json({
+        msg: 'Vui lòng cung cấp đầy đủ thông tin: email khách hàng, tên khách hàng, tên dịch vụ, giá dịch vụ và mã giao dịch'
+      });
+    }
+
+    console.log('=== CUSTOMER EMAIL SENDING DEBUG INFO ===');
+    console.log('Customer Email:', customerEmail);
+    console.log('Customer Name:', customerName);
+    console.log('Service Name:', serviceName);
+    console.log('Service Price:', servicePrice);
+    console.log('Transaction ID:', transactionId);
+    console.log('Email Config Available:', !!process.env.EMAIL_USER && !!process.env.EMAIL_PASS);
+
+    // Send order confirmation email to customer
+    const nodemailer = require('nodemailer');
+
+    // Check if email configuration is available
+    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+      console.log('Email configuration missing - EMAIL_USER or EMAIL_PASS not set in environment variables');
+      return res.status(500).json({
+        msg: 'Cấu hình email chưa được thiết lập. Vui lòng kiểm tra lại biến môi trường EMAIL_USER và EMAIL_PASS.'
+      });
+    }
+
+    // Create email transporter
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+      }
+    });
+
+    // Verify transporter configuration
+    try {
+      await transporter.verify();
+      console.log('Email transporter verified successfully');
+    } catch (verifyError) {
+      console.error('Email transporter verification failed:', verifyError);
+      console.error('Email configuration details (for debugging):', {
+        userEmail: process.env.EMAIL_USER,
+        hasEmailPass: !!process.env.EMAIL_PASS,
+        emailPassLength: process.env.EMAIL_PASS ? process.env.EMAIL_PASS.length : 0,
+        emailPassPreview: process.env.EMAIL_PASS ? process.env.EMAIL_PASS.substring(0, 4) + '...' : 'N/A'
+      });
+
+      // Check if it's a common configuration issue
+      if (!process.env.EMAIL_PASS || process.env.EMAIL_PASS === 'mat_khau_ung_dung_gmail') {
+        return res.status(500).json({
+          msg: 'Cấu hình email chưa được thiết lập đúng. Vui lòng cập nhật EMAIL_PASS trong file .env với App Password thực tế từ Gmail.'
+        });
+      }
+
+      return res.status(500).json({
+        msg: `Xác thực email thất bại: ${verifyError.message}. Vui lòng kiểm tra lại cấu hình email.`
+      });
+    }
+
+    const mailOptions = {
+      from: `"Kế Toán Sen Vàng" <${process.env.EMAIL_USER}>`,
+      to: customerEmail,
+      subject: `Xác nhận đơn hàng dịch vụ - ${serviceName}`,
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <title>Xác nhận đơn hàng dịch vụ</title>
+        </head>
+        <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <div style="text-align: center; border-bottom: 2px solid #FFD700; padding-bottom: 10px; margin-bottom: 20px;">
+            <h1 style="color: #FFD700;">KẾ TOÁN SEN VÀNG</h1>
+          </div>
+
+          <div>
+            <h2 style="color: #555;">Xác nhận đơn hàng dịch vụ</h2>
+            <p>Cảm ơn quý khách đã đặt dịch vụ tại <strong>Kế Toán Sen Vàng</strong>.</p>
+            <br>
+            <h3>Thông tin đơn hàng:</h3>
+            <p><strong>Mã đơn hàng:</strong> ${transactionId}</p>
+            <p><strong>Dịch vụ:</strong> ${serviceName}</p>
+            <p><strong>Giá tiền:</strong> ${servicePrice}</p>
+            <p><strong>Khách hàng:</strong> ${customerName}</p>
+            <p><strong>Thời gian đặt:</strong> ${new Date().toLocaleString('vi-VN')}</p>
+            <br>
+            <p>Chúng tôi sẽ liên hệ với quý khách trong thời gian sớm nhất để tiến hành xử lý đơn hàng.</p>
+            <br>
+            <p>Trân trọng,<br><strong>Đội ngũ Kế Toán Sen Vàng</strong></p>
+            <hr style="margin: 20px 0; border: none; border-top: 1px solid #eee;">
+            <p><em>Lưu ý: Đây là email tự động, vui lòng không.reply lại email này.</em></p>
+          </div>
+        </body>
+        </html>
+      `
+    };
+
+    console.log('About to send customer email with options:', {
+      from: mailOptions.from,
+      to: mailOptions.to,
+      subject: mailOptions.subject
+    });
+
+    try {
+      const result = await transporter.sendMail(mailOptions);
+      console.log('Customer email sent successfully:', result);
+      console.log(`Order confirmation email sent to: ${customerEmail}`);
+
+      // Return success response
+      res.json({
+        msg: 'Email xác nhận đã được gửi thành công',
+        emailSentTo: customerEmail,
+        messageId: result.messageId
+      });
+    } catch (emailError) {
+      console.error('Error sending customer email:', emailError);
+      console.error('Email error details:', {
+        message: emailError.message,
+        code: emailError.code,
+        response: emailError.response,
+        responseCode: emailError.responseCode,
+        command: emailError.command
+      });
+
+      // Return error response but still respond to client
+      return res.status(500).json({
+        msg: `Gửi email thất bại: ${emailError.message}. Vui lòng kiểm tra lại cấu hình email.`
+      });
+    }
+  } catch (err) {
+    console.error('Unexpected error in send-customer-order-confirmation:', err.message);
+    res.status(500).json({ msg: `Lỗi máy chủ: ${err.message}` });
+  }
+});
+
 module.exports = router;

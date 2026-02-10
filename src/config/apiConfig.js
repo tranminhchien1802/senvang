@@ -3,8 +3,8 @@ const getApiBaseUrl = () => {
   if (typeof window !== 'undefined') {
     // Client-side (browser)
     // Use environment variable if available (for production with external backend)
-    // Otherwise use Railway backend URL for production
-    return import.meta.env.VITE_API_URL || (window.location.hostname === 'localhost' ? '' : 'https://senvang-backend-production.up.railway.app');
+    // Otherwise use localhost for development
+    return import.meta.env.VITE_API_URL || (window.location.hostname === 'localhost' ? 'http://localhost:5000' : 'https://senvang-backend-production.up.railway.app');
   } else {
     // Server-side (Node.js) - this shouldn't be reached in a typical React app
     // But fallback to Railway backend URL for production
@@ -23,6 +23,7 @@ export const API_ENDPOINTS = {
   AUTH: {
     LOGIN: `${API_BASE_URL}/api/auth/login`,
     REGISTER: `${API_BASE_URL}/api/auth/register`,
+    GOOGLE_LOGIN: `${API_BASE_URL}/api/auth/google-login`,
     GOOGLE_CALLBACK: `${API_BASE_URL}/api/auth/google/callback`,
     VERIFY: `${API_BASE_URL}/api/auth/verify`
   },
@@ -34,6 +35,9 @@ export const API_ENDPOINTS = {
     ORDERS: `${API_BASE_URL}/api/admin/orders`,
     USERS: `${API_BASE_URL}/api/admin/users`,
     SEND_ORDER_CONFIRMATION: `${API_BASE_URL}/api/admin/send-order-confirmation`
+  },
+  EMAIL: {
+    SEND_CUSTOMER_ORDER_CONFIRMATION: `${API_BASE_URL}/api/admin/send-customer-order-confirmation`
   },
   BANNERS: {
     GET_ALL: `${API_BASE_URL}/api/banners`,

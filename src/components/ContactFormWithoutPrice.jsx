@@ -78,36 +78,39 @@ const ContactFormWithoutPrice = ({ onClose }) => {
 
       // Send contact request email using EmailJS
       try {
-        // Check if EmailJS is configured
-        const emailJSConfigured = import.meta.env.VITE_REACT_APP_EMAILJS_PUBLIC_KEY &&
-                                import.meta.env.VITE_REACT_APP_SERVICE_ID &&
-                                import.meta.env.VITE_REACT_APP_TEMPLATE_ID;
+        // Import email utility function
+        const { createEmailTemplate, sendEmailNotification } = await import('../utils/emailUtils');
 
-        if (emailJSConfigured) {
-          const emailParams = {
-            to_name: 'Quản trị viên',
-            to_email: 'admin@ketoansenvang.com',
-            service_name: contactInfo.serviceName,
-            service_price: 'Liên hệ để biết giá', // Hidden price
-            customer_name: contactInfo.fullName,
-            customer_phone: contactInfo.phone,
-            customer_email: contactInfo.email,
-            order_note: contactInfo.note,
-            order_date: new Date().toLocaleString('vi-VN'),
-            message: `Xin chào,\n\nCó một yêu cầu mới được gửi từ form liên hệ trên website của bạn:\n\n───────────────────────────────\n\n📌 **Thông tin khách hàng:**\n- Họ và tên: ${contactInfo.fullName}\n- Email: ${contactInfo.email}\n- Số điện thoại: ${contactInfo.phone}\n- Gói dịch vụ quan tâm: ${contactInfo.serviceName}\n- Nội dung yêu cầu: \n  ${contactInfo.note || 'Khách hàng chưa để lại ghi chú.'}\n\n───────────────────────────────\n\nVui lòng kiểm tra và phản hồi sớm nhất để không bỏ lỡ cơ hội hợp tác!'`,
-            subject: 'Yêu cầu dịch vụ mới - Kế Toán Sen Vàng'
-          };
+        // Create customer info object
+        const customerInfo = {
+          fullName: contactInfo.fullName,
+          email: contactInfo.email,
+          phone: contactInfo.phone,
+          serviceName: contactInfo.serviceName,
+          servicePrice: 'Liên hệ để biết giá',
+          note: contactInfo.note || 'Khách hàng chưa để lại ghi chú.'
+        };
 
-          // Dynamically import emailjs to avoid bundling when not needed
-          const emailjs = await import('@emailjs/browser');
-          
-          await emailjs.send(
-            import.meta.env.VITE_REACT_APP_SERVICE_ID,
-            import.meta.env.VITE_REACT_APP_TEMPLATE_ID,
-            emailParams,
-            import.meta.env.VITE_REACT_APP_EMAILJS_PUBLIC_KEY
-          );
-        }
+        // Create email template
+        const emailMessage = createEmailTemplate(customerInfo);
+
+        // Prepare email parameters - using field names that match EmailJS template
+        const emailParams = {
+          to_name: 'Quản trị viên',
+          to_email: 'admin@ketoansenvang.com',
+          from_name: contactInfo.fullName,
+          from_email: contactInfo.email,
+          phone: contactInfo.phone,
+          package_name: contactInfo.serviceName,
+          package_price: 'Liên hệ để biết giá',
+          note: contactInfo.note,
+          order_date: new Date().toLocaleString('vi-VN'),
+          message: emailMessage,
+          subject: 'Yêu cầu dịch vụ mới - Kế Toán Sen Vàng'
+        };
+
+        // Send email using utility function
+        await sendEmailNotification(emailParams);
       } catch (emailError) {
         console.error('Error sending contact request email:', emailError);
         // Don't fail the submission if email fails
