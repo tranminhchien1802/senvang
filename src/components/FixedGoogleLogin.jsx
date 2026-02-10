@@ -1,95 +1,26 @@
-import React, { useEffect, useRef, useCallback } from 'react';
+import React, { useEffect, useRef } from 'react';
+import { GoogleLogin } from '@react-oauth/google';
 import { jwtDecode } from 'jwt-decode';
 import { API_ENDPOINTS } from '../config/apiConfig';
 
 const FixedGoogleLogin = ({ onLoginSuccess, onLoginFailure }) => {
   const containerRef = useRef(null);
-  const scriptLoadedRef = useRef(false);
 
-  // Initialize Google Identity Services
-  const initializeGoogleSignIn = useCallback(() => {
-    // Check if script is already loaded
-    if (window.google && window.google.accounts) {
-      renderGoogleButton();
-      return;
-    }
-
-    // Load Google Identity Services script if not already loaded
-    if (!scriptLoadedRef.current) {
-      scriptLoadedRef.current = true;
-      const script = document.createElement('script');
-      script.src = 'https://accounts.google.com/gsi/client';
-      script.async = true;
-      script.defer = true;
-      script.onload = () => {
-        // Wait a bit to ensure the library is fully loaded
-        setTimeout(renderGoogleButton, 500);
-      };
-      script.onerror = () => {
-        console.error('Failed to load Google Identity Services script');
-        if (onLoginFailure) {
-          onLoginFailure(new Error('Không thể tải thư viện xác thực Google'));
-        }
-      };
-      document.head.appendChild(script);
-    } else {
-      // If script is loading, wait and try again
-      setTimeout(initializeGoogleSignIn, 500);
-    }
-  }, [onLoginSuccess, onLoginFailure]);
-
-  // Render the Google Sign-In button
-  const renderGoogleButton = useCallback(() => {
-    if (!window.google || !window.google.accounts || !containerRef.current) {
-      setTimeout(renderGoogleButton, 500);
-      return;
-    }
-
-    // Clean up any existing button
-    if (containerRef.current.firstChild) {
-      containerRef.current.removeChild(containerRef.current.firstChild);
-    }
-
-    // Initialize the Google Identity Services client
-    window.google.accounts.id.initialize({
-      client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID || import.meta.env.VITE_REACT_APP_GOOGLE_CLIENT_ID,
-      callback: handleCredentialResponse,
-      auto_select: false,
-    });
-
-    // Render the Google Sign-In button
-    window.google.accounts.id.renderButton(
-      containerRef.current,
-      {
-        type: 'standard',
-        theme: 'outline',
-        size: 'large',
-        text: 'signin_with',
-        shape: 'rectangular',
-        logo_alignment: 'left'
-      }
-    );
-
-    // Prompt for one-tap sign-up if user is returning
-    window.google.accounts.id.prompt();
-  }, []);
-
-  // Handle the credential response from Google
-  const handleCredentialResponse = async (response) => {
+  const handleSuccess = async (credentialResponse) => {
     try {
       // Decode the credential to access Google user info
-      const googleUserData = jwtDecode(response.credential);
+      const googleUserData = jwtDecode(credentialResponse.credential);
 
       // Send the credential to backend for verification
-      const apiResponse = await fetch(API_ENDPOINTS.AUTH.VERIFY, {
+      const response = await fetch(API_ENDPOINTS.AUTH.VERIFY, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ credential: response.credential }),
+        body: JSON.stringify({ credential: credentialResponse.credential }),
       });
 
-      const responseText = await apiResponse.text();
+      const responseText = await response.text();
 
       let result;
       try {
@@ -99,8 +30,8 @@ const FixedGoogleLogin = ({ onLoginSuccess, onLoginFailure }) => {
         throw new Error(`Failed to parse server response: ${responseText}`);
       }
 
-      if (!apiResponse.ok) {
-        throw new Error(result.message || `HTTP error! status: ${apiResponse.status}`);
+      if (!response.ok) {
+        throw new Error(result.message || `HTTP error! status: ${response.status}`);
       }
 
       // Store user data locally for frontend use
@@ -170,8 +101,7 @@ const FixedGoogleLogin = ({ onLoginSuccess, onLoginFailure }) => {
     }
   };
 
-  // Handle error from Google
-  const handleGoogleError = (error) => {
+  const handleError = (error) => {
     console.error('Google login error:', error);
 
     if (error.error === 'origin_mismatch') {
@@ -189,40 +119,41 @@ const FixedGoogleLogin = ({ onLoginSuccess, onLoginFailure }) => {
     }
   };
 
-  useEffect(() => {
-    // Clean up any existing Google API scripts to prevent conflicts
-    const existingScripts = document.querySelectorAll('script[src*="accounts.google.com"]');
-    existingScripts.forEach(script => {
-      script.remove();
-    });
+  // Handle postMessage error by wrapping in try-catch and using setTimeout
+  const safeHandleSuccess = (response) => {
+    setTimeout(() => {
+      try {
+        handleSuccess(response);
+      } catch (error) {
+        console.error('Error in Google login success handler:', error);
+        if (onLoginFailure) {
+          onLoginFailure(error);
+        }
+      }
+    }, 0);
+  };
 
-    // Clean up any existing iframes
-    const existingIframes = document.querySelectorAll('iframe[src*="accounts.google.com"]');
-    existingIframes.forEach(iframe => {
-      iframe.remove();
-    });
-
-    // Clean up any existing Google sign-in containers
-    const existingContainers = document.querySelectorAll('#g_id_onload, div[role="button"][jsaction*="google"], div[jsname="VbkGxd"]');
-    existingContainers.forEach(container => {
-      container.remove();
-    });
-
-    // Initialize Google Sign-In
-    initializeGoogleSignIn();
-
-    // Cleanup function
-    return () => {
-      // Remove any Google-related elements when component unmounts
-      const googleElements = document.querySelectorAll('[id*="google"], [class*="google"], [jsname*="VbkGxd"]');
-      googleElements.forEach(element => {
-        element.remove();
-      });
-    };
-  }, [initializeGoogleSignIn]);
+  const safeHandleError = (error) => {
+    setTimeout(() => {
+      try {
+        handleError(error);
+      } catch (error) {
+        console.error('Error in Google login error handler:', error);
+      }
+    }, 0);
+  };
 
   return (
-    <div ref={containerRef} style={{ display: 'flex', justifyContent: 'center' }}></div>
+    <div ref={containerRef} style={{ display: 'flex', justifyContent: 'center' }}>
+      <GoogleLogin
+        onSuccess={safeHandleSuccess}
+        onError={safeHandleError}
+        shape="rectangular"
+        size="large"
+        theme="outline"
+        text="signin_with"
+      />
+    </div>
   );
 };
 
