@@ -24,29 +24,39 @@ const { passport } = require('./config/passport');
 app.use(passport.initialize());
 app.use(passport.session());
 
-// CORS configuration
+// CORS configuration - unified approach
 const corsOptions = {
   origin: process.env.NODE_ENV === 'production'
     ? [
-        process.env.CLIENT_URL || 'https://yourdomain.com', 
+        process.env.CLIENT_URL || 'https://yourdomain.com',
         'https://*.vercel.app',
         'https://senvang-olive.vercel.app',
         'https://ketoansenvang.net',
         'https://www.ketoansenvang.net'
       ]
     : ['http://localhost:5173', 'http://localhost:3000', 'http://localhost:4173', 'http://localhost:5174'],
-  credentials: true
+  credentials: true,
+  optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
 };
 app.use(cors(corsOptions));
 
-// Alternative CORS setup if needed
+// Additional headers for enhanced security and compatibility
 app.use((req, res, next) => {
-  if (process.env.NODE_ENV !== 'production') {
-    // Only add headers for non-production environments
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, x-auth-token');
+  // Set security headers
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, x-auth-token');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  
+  // Additional headers to handle COEP/COOP policies
+  if (process.env.NODE_ENV === 'production') {
+    res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
+    res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
+  } else {
+    // For development, use more permissive settings
+    res.setHeader('Cross-Origin-Embedder-Policy', 'unsafe-none');
+    res.setHeader('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
   }
+  
   if (req.method === 'OPTIONS') {
     res.sendStatus(200);
   } else {
