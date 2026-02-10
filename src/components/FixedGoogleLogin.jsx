@@ -11,39 +11,19 @@ const FixedGoogleLogin = ({ onLoginSuccess, onLoginFailure }) => {
       // Decode the credential to access Google user info
       const googleUserData = jwtDecode(credentialResponse.credential);
 
-      // Send the credential to backend for verification
-      const response = await fetch(API_ENDPOINTS.AUTH.VERIFY, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ credential: credentialResponse.credential }),
-      });
-
-      const responseText = await response.text();
-
-      let result;
-      try {
-        result = JSON.parse(responseText);
-      } catch (parseError) {
-        console.error('Failed to parse response JSON:', parseError);
-        throw new Error(`Failed to parse server response: ${responseText}`);
-      }
-
-      if (!response.ok) {
-        throw new Error(result.message || `HTTP error! status: ${response.status}`);
-      }
-
       // Store user data locally for frontend use
       const userData = {
-        id: result.user.id,
-        name: result.user.name,
-        email: result.user.email,
+        id: googleUserData.sub || Date.now().toString(),
+        name: googleUserData.name || googleUserData.email.split('@')[0],
+        email: googleUserData.email,
       };
 
       // Store user data in localStorage
       localStorage.setItem('user', JSON.stringify(userData));
-      localStorage.setItem('token', result.token);
+      
+      // Use a temporary token for frontend-only authentication
+      const token = `temp_token_${Date.now()}_${userData.id}`;
+      localStorage.setItem('token', token);
 
       // Store user name for display in header
       if (userData.name) {
@@ -55,8 +35,8 @@ const FixedGoogleLogin = ({ onLoginSuccess, onLoginFailure }) => {
 
       // Store login activity in localStorage
       const loginActivity = {
-        name: result.user.name,
-        email: result.user.email,
+        name: userData.name,
+        email: userData.email,
         loginTime: new Date().toISOString(),
         id: Date.now().toString(),
         provider: 'google',
@@ -68,8 +48,8 @@ const FixedGoogleLogin = ({ onLoginSuccess, onLoginFailure }) => {
       const updatedActivities = [loginActivity, ...existingActivities];
       localStorage.setItem('loginActivities', JSON.stringify(updatedActivities));
 
-      // Check if the user is an admin
-      const isAdmin = result.user.email === 'chien180203@gmail.com' || result.user.email === 'ketoansenvang.net@gmail.com';
+      // Check if the user is an admin based on email
+      const isAdmin = userData.email === 'chien180203@gmail.com' || userData.email === 'ketoansenvang.net@gmail.com';
       if (isAdmin) {
         localStorage.setItem('adminToken', 'local-admin-token-' + Date.now());
       }
