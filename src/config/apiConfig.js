@@ -2,19 +2,9 @@
 const getApiBaseUrl = () => {
   if (typeof window !== 'undefined') {
     // Client-side (browser)
-    // Use relative paths for Vercel deployment
-    // Check if we're in production environment
-    const isProduction = window.location.hostname.includes('vercel.app') || 
-                        window.location.hostname.includes('ketoansenvang.net');
-    
-    if (isProduction) {
-      // For production, use relative path which will route to Vercel Functions
-      return '';
-    } else {
-      // For local development, use environment variable if available
-      // Otherwise use relative path to work with Vite proxy
-      return import.meta.env.VITE_API_URL || '';
-    }
+    // Use environment variable if available, otherwise use relative path
+    // This allows specifying a backend URL in production while using relative paths in development
+    return import.meta.env.VITE_API_URL || '';
   } else {
     // Server-side (Node.js)
     // Use environment variable or default
