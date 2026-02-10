@@ -8,8 +8,8 @@ const getApiBaseUrl = () => {
     if (window.location.hostname === 'localhost') {
       return ''; // Use same origin (no need to specify base URL)
     } else {
-      // For production, use environment variable or fallback
-      return import.meta.env.VITE_API_URL || '';
+      // For production, use relative path to access backend on same domain
+      return ''; // Use relative path so API calls go to same domain
     }
   } else {
     // Server-side (Node.js) - this shouldn't be reached in a typical React app
