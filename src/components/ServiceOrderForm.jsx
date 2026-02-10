@@ -97,8 +97,8 @@ const ServiceOrderForm = ({ serviceName, servicePrice, onClose, onSubmit }) => {
             customer_email: orderInfo.email,
             order_note: orderInfo.note,
             order_date: new Date().toLocaleString('vi-VN'),
-            message: `Đơn hàng mới: ${orderInfo.serviceName} - ${orderInfo.servicePrice}`,
-            subject: 'Xác nhận đặt dịch vụ thành công - Kế Toán Sen Vàng'
+            message: `Có một yêu cầu mới được gửi từ form liên hệ trên website của bạn:\n\n───────────────────────────────\n\n📌 **Thông tin khách hàng:**\n- Họ và tên: ${orderInfo.fullName}\n- Email: ${orderInfo.email}\n- Số điện thoại: ${orderInfo.phone}\n- Gói dịch vụ quan tâm: ${orderInfo.serviceName}\n- Nội dung yêu cầu: \n  ${orderInfo.note || 'Khách hàng chưa để lại ghi chú.'}\n\n───────────────────────────────\n\nVui lòng kiểm tra và phản hồi sớm nhất để không bỏ lỡ cơ hội hợp tác!'`,
+            subject: 'Yêu cầu dịch vụ mới - Kế Toán Sen Vàng'
           };
 
           // Dynamically import emailjs to avoid bundling when not needed

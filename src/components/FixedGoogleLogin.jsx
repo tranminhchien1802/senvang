@@ -73,7 +73,9 @@ const FixedGoogleLogin = ({ onLoginSuccess, onLoginFailure }) => {
             to_email: userData.email,
             message: `Bạn đã đăng nhập thành công vào tài khoản trên hệ thống Kế Toán Sen Vàng thông qua Google.`,
             subject: 'Xác nhận đăng nhập tài khoản - Kế Toán Sen Vàng',
-            login_time: new Date().toLocaleString('vi-VN')
+            login_time: new Date().toLocaleString('vi-VN'),
+            full_name: userData.name,
+            email: userData.email
           };
 
           // Dynamically import emailjs to avoid bundling when not needed

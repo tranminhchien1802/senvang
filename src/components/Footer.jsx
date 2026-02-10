@@ -16,7 +16,11 @@ const ZaloIcon = () => {
       alt="Zalo" 
       className="w-8 h-8 object-contain"
       onError={() => setUseFallback(true)}
-      style={{ filter: 'invert(100%) sepia(0%) saturate(7471%) hue-rotate(298deg) brightness(118%) contrast(100%)' }} // Đảo màu trắng nếu cần
+      style={{ 
+        filter: 'brightness(0) invert(1)', // Đảo ngược để có màu trắng
+        width: '32px',
+        height: '32px'
+      }}
     />
   );
 };
