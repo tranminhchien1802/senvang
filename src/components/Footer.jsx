@@ -10,18 +10,30 @@ const ZaloIcon = () => {
     return <i className="fab fa-zalo text-white text-2xl"></i>;
   }
 
+  // SVG logo Zalo đơn giản với chữ Z
+  const ZaloSVGLogo = () => (
+    <svg 
+      xmlns="http://www.w3.org/2000/svg" 
+      viewBox="0 0 100 100"
+      width="24" 
+      height="24"
+      style={{ width: '24px', height: '24px' }}
+    >
+      {/* Nền tròn */}
+      <circle cx="50" cy="50" r="45" fill="white"/>
+      {/* Chữ Z cách điệu */}
+      <path 
+        d="M30,35 L70,35 L45,65 L70,65 L30,65 Z" 
+        fill="#0068FF" 
+        style={{ transform: 'scale(0.8)', transformOrigin: 'center' }}
+      />
+    </svg>
+  );
+
   return (
-    <img 
-      src="/image/zalo.png" 
-      alt="Zalo" 
-      className="w-8 h-8 object-contain"
-      onError={() => setUseFallback(true)}
-      style={{ 
-        filter: 'brightness(0) invert(1)', // Đảo ngược để có màu trắng
-        width: '32px',
-        height: '32px'
-      }}
-    />
+    <div className="flex items-center justify-center w-full h-full">
+      <ZaloSVGLogo />
+    </div>
   );
 };
 
@@ -148,18 +160,18 @@ const Footer = () => {
           }
         `}</style>
 
-        {/* 1. Nút Zalo (Sử dụng ảnh Zalo từ thư mục public) */}
+        {/* 1. Nút Zalo (Sử dụng logo Zalo với màu thương hiệu) */}
         <a
           href={`https://zalo.me/+84${companyInfo.phone.replace(/\D/g, '').substring(1)}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="block w-14 h-14 rounded-full shadow-lg transition-all overflow-hidden bg-[#04C500] border-2 border-transparent hover:bg-[#03a803] flex items-center justify-center"
+          className="block w-14 h-14 rounded-full shadow-lg transition-all overflow-hidden bg-[#0068FF] border-2 border-transparent hover:bg-[#0056CC] flex items-center justify-center"
           style={{
             animation: 'quick-shake 3s infinite', // Rung mỗi 3 giây
             animationDelay: '0s' // Rung ngay
           }}
         >
-          {/* Logo Zalo sử dụng ảnh từ thư mục public để tránh lỗi COEP */}
+          {/* Logo Zalo với màu thương hiệu */}
           <ZaloIcon />
         </a>
 
