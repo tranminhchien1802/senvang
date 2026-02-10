@@ -139,6 +139,19 @@ const connectDB = async () => {
 
 connectDB();
 
+// Test route to check if server is receiving requests
+app.get('/test', (req, res) => {
+  console.log('Test endpoint hit from:', req.header('Origin'));
+  console.log('Request headers:', req.headers);
+  res.json({ 
+    status: 'OK', 
+    timestamp: new Date().toISOString(),
+    origin: req.header('Origin'),
+    env: process.env.NODE_ENV,
+    client_url: process.env.CLIENT_URL
+  });
+});
+
 // Routes
 app.use('/api/auth', require('./routers/auth')); // Add Google OAuth routes
 app.use('/api/users', require('./routers/User'));
