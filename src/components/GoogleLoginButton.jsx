@@ -4,10 +4,12 @@ import FixedGoogleLogin from './FixedGoogleLogin';
 
 const GoogleLoginButton = ({ onLoginSuccess, onLoginFailure }) => {
   return (
-    <FixedGoogleLogin
-      onLoginSuccess={onLoginSuccess}
-      onLoginFailure={onLoginFailure}
-    />
+    <div className="google-login-wrapper">
+      <FixedGoogleLogin
+        onLoginSuccess={onLoginSuccess}
+        onLoginFailure={onLoginFailure}
+      />
+    </div>
   );
 };
 
