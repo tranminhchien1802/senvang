@@ -73,20 +73,30 @@ const ServiceOrderForm = ({ serviceName, servicePrice, onClose, onSubmit }) => {
           // Create a simplified message to avoid duplication
           const messageContent = `Có yêu cầu tư vấn mới từ Website!\n\nThông tin khách hàng:\n\nHọ và tên: ${orderInfo.fullName}\n\nEmail: ${orderInfo.email}\n\nSố điện thoại: ${orderInfo.phone}\n\nGói dịch vụ: ${orderInfo.serviceName}\n\nGiá dịch vụ: ${orderInfo.servicePrice}\n\nNội dung yêu cầu: ${orderInfo.note || 'Khách hàng chưa để lại ghi chú.'}\n\nVui lòng phản hồi sớm cho khách hàng.`;
 
+          // Ensure all required fields are populated before sending
+          const customerName = orderInfo.fullName || 'Không có tên';
+          const customerEmail = orderInfo.email || 'Không có email';
+          const customerPhone = orderInfo.phone || 'Không có số điện thoại';
+          const serviceName = orderInfo.serviceName || 'Không có tên dịch vụ';
+          const servicePrice = orderInfo.servicePrice || 'Không có giá';
+          const orderNote = orderInfo.note || 'Khách hàng chưa để lại ghi chú.';
+
           const emailParams = {
             to_name: 'Quản trị viên',
-            customer_name: orderInfo.fullName,
-            customer_email: orderInfo.email,
-            customer_phone: orderInfo.phone,
-            service_package: orderInfo.serviceName,
-            service_price: orderInfo.servicePrice,
-            request_content: orderInfo.note || 'Khách hàng chưa để lại ghi chú.',
+            customer_name: customerName,
+            customer_email: customerEmail,
+            customer_phone: customerPhone,
+            service_package: serviceName,
+            service_price: servicePrice,
+            request_content: orderNote,
             subject: 'Yêu cầu dịch vụ mới - Kế Toán Sen Vàng'
           };
 
+          console.log('Sending email with params:', emailParams); // Debug log
+
           // Dynamically import emailjs to avoid bundling when not needed
           const emailjs = await import('@emailjs/browser');
-          
+
           await emailjs.send(
             import.meta.env.VITE_REACT_APP_SERVICE_ID,
             import.meta.env.VITE_REACT_APP_TEMPLATE_ID,
