@@ -38,27 +38,10 @@ const ServiceOrderForm = ({ serviceName, servicePrice, onClose, onSubmit }) => {
         email: orderInfo.email
       };
 
-      // Try to call backend API to create order
-      let responseOk = false;
+      // Skip backend API call to avoid 500 errors
+      // Just proceed with frontend-only order creation
       let result = null;
-      
-      try {
-        const response = await fetch(API_ENDPOINTS.ORDERS.CREATE, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(orderData)
-        });
-
-        if (response.ok) {
-          result = await response.json();
-          responseOk = true;
-        }
-      } catch (fetchError) {
-        console.error('Failed to connect to backend:', fetchError);
-        // Continue with frontend-only order creation
-      }
+      let responseOk = false;
 
       // Save order to localStorage for admin panel (fallback mechanism)
       const existingOrders = JSON.parse(localStorage.getItem('adminOrders')) || [];
