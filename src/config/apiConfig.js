@@ -2,13 +2,13 @@
 const getApiBaseUrl = () => {
   if (typeof window !== 'undefined') {
     // Client-side (browser)
-    // Use environment variable if available, otherwise use relative path
-    // This allows specifying a backend URL in production while using relative paths in development
-    return import.meta.env.VITE_API_URL || '';
+    // Use relative path for Vercel Functions in production
+    // This will route /api/* requests to the api/ directory functions
+    return '';
   } else {
-    // Server-side (Node.js)
-    // Use environment variable or default
-    return process.env.API_BASE_URL || process.env.BACKEND_URL || '';
+    // Server-side (Node.js) - this shouldn't be reached in a typical React app
+    // But fallback to empty string for relative paths
+    return '';
   }
 };
 
