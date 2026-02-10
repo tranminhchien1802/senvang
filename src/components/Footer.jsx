@@ -130,14 +130,14 @@ const Footer = () => {
           href={`https://zalo.me/${companyInfo.phone.replace(/\D/g, '')}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="block w-14 h-14 rounded-full shadow-lg transition-all overflow-hidden bg-white border-2 border-blue-500 hover:border-blue-600 flex items-center justify-center"
+          className="block w-14 h-14 rounded-full shadow-lg transition-all overflow-hidden bg-[#04C500] border-2 border-transparent hover:bg-[#03a803] flex items-center justify-center"
           style={{
             animation: 'quick-shake 3s infinite', // Rung mỗi 3 giây
             animationDelay: '0s' // Rung ngay
           }}
         >
           {/* Logo Zalo sử dụng Font Awesome thay thế để tránh lỗi COEP */}
-          <i className="fab fa-zalo text-green-600 text-2xl"></i>
+          <i className="fab fa-zalo text-white text-2xl"></i>
         </a>
 
         {/* 2. Nút Gọi điện (Rung lắc lệch nhịp với Zalo) */}
