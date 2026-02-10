@@ -141,14 +141,30 @@ const ServiceOrderForm = ({ serviceName, servicePrice, onClose, onSubmit }) => {
         boxShadow: '0 25px 50px rgba(0,0,0,0.25)',
         maxWidth: '28rem'
       }}>
-        <h2 className="text-2xl font-bold text-center text-gray-800 mb-6" style={{
-          fontSize: '1.5rem',
-          color: '#333',
-          marginBottom: '1.5rem',
-          textAlign: 'center'
-        }}>
-          ĐẶT DỊCH VỤ {serviceName?.toUpperCase()}
-        </h2>
+        <div className="text-center mb-6">
+          <h2 className="text-2xl font-bold text-gray-800 mb-2" style={{
+            fontSize: '1.5rem',
+            color: '#333',
+            marginBottom: '0.5rem',
+            textAlign: 'center'
+          }}>
+            ĐẶT DỊCH VỤ
+          </h2>
+          <div className="text-lg font-semibold text-[#D4AF37] mb-1" style={{
+            fontSize: '1.1rem',
+            color: '#D4AF37',
+            fontWeight: '600'
+          }}>
+            {serviceName?.toUpperCase()}
+          </div>
+          <div className="text-md font-bold text-red-600" style={{
+            fontSize: '1rem',
+            color: '#dc2626',
+            fontWeight: '700'
+          }}>
+            {servicePrice}
+          </div>
+        </div>
 
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
