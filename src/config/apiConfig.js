@@ -3,11 +3,11 @@ const getApiBaseUrl = () => {
   if (typeof window !== 'undefined') {
     // Client-side (browser)
     // Use environment variable if available (for production with external backend)
-    // Otherwise use relative path (for Vercel Functions or development)
-    return import.meta.env.VITE_API_URL || '';
+    // Otherwise use Railway backend URL for production
+    return import.meta.env.VITE_API_URL || (window.location.hostname === 'localhost' ? '' : 'https://senvang-backend-production.up.railway.app');
   } else {
     // Server-side (Node.js) - this shouldn't be reached in a typical React app
-    // But fallback to empty string for relative paths
+    // But fallback to Railway backend URL for production
     return '';
   }
 };

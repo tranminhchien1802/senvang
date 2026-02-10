@@ -1,27 +1,16 @@
 {
-  "version": 2,
-  "name": "senvang-frontend",
-  "builds": [
+  "rewrites": [
     {
-      "src": "package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "dist"
-      }
+      "source": "/api/:path*",
+      "destination": "https://senvang-backend-production.up.railway.app/api/:path*"
     },
     {
-      "src": "api/**/*.[jt]s",
-      "use": "@vercel/node"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
+      "source": "/health",
+      "destination": "https://senvang-backend-production.up.railway.app/health"
     },
     {
-      "src": "/(.*)",
-      "dest": "/index.html"
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ],
   "headers": [
@@ -38,7 +27,7 @@
         },
         {
           "key": "Access-Control-Allow-Headers",
-          "value": "Content-Type, Authorization, x-auth-token"
+          "value": "X-Requested-With, Content-Type, Accept, Authorization, x-auth-token"
         }
       ]
     }
