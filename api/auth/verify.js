@@ -32,12 +32,32 @@ export default async function handler(req, res) {
   }
 
   try {
+    console.log('Verify endpoint called');
+    
+    // Check if required environment variables are set
+    if (!process.env.GOOGLE_CLIENT_ID) {
+      console.error('Missing GOOGLE_CLIENT_ID environment variable');
+      return res.status(500).json({ 
+        msg: 'Server configuration error: Missing GOOGLE_CLIENT_ID' 
+      });
+    }
+    
+    if (!process.env.MONGODB_URI) {
+      console.error('Missing MONGODB_URI environment variable');
+      return res.status(500).json({ 
+        msg: 'Server configuration error: Missing MONGODB_URI' 
+      });
+    }
+
     const { credential } = req.body;
 
     if (!credential) {
+      console.error('No credential provided in request body');
       return res.status(400).json({ msg: 'Credential is required' });
     }
 
+    console.log('Verifying Google token...');
+    
     // Verify the Google token
     const ticket = await client.verifyIdToken({
       idToken: credential,
@@ -48,15 +68,20 @@ export default async function handler(req, res) {
 
     const { name, email, picture, sub: googleId } = googleUser;
 
+    console.log('Connecting to MongoDB...');
+    
     // Connect to MongoDB
     if (!mongoose.connection.readyState) {
       await mongoose.connect(process.env.MONGODB_URI);
+      console.log('Connected to MongoDB');
     }
 
     // Check if user already exists
+    console.log('Finding user in database...');
     let user = await UserModel.findOne({ email });
 
     if (user) {
+      console.log('User found, updating if needed...');
       // Update user with Google info if they registered without OAuth before
       if (!user.isOAuth) {
         user.googleId = googleId;
@@ -65,6 +90,7 @@ export default async function handler(req, res) {
         await user.save();
       }
     } else {
+      console.log('Creating new user...');
       // Create new user
       user = new UserModel({
         googleId,
@@ -134,6 +160,8 @@ export default async function handler(req, res) {
       }
     }
 
+    console.log('Generating JWT token...');
+    
     // Generate JWT token
     const payload = { userId: user._id };
     const token = jwt.sign(payload, process.env.JWT_SECRET || 'default_secret', { expiresIn: '7d' });
@@ -198,6 +226,8 @@ export default async function handler(req, res) {
       }
     }
 
+    console.log('Returning success response...');
+    
     res.status(200).json({
       msg: 'Đăng nhập thành công',
       token,
@@ -210,9 +240,14 @@ export default async function handler(req, res) {
     });
   } catch (err) {
     console.error('Google auth error:', err.message);
-    res.status(400).json({ 
-      msg: 'Token xác thực không hợp lệ hoặc đã hết hạn',
-      error: err.message 
+    console.error('Stack trace:', err.stack);
+    
+    // Return 500 for server errors, 400 for client errors
+    const statusCode = err.message.includes('invalid token') || err.message.includes('expired') ? 400 : 500;
+    res.status(statusCode).json({
+      msg: statusCode === 400 ? 'Token xác thực không hợp lệ hoặc đã hết hạn' : 'Lỗi máy chủ',
+      error: err.message,
+      ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
     });
   }
 }
