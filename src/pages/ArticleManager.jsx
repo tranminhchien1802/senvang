@@ -9,6 +9,7 @@ const ArticleManager = () => {
     image: '',
     date: new Date().toISOString().split('T')[0],
     category: 'Bài viết',
+    isMain: false,      // Là bài viết chính
     isNotification: false,
     isFeatured: false,
     color: '#005a9e' // Default color
@@ -35,6 +36,7 @@ const ArticleManager = () => {
         image: "https://images.unsplash.com/photo-1553877522-43269d4ea984?w=600&h=400&fit=crop",
         date: "2024-01-11",
         category: "Thuế doanh nghiệp",
+        isMain: false,
         isNotification: false,
         isFeatured: false,
         color: '#005a9e'
@@ -230,6 +232,17 @@ const ArticleManager = () => {
                   <label className="flex items-center">
                     <input
                       type="checkbox"
+                      name="isMain"
+                      checked={formData.isMain}
+                      onChange={handleChange}
+                      className="rounded border-gray-300 text-[#D4AF37] focus:ring-[#D4AF37]"
+                    />
+                    <span className="ml-2 text-sm text-gray-700">Là bài viết chính</span>
+                  </label>
+
+                  <label className="flex items-center">
+                    <input
+                      type="checkbox"
                       name="isNotification"
                       checked={formData.isNotification}
                       onChange={handleChange}
@@ -332,6 +345,11 @@ const ArticleManager = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex space-x-1">
+                          {article.isMain && (
+                            <span className="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
+                              CV
+                            </span>
+                          )}
                           {article.isNotification && (
                             <span className="px-2 py-1 text-xs font-medium bg-red-100 text-red-800 rounded-full">
                               TB

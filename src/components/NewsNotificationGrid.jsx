@@ -95,41 +95,32 @@ const NewsNotificationGrid = () => {
     }
 
     // Updated logic based on your requirements:
-    // - When nothing is selected (no flags), only 1 article should show
-    // - When "Thông báo" is selected, up to 2 articles should show below the main article
-    // - When "Nổi bật" is selected, it should appear in the featured announcements section
-    // - When both are selected, it should appear in both sections with priority in the featured section
+    // - When "Là bài viết chính" is selected, article appears in main position (where "Chưa có bài viết nào" is)
+    // - When "Là thông báo" is selected, article appears in "THÔNG BÁO MỚI NHẤT" section (sidebar)
+    // - When "Là bài viết nổi bật" is selected, article appears under main article
+    // - When multiple flags are selected, article appears in corresponding sections
 
-    // Get articles with no flags (neither isNotification nor isFeatured) - only 1 should be shown
-    const noFlagArticles = savedArticles
-      .filter(article => !article.isNotification && !article.isFeatured)
+    // Get the main article (with isMain flag) - only 1 should be shown as main
+    const mainArticle = savedArticles
+      .filter(article => article.isMain)
       .sort((a, b) => new Date(b.date || b.createdAt || new Date()) - new Date(a.date || a.createdAt || new Date()))
       .slice(0, 1); // Only take the most recent one
 
-    // Get articles with only isNotification flag (not isFeatured) - up to 2 can appear under main article
-    const notificationOnlyArticles = savedArticles
-      .filter(article => article.isNotification && !article.isFeatured)
+    // Get articles for sidebar notifications (with isNotification flag but not isMain)
+    const notificationArticles = savedArticles
+      .filter(article => article.isNotification && !article.isMain)
       .sort((a, b) => new Date(b.date || b.createdAt || new Date()) - new Date(a.date || a.createdAt || new Date()))
-      .slice(0, 2); // Up to 2 notifications
+      .slice(0, 3); // Up to 3 notifications in sidebar
 
-    // Get articles with isFeatured flag (either with or without isNotification) - these go to sidebar
-    const featuredArticles = savedArticles
-      .filter(article => article.isFeatured)
-      .sort((a, b) => {
-        // If both have isFeatured, prioritize those that also have isNotification
-        if (a.isNotification && !b.isNotification) return -1;
-        if (!a.isNotification && b.isNotification) return 1;
-        // Otherwise sort by date (most recent first)
-        return new Date(b.date || b.createdAt || new Date()) - new Date(a.date || a.createdAt || new Date());
-      })
-      .slice(0, 3); // Limit to 3 featured articles
-
-    // Combine main articles: first the no-flag article (if exists), then notifications under it
-    const mainArticles = [...noFlagArticles];
+    // Get articles for under main article section (with isFeatured flag but not isMain)
+    const featuredUnderMain = savedArticles
+      .filter(article => article.isFeatured && !article.isMain)
+      .sort((a, b) => new Date(b.date || b.createdAt || new Date()) - new Date(a.date || a.createdAt || new Date()))
+      .slice(0, 5); // Up to 5 featured articles under main
 
     // Set the articles and notifications
-    setArticles(mainArticles);
-    setNotifications(featuredArticles);
+    setArticles([...mainArticle, ...featuredUnderMain]); // Main article first, then featured under it
+    setNotifications(notificationArticles); // Notifications in sidebar
   }, []);
 
   return (
@@ -151,161 +142,153 @@ const NewsNotificationGrid = () => {
             </div>
 
             {articles.length > 0 ? (
-              <div className="featured-article" style={{
-                display: 'flex',
-                gap: '15px',
-                marginTop: '10px',
-                borderTop: '2px solid #005a9e',
-                paddingTop: '15px'
-              }}>
-                <div className="flex-shrink-0" style={{ flex: '0 0 300px' }}>
-                  {articles[0].image && (
-                    <img
-                      src={articles[0].image}
-                      alt={articles[0].title}
-                      style={{
-                        width: '100%',
-                        height: '200px',
-                        objectFit: 'cover',
-                        borderRadius: '4px'
-                      }}
-                    />
-                  )}
-                </div>
-                <div className="featured-content" style={{ flex: '1' }}>
-                  <h3 style={{
-                    fontSize: '1.2em',
-                    color: '#005a9e',
-                    marginBottom: '10px',
-                    fontWeight: 'bold'
-                  }}>
-                    {articles[0].title}
-                  </h3>
-                  <p style={{
-                    color: '#666',
-                    lineHeight: '1.6',
-                    marginBottom: '15px'
-                  }}>
-                    {articles[0].excerpt || articles[0].description}
-                  </p>
-                  {articles[0].link ? (
-                    <a
-                      href={articles[0].link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{
-                        color: '#005a9e',
-                        textDecoration: 'none',
-                        fontWeight: 'bold',
-                        fontSize: '0.9em'
-                      }}
-                      className="read-more"
-                    >
-                      XEM THÊM...
-                    </a>
-                  ) : (
-                    <a
-                      href={`https://www.google.com/search?q=${encodeURIComponent(articles[0].title)}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{
-                        color: '#005a9e',
-                        textDecoration: 'none',
-                        fontWeight: 'bold',
-                        fontSize: '0.9em'
-                      }}
-                      className="read-more"
-                    >
-                      XEM THÊM...
-                    </a>
-                  )}
-                </div>
-              </div>
-            ) : (
-              <div className="text-center py-8 text-gray-500">
-                Chưa có bài viết nào
-              </div>
-            )}
-
-            {/* Sub news grid - Display notifications that appear under articles (only isNotification, not isFeatured) */}
-            <div className="sub-news-grid" style={{ marginTop: '20px' }}>
-              {(() => {
-                // Get all articles from localStorage to find notifications that appear under posts
-                const allSavedArticles = JSON.parse(localStorage.getItem('knowledgeArticles')) ||
-                               JSON.parse(localStorage.getItem('featuredArticles')) ||
-                               JSON.parse(localStorage.getItem('blogPosts')) ||
-                               JSON.parse(localStorage.getItem('newsArticles')) ||
-                               JSON.parse(localStorage.getItem('homepageArticles')) ||
-                               [];
-
-                // Get notifications that appear under articles (only isNotification, not isFeatured)
-                const underArticlesNotifications = allSavedArticles
-                  .filter(article => article.isNotification && !article.isFeatured)
-                  .sort((a, b) => new Date(b.date || b.createdAt || new Date()) - new Date(a.date || a.createdAt || new Date()))
-                  .slice(0, 2); // Limit to 2 notifications under main article
-
-                return underArticlesNotifications.map((notification, index) => (
-                  <div key={`under-article-${notification.id || index}`} className="sub-notification" style={{
+              <>
+                {/* Main article (first article in the list should be the main one) */}
+                {articles[0]?.isMain && (
+                  <div className="featured-article" style={{
                     display: 'flex',
-                    gap: '10px',
-                    padding: '10px 0',
-                    borderBottom: '1px dashed #ccc',
-                    alignItems: 'center',
-                    backgroundColor: '#f0f8ff',
-                    borderLeft: '3px solid #005a9e',
-                    paddingLeft: '10px'
+                    gap: '15px',
+                    marginTop: '10px',
+                    borderTop: '2px solid #005a9e',
+                    paddingTop: '15px'
                   }}>
-                    <div className="flex-shrink-0" style={{ width: '80px', height: '60px' }}>
-                      {notification.image && (
+                    <div className="flex-shrink-0" style={{ flex: '0 0 300px' }}>
+                      {articles[0].image && (
                         <img
-                          src={notification.image}
-                          alt={notification.title}
+                          src={articles[0].image}
+                          alt={articles[0].title}
                           style={{
                             width: '100%',
-                            height: '100%',
+                            height: '200px',
                             objectFit: 'cover',
                             borderRadius: '4px'
                           }}
                         />
                       )}
                     </div>
-                    <div className="sub-notification-info" style={{ flex: '1' }}>
-                      {notification.link ? (
+                    <div className="featured-content" style={{ flex: '1' }}>
+                      <h3 style={{
+                        fontSize: '1.2em',
+                        color: '#005a9e',
+                        marginBottom: '10px',
+                        fontWeight: 'bold'
+                      }}>
+                        {articles[0].title}
+                      </h3>
+                      <p style={{
+                        color: '#666',
+                        lineHeight: '1.6',
+                        marginBottom: '15px'
+                      }}>
+                        {articles[0].excerpt || articles[0].description}
+                      </p>
+                      {articles[0].link ? (
                         <a
-                          href={notification.link}
+                          href={articles[0].link}
                           target="_blank"
                           rel="noopener noreferrer"
                           style={{
                             color: '#005a9e',
                             textDecoration: 'none',
-                            fontSize: '14px',
-                            margin: '0 0 5px 0',
-                            lineHeight: '1.4'
+                            fontWeight: 'bold',
+                            fontSize: '0.9em'
                           }}
+                          className="read-more"
                         >
-                          {notification.title}
+                          XEM THÊM...
                         </a>
                       ) : (
-                        <h4 style={{
-                          fontSize: '14px',
-                          color: '#005a9e',
-                          margin: '0 0 5px 0',
-                          lineHeight: '1.4'
-                        }}>
-                          {notification.title}
-                        </h4>
+                        <a
+                          href={`https://www.google.com/search?q=${encodeURIComponent(articles[0].title)}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{
+                            color: '#005a9e',
+                            textDecoration: 'none',
+                            fontWeight: 'bold',
+                            fontSize: '0.9em'
+                          }}
+                          className="read-more"
+                        >
+                          XEM THÊM...
+                        </a>
                       )}
-                      <span style={{
-                        fontSize: '11px',
-                        color: '#666'
-                      }}>
-                        Ngày đăng: {new Date(notification.date).toLocaleDateString('vi-VN')} (Thông báo)
-                      </span>
                     </div>
                   </div>
-                ));
-              })()}
-            </div>
+                )}
+
+                {/* Featured articles under main article (those with isFeatured flag) */}
+                {articles.slice(1).length > 0 && (
+                  <div className="sub-news-grid" style={{ marginTop: '20px' }}>
+                    {articles.slice(1).map((article, index) => (
+                      <div key={`featured-under-main-${article.id || index}`} className="sub-notification" style={{
+                        display: 'flex',
+                        gap: '10px',
+                        padding: '10px 0',
+                        borderBottom: '1px dashed #ccc',
+                        alignItems: 'center',
+                        backgroundColor: '#f0f8ff',
+                        borderLeft: '3px solid #005a9e',
+                        paddingLeft: '10px'
+                      }}>
+                        <div className="flex-shrink-0" style={{ width: '80px', height: '60px' }}>
+                          {article.image && (
+                            <img
+                              src={article.image}
+                              alt={article.title}
+                              style={{
+                                width: '100%',
+                                height: '100%',
+                                objectFit: 'cover',
+                                borderRadius: '4px'
+                              }}
+                            />
+                          )}
+                        </div>
+                        <div className="sub-notification-info" style={{ flex: '1' }}>
+                          {article.link ? (
+                            <a
+                              href={article.link}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              style={{
+                                color: '#005a9e',
+                                textDecoration: 'none',
+                                fontSize: '14px',
+                                margin: '0 0 5px 0',
+                                lineHeight: '1.4'
+                              }}
+                            >
+                              {article.title}
+                            </a>
+                          ) : (
+                            <h4 style={{
+                              fontSize: '14px',
+                              color: '#005a9e',
+                              margin: '0 0 5px 0',
+                              lineHeight: '1.4'
+                            }}>
+                              {article.title}
+                            </h4>
+                          )}
+                          <span style={{
+                            fontSize: '11px',
+                            color: '#666'
+                          }}>
+                            Ngày đăng: {new Date(article.date).toLocaleDateString('vi-VN')}
+                            {article.isNotification && ' (Thông báo)'}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                Chưa có bài viết nào
+              </div>
+            )}
           </div>
 
           {/* Sidebar news section (right side) */}
