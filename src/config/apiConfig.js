@@ -4,11 +4,15 @@ const getApiBaseUrl = () => {
     // Client-side (browser)
     // Use environment variable if available (for production with external backend)
     // Otherwise use localhost for development
-    // NOTE: Replace with your actual Render backend URL
-    return import.meta.env.VITE_API_URL || (window.location.hostname === 'localhost' ? 'http://localhost:5000' : 'https://YOUR-RENDER-URL.onrender.com');
+    // When running both frontend and backend locally, use the same origin
+    if (window.location.hostname === 'localhost') {
+      return ''; // Use same origin (no need to specify base URL)
+    } else {
+      // For production, use environment variable or fallback
+      return import.meta.env.VITE_API_URL || '';
+    }
   } else {
     // Server-side (Node.js) - this shouldn't be reached in a typical React app
-    // But fallback to Render backend URL for production
     return '';
   }
 };
