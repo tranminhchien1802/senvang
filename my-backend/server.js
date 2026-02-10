@@ -28,7 +28,7 @@ app.use(passport.session());
 const securityHeaders = require('./middleware/securityHeaders');
 app.use(securityHeaders);
 
-// Dynamic CORS configuration
+// Enhanced CORS configuration
 const cors = require('cors');
 const corsOptions = {
   origin: function (origin, callback) {
@@ -37,6 +37,11 @@ const corsOptions = {
       callback(null, true);
       return;
     }
+    
+    // For production, allow specific origins
+    // Check if NODE_ENV is properly set to 'production'
+    console.log('NODE_ENV:', process.env.NODE_ENV); // Debug log
+    console.log('Origin:', origin); // Debug log
     
     // Define allowed origins for production
     const allowedOrigins = [
@@ -50,10 +55,15 @@ const corsOptions = {
     const isAllowed = allowedOrigins.includes(origin) || 
                      (origin && origin.endsWith('.vercel.app'));
     
+    console.log('Is origin allowed:', isAllowed); // Debug log
     callback(null, isAllowed);
   },
   credentials: true,
-  optionsSuccessStatus: 200
+  optionsSuccessStatus: 200,
+  // Additional headers to ensure proper CORS handling
+  preflightContinue: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization', 'x-auth-token']
 };
 app.use(cors(corsOptions));
 
