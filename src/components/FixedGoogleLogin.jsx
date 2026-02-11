@@ -1,7 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { GoogleLogin } from '@react-oauth/google';
 import { jwtDecode } from 'jwt-decode';
-import { API_ENDPOINTS } from '../config/apiConfig';
 
 const FixedGoogleLogin = ({ onLoginSuccess, onLoginFailure }) => {
   const containerRef = useRef(null);
