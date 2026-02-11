@@ -3,7 +3,7 @@
   "trailingSlash": false,
   "rewrites": [
     {
-      "source": "/admin/(.*)",
+      "source": "/admin/login",
       "destination": "/index.html"
     },
     {
@@ -11,7 +11,11 @@
       "destination": "/index.html"
     },
     {
-      "source": "/(.*)",
+      "source": "/admin/(.*)",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/((?!api/|_next/|_static/|_vercel/|favicon\\.ico|sitemap\\.xml|robots\\.txt).*)",
       "destination": "/index.html"
     }
   ]
