@@ -8,8 +8,8 @@ const getApiBaseUrl = () => {
     if (window.location.hostname === 'localhost') {
       return ''; // Use same origin (no need to specify base URL)
     } else {
-      // For production, use relative path to access backend on same domain
-      return ''; // Use relative path so API calls go to same domain
+      // For production, use the backend URL on Render
+      return 'https://senvang-jef9.onrender.com'; // Use backend URL for production
     }
   } else {
     // Server-side (Node.js) - this shouldn't be reached in a typical React app
