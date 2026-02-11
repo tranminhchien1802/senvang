@@ -6,7 +6,7 @@ const getApiBaseUrl = () => {
     // Otherwise use localhost for development
     // When running both frontend and backend locally, use the same origin
     if (window.location.hostname === 'localhost') {
-      return ''; // Use same origin (no need to specify base URL)
+      return 'http://localhost:5000'; // Use backend URL for local development
     } else {
       // For production, use the backend URL on Render
       return 'https://senvang-jef9.onrender.com'; // Use backend URL for production
