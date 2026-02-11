@@ -6,10 +6,11 @@ const getApiBaseUrl = () => {
     // Otherwise use localhost for development
     // When running both frontend and backend locally, use the same origin
     if (window.location.hostname === 'localhost') {
+      // Use backend URL for local development if available, otherwise use relative path
       return 'http://localhost:5000'; // Use backend URL for local development
     } else {
-      // For production, use the backend URL on Render
-      return 'https://senvang-jef9.onrender.com'; // Use backend URL for production
+      // For production, use relative path to allow client-side only mode
+      return ''; // Use relative path for client-side only mode
     }
   } else {
     // Server-side (Node.js) - this shouldn't be reached in a typical React app
