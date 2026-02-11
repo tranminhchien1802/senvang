@@ -10,6 +10,7 @@ const config = {
     clientSecret: process.env.GOOGLE_CLIENT_SECRET || 'your_google_client_secret',
   },
   corsOrigin: process.env.CORS_ORIGIN || '*',
+  clientUrl: process.env.CLIENT_URL || 'http://localhost:5173',
 };
 
 module.exports = config;
