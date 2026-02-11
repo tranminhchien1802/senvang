@@ -1,27 +1,29 @@
 {
-  "version": 2,
   "cleanUrls": true,
   "trailingSlash": false,
-  "routes": [
+  "rewrites": [
     {
-      "src": "/admin/login",
-      "dest": "/index.html"
+      "source": "/admin/(.*)",
+      "destination": "/index.html"
     },
     {
-      "src": "/admin",
-      "dest": "/index.html"
+      "source": "/admin",
+      "destination": "/index.html"
     },
     {
-      "src": "/admin/(.*)",
-      "dest": "/index.html"
-    },
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ],
+  "headers": [
     {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
+        }
+      ]
     }
   ]
 }
