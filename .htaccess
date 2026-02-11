@@ -1,0 +1,11 @@
+# Cấu hình Apache cho ứng dụng React/Vite SPA
+Options -MultiViews
+RewriteEngine On
+
+# Điều hướng tất cả các request đến index.html
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ /index.html [QSA,L]
+
+# Nếu bạn có thư mục api riêng, bạn có thể loại trừ khỏi quy tắc trên
+# RewriteRule ^api/ - [L]
