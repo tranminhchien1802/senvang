@@ -27,125 +27,63 @@ const Login = () => {
       }
 
       if (isRegister) {
-        // Try backend registration first
-        try {
-          const data = await import('../utils/api').then(api => 
-            api.default.post('/users/register', { name, email, password, phone })
-          );
+        // Use localStorage for registration (client-side only mode)
+        const users = JSON.parse(localStorage.getItem('users')) || [];
+        const existingUser = users.find(user => user.email === email);
 
-          // Backend registration successful
-          alert('Đăng ký thành công! Vui lòng kiểm tra email để xác nhận.');
-          setIsRegister(false); // Switch to login form
-        } catch (backendError) {
-          // Fallback to localStorage registration
-          const users = JSON.parse(localStorage.getItem('users')) || [];
-          const existingUser = users.find(user => user.email === email);
-          
-          if (existingUser) {
-            alert('Email đã được đăng ký. Vui lòng sử dụng email khác.');
-            setLoading(false);
-            return;
-          }
-
-          const newUser = {
-            id: Date.now().toString(),
-            name,
-            email,
-            password, // In a real app, this should be hashed
-            phone,
-            createdAt: new Date().toISOString()
-          };
-          users.push(newUser);
-          localStorage.setItem('users', JSON.stringify(users));
-
-          alert('Đăng ký thành công!');
-          setIsRegister(false); // Switch to login form
+        if (existingUser) {
+          alert('Email đã được đăng ký. Vui lòng sử dụng email khác.');
+          setLoading(false);
+          return;
         }
+
+        const newUser = {
+          id: Date.now().toString(),
+          name,
+          email,
+          password, // In a real app, this should be hashed
+          phone,
+          createdAt: new Date().toISOString()
+        };
+        users.push(newUser);
+        localStorage.setItem('users', JSON.stringify(users));
+
+        alert('Đăng ký thành công!');
+        setIsRegister(false); // Switch to login form
       } else {
-        // Try backend login first
-        try {
-          const data = await import('../utils/api').then(api => 
-            api.default.post('/users/login', { email, password })
-          );
+        // Use localStorage for login (client-side only mode)
+        const users = JSON.parse(localStorage.getItem('users')) || [];
+        const user = users.find(u => u.email === email && u.password === password);
 
-          // Backend login successful
-          localStorage.setItem('token', data.token);
-          if (data.user && data.user.name) {
-            localStorage.setItem('userName', data.user.name);
-          }
-          if (data.user && data.user.email) {
-            localStorage.setItem('userEmail', data.user.email);
-          }
-
-          // Store login activity in localStorage
-          const loginActivity = {
-            name: data.user?.name || email,
-            email: data.user?.email || email,
-            loginTime: new Date().toISOString(),
-            id: Date.now().toString(),
-            provider: 'email',
-            ip: 'local',
-            userAgent: navigator.userAgent
-          };
-
-          const existingActivities = JSON.parse(localStorage.getItem('loginActivities')) || [];
-          const updatedActivities = [loginActivity, ...existingActivities];
-          localStorage.setItem('loginActivities', JSON.stringify(updatedActivities));
-
-          window.dispatchEvent(new Event('userLoggedIn'));
-          alert('Đăng nhập thành công!');
-          navigate(redirect);
-        } catch (backendError) {
-          // Check for admin login
-          if ((email === 'chien180203@gmail.com' || email === 'ketoansenvang.net@gmail.com') && password === '123') {
-            // Admin login
-            localStorage.setItem('adminToken', 'local-admin-token-' + Date.now());
-            localStorage.setItem('userName', 'Admin');
-            localStorage.setItem('userEmail', email);
-          }
-
-          // Fallback to localStorage login
-          const users = JSON.parse(localStorage.getItem('users')) || [];
-          const user = users.find(user => user.email === email && user.password === password);
-          
-          if (!user) {
-            alert('Email hoặc mật khẩu không đúng!');
-            setLoading(false);
-            return;
-          }
-
-          // Store user info in localStorage
-          localStorage.setItem('token', 'local-user-token-' + Date.now());
-          localStorage.setItem('userName', user.name);
-          localStorage.setItem('userEmail', user.email);
-          localStorage.setItem('user', JSON.stringify(user));
-
-          // Store login activity in localStorage
-          const loginActivity = {
-            name: user.name,
-            email: user.email,
-            loginTime: new Date().toISOString(),
-            id: Date.now().toString(),
-            provider: 'email',
-            ip: 'local',
-            userAgent: navigator.userAgent
-          };
-
-          const existingActivities = JSON.parse(localStorage.getItem('loginActivities')) || [];
-          const updatedActivities = [loginActivity, ...existingActivities];
-          localStorage.setItem('loginActivities', JSON.stringify(updatedActivities));
-
-          window.dispatchEvent(new Event('userLoggedIn'));
-          alert('Đăng nhập thành công!');
-
-          // Check if user is admin and redirect accordingly
-          const isAdmin = localStorage.getItem('adminToken');
-          if (isAdmin) {
-            navigate('/admin');
-          } else {
-            navigate(redirect);
-          }
+        if (!user) {
+          alert('Email hoặc mật khẩu không đúng!');
+          setLoading(false);
+          return;
         }
+
+        // Store user data in localStorage
+        localStorage.setItem('token', 'local_token_' + Date.now());
+        localStorage.setItem('userName', user.name);
+        localStorage.setItem('userEmail', user.email);
+
+        // Store login activity in localStorage
+        const loginActivity = {
+          name: user.name,
+          email: user.email,
+          loginTime: new Date().toISOString(),
+          id: Date.now().toString(),
+          provider: 'email',
+          ip: 'local',
+          userAgent: navigator.userAgent
+        };
+
+        const existingActivities = JSON.parse(localStorage.getItem('loginActivities')) || [];
+        const updatedActivities = [loginActivity, ...existingActivities];
+        localStorage.setItem('loginActivities', JSON.stringify(updatedActivities));
+
+        window.dispatchEvent(new Event('userLoggedIn'));
+        alert('Đăng nhập thành công!');
+        navigate(redirect);
       }
     } catch (error) {
       console.error('Error:', error);
