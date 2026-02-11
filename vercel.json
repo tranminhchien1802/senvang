@@ -1,22 +1,27 @@
 {
+  "version": 2,
   "cleanUrls": true,
   "trailingSlash": false,
-  "rewrites": [
+  "routes": [
     {
-      "source": "/admin/login",
-      "destination": "/index.html"
+      "src": "/admin/login",
+      "dest": "/index.html"
     },
     {
-      "source": "/admin",
-      "destination": "/index.html"
+      "src": "/admin",
+      "dest": "/index.html"
     },
     {
-      "source": "/admin/(.*)",
-      "destination": "/index.html"
+      "src": "/admin/(.*)",
+      "dest": "/index.html"
     },
     {
-      "source": "/((?!api/|_next/|_static/|_vercel/|favicon\\.ico|sitemap\\.xml|robots\\.txt).*)",
-      "destination": "/index.html"
+      "src": "/api/(.*)",
+      "dest": "/api/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
     }
   ]
 }
