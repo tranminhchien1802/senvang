@@ -1,11 +1,23 @@
-# Cấu hình Apache cho ứng dụng React/Vite SPA
+# Cấu hình Apache cho ứng dụng React/Vite SPA với API proxy
 Options -MultiViews
 RewriteEngine On
+
+# Enable CORS headers
+<IfModule mod_headers.c>
+    Header always set Access-Control-Allow-Origin "*"
+    Header always set Access-Control-Allow-Methods "GET, POST, PUT, PATCH, DELETE, OPTIONS"
+    Header always set Access-Control-Allow-Headers "DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization"
+</IfModule>
+
+# Handle preflight requests
+RewriteCond %{REQUEST_METHOD} OPTIONS
+RewriteRule ^(.*)$ - [R=200,L,E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+# Proxy API requests to backend
+RewriteCond %{REQUEST_URI} ^/api/
+RewriteRule ^(.*)$ http://localhost:5000/$1 [P,L]  # Thay bằng backend của bạn
 
 # Điều hướng tất cả các request đến index.html
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^(.*)$ /index.html [QSA,L]
-
-# Nếu bạn có thư mục api riêng, bạn có thể loại trừ khỏi quy tắc trên
-# RewriteRule ^api/ - [L]

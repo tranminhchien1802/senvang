@@ -5,12 +5,12 @@ const getApiBaseUrl = () => {
     // Use environment variable if available (for production with external backend)
     // Otherwise use localhost for development
     // When running both frontend and backend locally, use the same origin
-    if (window.location.hostname === 'localhost') {
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
       // Use backend URL for local development if available, otherwise use relative path
       return 'http://localhost:5000'; // Use backend URL for local development
     } else {
-      // For production, use relative path to allow client-side only mode
-      return ''; // Use relative path for client-side only mode
+      // For production, use relative path to leverage server proxy
+      return ''; // Use relative path to leverage server proxy configuration
     }
   } else {
     // Server-side (Node.js) - this shouldn't be reached in a typical React app
