@@ -257,6 +257,31 @@ function App() {
         <Route path="/auth/success" element={<AuthSuccess />} />
         <Route path="/login" element={<Login />} />
         <Route path="/login/*" element={<Login />} />
+        
+        {/* Catch-all route for SPA - must be the last route */}
+        <Route path="*" element={
+          <>
+            <Header />
+            <div className="flex flex-col min-h-screen">
+              <main className="flex-grow bg-white pt-24">
+                <div className="container mx-auto px-4 py-8">
+                  <div className="text-center">
+                    <h1 className="text-4xl font-bold text-gray-900 mb-4">404 - Trang không tồn tại</h1>
+                    <p className="text-xl text-gray-600 mb-8">Xin lỗi, trang bạn đang tìm kiếm không tồn tại.</p>
+                    <a 
+                      href="/" 
+                      className="inline-block bg-[#D4AF37] hover:bg-[#b8942f] text-white font-bold py-3 px-6 rounded-lg transition-colors"
+                    >
+                      Quay về trang chủ
+                    </a>
+                  </div>
+                </div>
+              </main>
+              <Footer />
+              <FloatingContact />
+            </div>
+          </>
+        } />
       </Routes>
     </Router>
     </GoogleOAuthProvider>
