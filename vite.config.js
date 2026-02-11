@@ -9,7 +9,7 @@ export default defineConfig({
     port: 5173,
     proxy: {
       '/api': {
-        target: 'https://senvang-backend-production.up.railway.app', // Backend của bạn trên Railway
+        target: 'https://senvang-jef9.onrender.com', // Backend của bạn trên Render
         changeOrigin: true,
         secure: false,
         rewrite: (path) => path.replace(/^\/api/, '/api')
