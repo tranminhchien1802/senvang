@@ -87,17 +87,21 @@ app.use(express.static(path.join(__dirname, 'public'), {
 // Serve uploaded files
 app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 
-// Kết nối MongoDB
+// Kết nối MongoDB (không bắt buộc phải thành công)
 const connectDB = async () => {
   try {
-    await mongoose.connect(process.env.MONGODB_URI || config.mongoUri, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-    console.log('✅ Kết nối MongoDB thành công');
+    if (process.env.MONGODB_URI) {
+      await mongoose.connect(process.env.MONGODB_URI, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+      });
+      console.log('✅ Kết nối MongoDB thành công');
+    } else {
+      console.log('⚠️ Không tìm thấy MONGODB_URI, một số tính năng sẽ bị giới hạn');
+    }
   } catch (err) {
-    console.error('❌ Lỗi kết nối MongoDB:', err);
-    process.exit(1); // Exit process with failure
+    console.error('❌ Không thể kết nối MongoDB:', err.message);
+    console.log('⚠️ Chạy ở chế độ giới hạn (một số tính năng không khả dụng)');
   }
 };
 
