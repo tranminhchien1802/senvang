@@ -28,14 +28,14 @@ const FixedGoogleLogin = ({ onLoginSuccess, onLoginFailure }) => {
         }
 
         // Extract user data from response
-        const userData = {
+        const backendUserData = {
           id: data.user.id,
           name: data.user.name,
           email: data.user.email,
         };
 
         // Store user data in localStorage
-        localStorage.setItem('user', JSON.stringify(userData));
+        localStorage.setItem('user', JSON.stringify(backendUserData));
 
         // Store the JWT token from backend
         localStorage.setItem('token', data.token);
@@ -57,6 +57,15 @@ const FixedGoogleLogin = ({ onLoginSuccess, onLoginFailure }) => {
         // Generate a temporary token
         const tempToken = 'temp_token_' + Date.now();
         localStorage.setItem('token', tempToken);
+      }
+
+      // Get the final user data (either from backend or fallback)
+      const userData = JSON.parse(localStorage.getItem('user')) || {
+        id: googleUserData.sub,
+        name: googleUserData.name,
+        email: googleUserData.email,
+        avatar: googleUserData.picture
+      };
 
       // Store user name for display in header
       if (userData.name) {
