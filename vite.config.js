@@ -9,9 +9,10 @@ export default defineConfig({
     port: 5173,
     proxy: {
       '/api': {
-        target: 'http://localhost:5000',
+        target: 'https://senvang-backend-production.up.railway.app', // Backend của bạn trên Railway
         changeOrigin: true,
         secure: false,
+        rewrite: (path) => path.replace(/^\/api/, '/api')
       }
     },
     // Cấu hình để hỗ trợ đồng bộ dữ liệu nhanh
@@ -23,7 +24,7 @@ export default defineConfig({
     // Khi chạy preview, proxy tới backend
     proxy: {
       '/api': {
-        target: process.env.BACKEND_URL || 'http://localhost:5000',
+        target: process.env.BACKEND_URL || 'https://senvang-backend-production.up.railway.app',
         changeOrigin: true,
         secure: false,
       },
