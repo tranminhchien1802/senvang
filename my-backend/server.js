@@ -70,6 +70,16 @@ app.use((req, res, next) => {
   next();
 });
 
+// Additional headers to support OAuth flows
+app.use((req, res, next) => {
+  // Allow cross-origin requests for OAuth
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, x-auth-token");
+  res.setHeader("Access-Control-Allow-Credentials", "true");
+  next();
+});
+
 app.use(express.json());
 
 // Serve static files from public directory (for built frontend)
