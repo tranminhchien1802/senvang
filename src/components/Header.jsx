@@ -34,13 +34,48 @@ const Header = () => {
   const [isUserLoggedIn, setIsUserLoggedIn] = useState(!!localStorage.getItem('token'));
   const location = useLocation();
 
-  // Load company info from localStorage
+  // Load company info from localStorage with improved sync
   useEffect(() => {
-    const savedSettings = JSON.parse(localStorage.getItem('generalSettings')) || {};
-    setCompanyInfo({
-      companyName: savedSettings.companyName || 'KẾ TOÁN SEN VÀNG',
-      logo: savedSettings.logo || ''
-    });
+    const loadCompanyInfo = () => {
+      // Try multiple storage keys to ensure we get the latest data
+      let savedSettings = JSON.parse(localStorage.getItem('generalSettings')) ||
+                         JSON.parse(localStorage.getItem('master_website_data_v2')?.settings || '{}') ||
+                         {};
+      
+      setCompanyInfo({
+        companyName: savedSettings.companyName || 'KẾ TOÁN SEN VÀNG',
+        logo: savedSettings.logo || ''
+      });
+    };
+
+    loadCompanyInfo();
+
+    // Listen for settings updates from other components
+    const handleSettingsUpdate = (e) => {
+      const settings = e.detail || JSON.parse(localStorage.getItem('generalSettings') || '{}');
+      setCompanyInfo({
+        companyName: settings.companyName || 'KẾ TOÁN SEN VÀNG',
+        logo: settings.logo || ''
+      });
+    };
+
+    window.addEventListener('settingsUpdated', handleSettingsUpdate);
+
+    // Also periodically check for updates (every 2 seconds) to catch any missed changes
+    const interval = setInterval(() => {
+      const currentSettings = JSON.parse(localStorage.getItem('generalSettings') || '{}');
+      if (currentSettings.logo !== companyInfo.logo || currentSettings.companyName !== companyInfo.companyName) {
+        setCompanyInfo({
+          companyName: currentSettings.companyName || 'KẾ TOÁN SEN VÀNG',
+          logo: currentSettings.logo || ''
+        });
+      }
+    }, 2000);
+
+    return () => {
+      window.removeEventListener('settingsUpdated', handleSettingsUpdate);
+      clearInterval(interval);
+    };
   }, []);
 
 

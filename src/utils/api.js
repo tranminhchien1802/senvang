@@ -52,10 +52,21 @@ class ApiClient {
         }
         return data;
       } else {
+        // Check if response is HTML (which indicates an error page)
+        const responseText = await response.text();
+        if (responseText.trim().startsWith('<!DOCTYPE html') || 
+            responseText.trim().startsWith('<html') || 
+            responseText.toLowerCase().includes('<head') || 
+            responseText.toLowerCase().includes('<body')) {
+          // This is an HTML response, likely an error page
+          console.error('Received HTML response instead of JSON:', responseText.substring(0, 200) + '...');
+          throw new Error('Server returned an HTML error page instead of JSON data');
+        }
+        
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-        return await response.text();
+        return responseText;
       }
     } catch (error) {
       console.error('API request failed:', error);

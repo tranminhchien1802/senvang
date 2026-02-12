@@ -265,34 +265,38 @@ const ServiceOrderForm = ({ serviceName, servicePrice, onClose, onSubmit }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999] p-4">
       <div className="bg-white p-8 rounded-xl shadow-2xl w-full max-w-md" style={{
         backgroundColor: '#fff',
         padding: '2rem',
         borderRadius: '0.5rem',
         boxShadow: '0 25px 50px rgba(0,0,0,0.25)',
-        maxWidth: '28rem'
+        maxWidth: '28rem',
+        zIndex: 9999
       }}>
-        <div className="text-center mb-6">
+        <div className="text-center mb-6 relative" style={{ zIndex: 10000 }}>
           <h2 className="text-2xl font-bold text-gray-800 mb-2" style={{
             fontSize: '1.5rem',
             color: '#333',
             marginBottom: '0.5rem',
-            textAlign: 'center'
+            textAlign: 'center',
+            zIndex: 10000
           }}>
             ĐẶT DỊCH VỤ
           </h2>
           <div className="text-lg font-semibold text-[#D4AF37] mb-1" style={{
             fontSize: '1.1rem',
             color: '#D4AF37',
-            fontWeight: '600'
+            fontWeight: '600',
+            zIndex: 10000
           }}>
             {serviceName?.toUpperCase()}
           </div>
           <div className="text-md font-bold text-red-600" style={{
             fontSize: '1rem',
             color: '#dc2626',
-            fontWeight: '700'
+            fontWeight: '700',
+            zIndex: 10000
           }}>
             {servicePrice}
           </div>

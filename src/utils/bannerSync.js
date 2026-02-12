@@ -295,14 +295,28 @@ export const deleteBannerFromBackend = async (bannerId, token) => {
  */
 export const refreshBanners = () => {
   const bannerData = JSON.parse(localStorage.getItem('banners') || '[]');
-  
+
   // Ensure all storage keys are consistent
   localStorage.setItem('banners', JSON.stringify(bannerData));
   localStorage.setItem('bannerSlides', JSON.stringify(bannerData));
   localStorage.setItem('websiteBanners', JSON.stringify(bannerData));
-  
+
+  // Update master data as well
+  try {
+    const masterDataStr = localStorage.getItem('master_website_data_v2');
+    let masterData = masterDataStr ? JSON.parse(masterDataStr) : {};
+    masterData.banners = bannerData;
+    masterData.timestamp = Date.now();
+    localStorage.setItem('master_website_data_v2', JSON.stringify(masterData));
+  } catch (e) {
+    console.warn('Could not update master data:', e);
+  }
+
   // Dispatch a custom event to notify other components about the refresh
   window.dispatchEvent(new CustomEvent('bannersUpdated', { detail: bannerData }));
   
+  // Dispatch a general sync event
+  window.dispatchEvent(new CustomEvent('forceDataSync'));
+
   return bannerData;
 };

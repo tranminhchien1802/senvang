@@ -6,6 +6,7 @@ import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { ensureDataSync } from './utils/dataSync'; // Keep for regular login buttons
+import { initializeDataSync } from './utils/improvedDataSync'; // New improved sync
 import UpdateServicesData from './components/UpdateServicesData';
 import DataSync from './components/DataSync';
 import Header from './components/Header';
@@ -41,6 +42,8 @@ function App() {
   useEffect(() => {
     // Ensure data synchronization when app starts
     ensureDataSync();
+    // Initialize improved data sync
+    initializeDataSync();
   }, []);
 
   return (

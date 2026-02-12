@@ -16,14 +16,45 @@ const GeneralSettings = () => {
     metaDescription: 'Cung cấp dịch vụ kế toán, đăng ký kinh doanh, thuế và thiết kế web chuyên nghiệp cho doanh nghiệp'
   });
 
-  // Load data from localStorage
+  // Load data from localStorage with improved sync
   useEffect(() => {
-    const savedSettings = JSON.parse(localStorage.getItem('generalSettings')) || {};
-    setCompanyInfo(prev => ({
-      ...prev,
-      ...savedSettings,
-      logoPreview: savedSettings.logo || ''
-    }));
+    const loadSettings = () => {
+      // Try multiple storage keys to ensure we get the latest data
+      const savedSettings = JSON.parse(localStorage.getItem('generalSettings')) ||
+                           JSON.parse(localStorage.getItem('master_website_data_v2')?.settings || '{}') ||
+                           {};
+                           
+      setCompanyInfo(prev => ({
+        ...prev,
+        ...savedSettings,
+        logoPreview: savedSettings.logo || ''
+      }));
+    };
+
+    loadSettings();
+
+    // Listen for storage changes to update settings when they change in other tabs
+    const handleStorageChange = (e) => {
+      if (e.key === 'generalSettings' || e.key === 'master_website_data_v2') {
+        setTimeout(() => {
+          const updatedSettings = JSON.parse(localStorage.getItem('generalSettings')) ||
+                                JSON.parse(localStorage.getItem('master_website_data_v2')?.settings || '{}') ||
+                                {};
+                                
+          setCompanyInfo(prev => ({
+            ...prev,
+            ...updatedSettings,
+            logoPreview: updatedSettings.logo || ''
+          }));
+        }, 100);
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
   }, []);
 
   const handleInputChange = (field, value) => {
@@ -33,18 +64,33 @@ const GeneralSettings = () => {
     }));
   };
 
-  const handleLogoChange = (e) => {
+  const handleLogoChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setCompanyInfo(prev => ({
-          ...prev,
-          logo: reader.result,
-          logoPreview: reader.result
-        }));
-      };
-      reader.readAsDataURL(file);
+      try {
+        // Use the new image storage utility
+        const imageStorageModule = await import('../utils/imageStorage');
+        const result = await imageStorageModule.saveLogoImage(file);
+        
+        if (result.success) {
+          // Update state with the new logo
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            setCompanyInfo(prev => ({
+              ...prev,
+              logo: reader.result, // Use the base64 result
+              logoPreview: reader.result // Use the same for preview
+            }));
+          };
+          reader.readAsDataURL(file);
+        } else {
+          console.error('Failed to save logo:', result.error);
+          alert('Lỗi khi lưu logo: ' + result.error);
+        }
+      } catch (error) {
+        console.error('Error handling logo change:', error);
+        alert('Lỗi khi xử lý file logo: ' + error.message);
+      }
     }
   };
 
@@ -55,6 +101,24 @@ const GeneralSettings = () => {
     // Save to localStorage
     const { logoPreview, ...settingsToSave } = companyInfo;
     localStorage.setItem('generalSettings', JSON.stringify(settingsToSave));
+
+    // Also update master data
+    try {
+      const masterDataStr = localStorage.getItem('master_website_data_v2');
+      let masterData = masterDataStr ? JSON.parse(masterDataStr) : {};
+      if (!masterData.settings) masterData.settings = {};
+      masterData.settings = settingsToSave;
+      masterData.timestamp = Date.now();
+      localStorage.setItem('master_website_data_v2', JSON.stringify(masterData));
+    } catch (e) {
+      console.warn('Could not update master data:', e);
+    }
+
+    // Dispatch event to notify other components
+    window.dispatchEvent(new CustomEvent('settingsUpdated', { detail: settingsToSave }));
+    
+    // Dispatch general sync event
+    window.dispatchEvent(new CustomEvent('forceDataSync'));
 
     alert('Cập nhật cài đặt chung thành công!');
   };

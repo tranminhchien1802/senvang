@@ -15,45 +15,79 @@ const BannerManager = () => {
   });
   const [uploading, setUploading] = useState(false);
 
-  // Load banners from localStorage
+  // Load banners from localStorage with improved sync
   useEffect(() => {
-    const savedBanners = localStorage.getItem('websiteBanners');
-    if (savedBanners) {
-      setBanners(JSON.parse(savedBanners));
-    } else {
-      // Initialize with default banners
-      const defaultBanners = [
-        {
-          id: '1',
-          title: 'DỊCH VỤ THÀNH LẬP DOANH NGHIỆP',
-          description: 'Thủ tục nhanh chóng, chi phí minh bạch, hỗ trợ trọn đời',
-          image: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&h=600&fit=crop',
-          buttonText: 'Tư Vấn Miễn Phí',
-          buttonLink: '/dang-ky-kinh-doanh',
-          order: 1
-        },
-        {
-          id: '2',
-          title: 'DỊCH VỤ KẾ TOÁN TRỌN GÓI',
-          description: 'Dịch vụ kế toán chuyên nghiệp, báo cáo thuế đúng hạn',
-          image: 'https://images.unsplash.com/photo-1553877522-43269d4ea984?w=1200&h=600&fit=crop',
-          buttonText: 'Xem Gói Dịch Vụ',
-          buttonLink: '/ke-toan-doanh-nghiep',
-          order: 2
-        },
-        {
-          id: '3',
-          title: 'THIẾT KẾ WEBSITE CHUYÊN NGHIỆP',
-          description: 'Thiết kế website theo yêu cầu, chuẩn SEO, tốc độ cao',
-          image: 'https://images.unsplash.com/photo-1551650975-87deedd944c3?w=1200&h=600&fit=crop',
-          buttonText: 'Thiết Kế Ngay',
-          buttonLink: '/thiet-ke-web',
-          order: 3
-        }
-      ];
-      setBanners(defaultBanners);
-      localStorage.setItem('websiteBanners', JSON.stringify(defaultBanners));
-    }
+    const loadBanners = () => {
+      // Try multiple storage keys to ensure we get the latest data
+      let savedBanners = JSON.parse(localStorage.getItem('websiteBanners')) ||
+                        JSON.parse(localStorage.getItem('banners')) ||
+                        JSON.parse(localStorage.getItem('bannerSlides')) ||
+                        JSON.parse(localStorage.getItem('master_website_data_v2')?.banners || '[]') ||
+                        null;
+                        
+      if (savedBanners && savedBanners.length > 0) {
+        setBanners(savedBanners);
+      } else {
+        // Initialize with default banners
+        const defaultBanners = [
+          {
+            id: '1',
+            title: 'DỊCH VỤ THÀNH LẬP DOANH NGHIỆP',
+            description: 'Thủ tục nhanh chóng, chi phí minh bạch, hỗ trợ trọn đời',
+            image: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&h=600&fit=crop',
+            buttonText: 'Tư Vấn Miễn Phí',
+            buttonLink: '/dang-ky-kinh-doanh',
+            order: 1
+          },
+          {
+            id: '2',
+            title: 'DỊCH VỤ KẾ TOÁN TRỌN GÓI',
+            description: 'Dịch vụ kế toán chuyên nghiệp, báo cáo thuế đúng hạn',
+            image: 'https://images.unsplash.com/photo-1553877522-43269d4ea984?w=1200&h=600&fit=crop',
+            buttonText: 'Xem Gói Dịch Vụ',
+            buttonLink: '/ke-toan-doanh-nghiep',
+            order: 2
+          },
+          {
+            id: '3',
+            title: 'THIẾT KẾ WEBSITE CHUYÊN NGHIỆP',
+            description: 'Thiết kế website theo yêu cầu, chuẩn SEO, tốc độ cao',
+            image: 'https://images.unsplash.com/photo-1551650975-87deedd944c3?w=1200&h=600&fit=crop',
+            buttonText: 'Thiết Kế Ngay',
+            buttonLink: '/thiet-ke-web',
+            order: 3
+          }
+        ];
+        setBanners(defaultBanners);
+        
+        // Save to all storage keys for consistency
+        localStorage.setItem('websiteBanners', JSON.stringify(defaultBanners));
+        localStorage.setItem('banners', JSON.stringify(defaultBanners));
+        localStorage.setItem('bannerSlides', JSON.stringify(defaultBanners));
+      }
+    };
+
+    loadBanners();
+
+    // Listen for storage changes to update banners when they change in other tabs
+    const handleStorageChange = (e) => {
+      if (e.key === 'websiteBanners' || e.key === 'banners' || e.key === 'bannerSlides' || e.key === 'master_website_data_v2') {
+        setTimeout(() => {
+          const updatedBanners = JSON.parse(localStorage.getItem('websiteBanners')) ||
+                               JSON.parse(localStorage.getItem('banners')) ||
+                               JSON.parse(localStorage.getItem('bannerSlides')) ||
+                               JSON.parse(localStorage.getItem('master_website_data_v2')?.banners || '[]') ||
+                               [];
+          setBanners(updatedBanners);
+        }, 100);
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
   }, []);
 
   const handleFormChange = (e) => {
@@ -71,35 +105,30 @@ const BannerManager = () => {
     setUploading(true);
 
     try {
-      // Validate file type
-      if (!file.type.match('image.*')) {
-        alert('Please select an image file (JPEG, PNG, GIF, etc.)');
+      // Use the new image storage utility
+      const imageStorageModule = await import('../../utils/imageStorage');
+      const result = await imageStorageModule.saveBannerImage(Date.now().toString(), file);
+      
+      if (result.success) {
+        // Read the file to get the base64 data for immediate use
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          setBannerForm({
+            ...bannerForm,
+            image: event.target.result
+          });
+          setUploading(false);
+        };
+        reader.onerror = () => {
+          alert('Error reading image file. Please try again.');
+          setUploading(false);
+        };
+        reader.readAsDataURL(file);
+      } else {
+        console.error('Failed to save banner image:', result.error);
+        alert('Error saving image: ' + result.error);
         setUploading(false);
-        return;
       }
-
-      // Validate file size (max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        alert('File size exceeds 5MB limit. Please select a smaller image.');
-        setUploading(false);
-        return;
-      }
-
-      // Skip backend upload attempt since we're working in local mode
-      // Only use local storage for image data
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        setBannerForm({
-          ...bannerForm,
-          image: event.target.result
-        });
-        setUploading(false);
-      };
-      reader.onerror = () => {
-        alert('Error reading image file. Please try again.');
-        setUploading(false);
-      };
-      reader.readAsDataURL(file);
     } catch (error) {
       console.error('Error uploading image:', error);
       alert('Error uploading image. Please try again.');

@@ -7,14 +7,14 @@ const BannerSlider = () => {
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
   const [refreshTrigger, setRefreshTrigger] = useState(0); // State để force refresh
 
-  // Load banners from localStorage
+  // Load banners from localStorage with improved sync
   useEffect(() => {
     const loadBanners = () => {
-      // Always prioritize localStorage data for immediate consistency
       // Try multiple storage keys to ensure we get the latest data
       let savedBanners = JSON.parse(localStorage.getItem('banners')) ||
                         JSON.parse(localStorage.getItem('bannerSlides')) ||
                         JSON.parse(localStorage.getItem('websiteBanners')) ||
+                        JSON.parse(localStorage.getItem('master_website_data_v2')?.banners || '[]') ||
                         [];
       console.log('Loaded banners from localStorage:', savedBanners); // Debug log
       setBanners(savedBanners);
@@ -25,13 +25,14 @@ const BannerSlider = () => {
     // Listen for storage changes to update banners when they change in admin
     const handleStorageChange = (e) => {
       // Reload regardless of which key changed, to ensure consistency
-      if (e.key === 'banners' || e.key === 'bannerSlides' || e.key === 'websiteBanners') {
+      if (e.key === 'banners' || e.key === 'bannerSlides' || e.key === 'websiteBanners' || e.key === 'master_website_data_v2') {
         console.log('Storage change detected for key:', e.key); // Debug log
         // Force reload the banners from localStorage
         setTimeout(() => {
           const freshBanners = JSON.parse(localStorage.getItem('banners')) ||
                               JSON.parse(localStorage.getItem('bannerSlides')) ||
                               JSON.parse(localStorage.getItem('websiteBanners')) ||
+                              JSON.parse(localStorage.getItem('master_website_data_v2')?.banners || '[]') ||
                               [];
           console.log('Fresh banners loaded after storage change:', freshBanners); // Debug log
           setBanners(freshBanners);
@@ -45,6 +46,7 @@ const BannerSlider = () => {
       const freshBanners = JSON.parse(localStorage.getItem('banners')) ||
                           JSON.parse(localStorage.getItem('bannerSlides')) ||
                           JSON.parse(localStorage.getItem('websiteBanners')) ||
+                          JSON.parse(localStorage.getItem('master_website_data_v2')?.banners || '[]') ||
                           [];
       console.log('Refresh event triggered, banners loaded:', freshBanners); // Debug log
       setBanners(freshBanners);
@@ -63,6 +65,7 @@ const BannerSlider = () => {
       const freshBanners = JSON.parse(localStorage.getItem('banners')) ||
                           JSON.parse(localStorage.getItem('bannerSlides')) ||
                           JSON.parse(localStorage.getItem('websiteBanners')) ||
+                          JSON.parse(localStorage.getItem('master_website_data_v2')?.banners || '[]') ||
                           [];
       if (freshBanners.length !== banners.length) {
         console.log('Periodic check - banners changed:', freshBanners); // Debug log
@@ -71,14 +74,22 @@ const BannerSlider = () => {
       }
     }, 1500);
 
+    // Listen for force data sync events
+    const handleForceSync = () => {
+      loadBanners();
+      setRefreshTrigger(prev => prev + 1);
+    };
+
     window.addEventListener('storage', handleStorageChange);
     window.addEventListener('refreshBanners', handleRefreshEvent);
     window.addEventListener('bannersUpdated', handleBannerUpdate);
+    window.addEventListener('forceDataSync', handleForceSync);
 
     return () => {
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('refreshBanners', handleRefreshEvent);
       window.removeEventListener('bannersUpdated', handleBannerUpdate);
+      window.removeEventListener('forceDataSync', handleForceSync);
       clearInterval(interval);
     };
   }, [refreshTrigger]); // Add refreshTrigger to dependency array
