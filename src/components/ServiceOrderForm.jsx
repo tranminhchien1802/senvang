@@ -266,211 +266,119 @@ const ServiceOrderForm = ({ serviceName, servicePrice, onClose, onSubmit }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999] p-4">
-      <div className="bg-white p-8 rounded-xl shadow-2xl w-full max-w-md" style={{
-        backgroundColor: '#fff',
-        padding: '2rem',
-        borderRadius: '0.5rem',
-        boxShadow: '0 25px 50px rgba(0,0,0,0.25)',
-        maxWidth: '28rem',
-        zIndex: 9999
-      }}>
-        <div className="text-center mb-6 relative" style={{ zIndex: 10000 }}>
-          <h2 className="text-2xl font-bold text-gray-800 mb-2" style={{
-            fontSize: '1.5rem',
-            color: '#333',
-            marginBottom: '0.5rem',
-            textAlign: 'center',
-            zIndex: 10000
-          }}>
-            ĐẶT DỊCH VỤ
-          </h2>
-          <div className="text-lg font-semibold text-[#D4AF37] mb-1" style={{
-            fontSize: '1.1rem',
-            color: '#D4AF37',
-            fontWeight: '600',
-            zIndex: 10000
-          }}>
-            {serviceName?.toUpperCase()}
+      <div className="bg-white rounded-xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+        <div className="p-6">
+          <div className="text-center mb-4">
+            <h2 className="text-2xl font-bold text-gray-800 mb-1">ĐẶT DỊCH VỤ</h2>
+            <div className="text-lg font-semibold text-[#D4AF37] mb-1">
+              {serviceName?.toUpperCase()}
+            </div>
+            <div className="text-md font-bold text-red-600">
+              {servicePrice}
+            </div>
           </div>
-          <div className="text-md font-bold text-red-600" style={{
-            fontSize: '1rem',
-            color: '#dc2626',
-            fontWeight: '700',
-            zIndex: 10000
-          }}>
-            {servicePrice}
-          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Họ và tên <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                name="fullName"
+                value={orderInfo.fullName}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Email <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="email"
+                name="email"
+                value={orderInfo.email}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Số điện thoại <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="tel"
+                name="phone"
+                value={orderInfo.phone}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Ghi chú
+              </label>
+              <textarea
+                name="note"
+                value={orderInfo.note}
+                onChange={handleInputChange}
+                rows="2"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent"
+                placeholder="Ghi chú thêm về yêu cầu của bạn..."
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4 pt-2">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Dịch vụ
+                </label>
+                <input
+                  type="text"
+                  value={orderInfo.serviceName}
+                  readOnly
+                  className="w-full px-3 py-2 bg-gray-100 text-gray-700 rounded-lg border border-gray-300"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Giá tiền
+                </label>
+                <input
+                  type="text"
+                  value={orderInfo.servicePrice}
+                  readOnly
+                  className="w-full px-3 py-2 bg-gray-100 text-gray-700 rounded-lg border border-gray-300"
+                />
+              </div>
+            </div>
+
+            <div className="flex space-x-3 pt-4">
+              <button
+                type="button"
+                onClick={onClose}
+                className="flex-1 py-2 px-4 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors font-medium"
+              >
+                Hủy
+              </button>
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className={`flex-1 py-2 px-4 text-white font-bold rounded-lg transition-colors ${isSubmitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#D4AF37] hover:bg-[#b8942f]'}`}
+              >
+                {isSubmitting ? 'Đang xử lý...' : 'ĐẶT DỊCH VỤ'}
+              </button>
+            </div>
+          </form>
         </div>
-
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label className="block text-gray-700 mb-2 font-medium" style={{ color: '#4a5568', marginBottom: '0.5rem', fontWeight: '500' }}>
-              Họ và tên <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              name="fullName"
-              value={orderInfo.fullName}
-              onChange={handleInputChange}
-              className="w-full px-4 py-2 bg-gray-50 text-gray-900 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent"
-              style={{
-                width: '100%',
-                padding: '0.5rem 1rem',
-                backgroundColor: '#f8fafc',
-                color: '#1a202c',
-                borderRadius: '0.5rem',
-                border: '1px solid #e2e8f0',
-                outline: 'none'
-              }}
-              required
-            />
-          </div>
-
-          <div className="mb-4">
-            <label className="block text-gray-700 mb-2 font-medium" style={{ color: '#4a5568', marginBottom: '0.5rem', fontWeight: '500' }}>
-              Email <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="email"
-              name="email"
-              value={orderInfo.email}
-              onChange={handleInputChange}
-              className="w-full px-4 py-2 bg-gray-50 text-gray-900 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent"
-              style={{
-                width: '100%',
-                padding: '0.5rem 1rem',
-                backgroundColor: '#f8fafc',
-                color: '#1a202c',
-                borderRadius: '0.5rem',
-                border: '1px solid #e2e8f0',
-                outline: 'none'
-              }}
-              required
-            />
-          </div>
-
-          <div className="mb-4">
-            <label className="block text-gray-700 mb-2 font-medium" style={{ color: '#4a5568', marginBottom: '0.5rem', fontWeight: '500' }}>
-              Số điện thoại <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="tel"
-              name="phone"
-              value={orderInfo.phone}
-              onChange={handleInputChange}
-              className="w-full px-4 py-2 bg-gray-50 text-gray-900 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent"
-              style={{
-                width: '100%',
-                padding: '0.5rem 1rem',
-                backgroundColor: '#f8fafc',
-                color: '#1a202c',
-                borderRadius: '0.5rem',
-                border: '1px solid #e2e8f0',
-                outline: 'none'
-              }}
-              required
-            />
-          </div>
-
-          <div className="mb-4">
-            <label className="block text-gray-700 mb-2 font-medium" style={{ color: '#4a5568', marginBottom: '0.5rem', fontWeight: '500' }}>
-              Ghi chú
-            </label>
-            <textarea
-              name="note"
-              value={orderInfo.note}
-              onChange={handleInputChange}
-              rows="3"
-              className="w-full px-4 py-2 bg-gray-50 text-gray-900 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent"
-              style={{
-                width: '100%',
-                padding: '0.5rem 1rem',
-                backgroundColor: '#f8fafc',
-                color: '#1a202c',
-                borderRadius: '0.5rem',
-                border: '1px solid #e2e8f0',
-                outline: 'none'
-              }}
-              placeholder="Ghi chú thêm về yêu cầu của bạn..."
-            />
-          </div>
-
-          <div className="mb-4">
-            <label className="block text-gray-700 mb-2 font-medium" style={{ color: '#4a5568', marginBottom: '0.5rem', fontWeight: '500' }}>
-              Dịch vụ
-            </label>
-            <input
-              type="text"
-              value={orderInfo.serviceName}
-              readOnly
-              className="w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-lg border border-gray-300"
-              style={{
-                width: '100%',
-                padding: '0.5rem 1rem',
-                backgroundColor: '#edf2f7',
-                color: '#4a5568',
-                borderRadius: '0.5rem',
-                border: '1px solid #e2e8f0'
-              }}
-            />
-          </div>
-
-          <div className="mb-6">
-            <label className="block text-gray-700 mb-2 font-medium" style={{ color: '#4a5568', marginBottom: '0.5rem', fontWeight: '500' }}>
-              Giá tiền
-            </label>
-            <input
-              type="text"
-              value={orderInfo.servicePrice}
-              readOnly
-              className="w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-lg border border-gray-300"
-              style={{
-                width: '100%',
-                padding: '0.5rem 1rem',
-                backgroundColor: '#edf2f7',
-                color: '#4a5568',
-                borderRadius: '0.5rem',
-                border: '1px solid #e2e8f0'
-              }}
-            />
-          </div>
-
-          <div className="flex justify-end space-x-4">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-6 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors font-medium"
-              style={{
-                padding: '0.5rem 1.5rem',
-                backgroundColor: '#e2e8f0',
-                color: '#2d3748',
-                borderRadius: '0.5rem',
-                border: 'none',
-                cursor: 'pointer',
-                transition: 'background-color 0.3s'
-              }}
-            >
-              Hủy
-            </button>
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className={`px-6 py-2 text-white font-bold rounded-lg transition-colors ${isSubmitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#D4AF37] hover:bg-[#b8942f]'}`}
-              style={{
-                padding: '0.5rem 1.5rem',
-                backgroundColor: isSubmitting ? '#a0a0a0' : '#D4AF37',
-                color: '#fff',
-                fontWeight: 'bold',
-                borderRadius: '0.5rem',
-                border: 'none',
-                cursor: isSubmitting ? 'not-allowed' : 'pointer',
-                transition: 'background-color 0.3s'
-              }}
-            >
-              {isSubmitting ? 'Đang xử lý...' : 'ĐẶT DỊCH VỤ'}
-            </button>
-          </div>
-        </form>
       </div>
     </div>
   );
