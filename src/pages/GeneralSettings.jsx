@@ -20,10 +20,16 @@ const GeneralSettings = () => {
   useEffect(() => {
     const loadSettings = () => {
       // Try multiple storage keys to ensure we get the latest data
-      const savedSettings = JSON.parse(localStorage.getItem('generalSettings')) ||
-                           JSON.parse(localStorage.getItem('master_website_data_v2')?.settings || '{}') ||
-                           {};
-                           
+      let savedSettings = JSON.parse(localStorage.getItem('generalSettings')) ||
+                         JSON.parse(localStorage.getItem('master_website_data_v2')?.settings || '{}') ||
+                         {};
+                         
+      // Nếu không có logo, sử dụng logo mặc định
+      if (!savedSettings.logo) {
+        savedSettings.logo = '/image/logo.jpg';
+        localStorage.setItem('generalSettings', JSON.stringify(savedSettings));
+      }
+      
       setCompanyInfo(prev => ({
         ...prev,
         ...savedSettings,
@@ -37,10 +43,16 @@ const GeneralSettings = () => {
     const handleStorageChange = (e) => {
       if (e.key === 'generalSettings' || e.key === 'master_website_data_v2') {
         setTimeout(() => {
-          const updatedSettings = JSON.parse(localStorage.getItem('generalSettings')) ||
-                                JSON.parse(localStorage.getItem('master_website_data_v2')?.settings || '{}') ||
-                                {};
-                                
+          let updatedSettings = JSON.parse(localStorage.getItem('generalSettings')) ||
+                               JSON.parse(localStorage.getItem('master_website_data_v2')?.settings || '{}') ||
+                               {};
+                               
+          // Nếu không có logo, sử dụng logo mặc định
+          if (!updatedSettings.logo) {
+            updatedSettings.logo = '/image/logo.jpg';
+            localStorage.setItem('generalSettings', JSON.stringify(updatedSettings));
+          }
+          
           setCompanyInfo(prev => ({
             ...prev,
             ...updatedSettings,

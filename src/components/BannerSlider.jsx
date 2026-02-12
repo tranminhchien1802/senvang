@@ -100,14 +100,44 @@ const BannerSlider = () => {
   };
 
   if (banners.length === 0) {
-    return (
-      <div className="relative h-96 bg-gradient-to-r from-gray-100 to-gray-200 flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-gray-500 text-lg">Chưa có banner nào được tạo</p>
-          <p className="text-gray-400 text-sm mt-2">Vui lòng thêm banner trong phần quản trị</p>
-        </div>
-      </div>
-    );
+    // Nếu không có banner trong localStorage, sử dụng banner mặc định từ thư mục public
+    const defaultBanners = [
+      {
+        id: 'default-1',
+        title: 'DỊCH VỤ KẾ TOÁN CHUYÊN NGHIỆP',
+        description: 'Hơn 10 năm kinh nghiệm đồng hành cùng 5000+ doanh nghiệp khởi sự thành công',
+        image: '/image/banner-1.jpg',
+        buttonText: 'Xem Các Dịch Vụ',
+        buttonLink: '/dich-vu'
+      },
+      {
+        id: 'default-2',
+        title: 'THÀNH LẬP DOANH NGHIỆP',
+        description: 'Dễ dàng – Hiệu quả – Chất lượng. Đồng hành tận tâm và chuyên nghiệp',
+        image: '/image/banner-dich-vu-ke-toan-binh-duong.png',
+        buttonText: 'Liên Hệ Tư Vấn',
+        buttonLink: '/lien-he'
+      },
+      {
+        id: 'default-3',
+        title: 'GIẢI PHÁP TÀI CHÍNH TOÀN DIỆN',
+        description: 'Tư vấn chiến lược thuế, quản lý kế toán chuyên nghiệp',
+        image: '/image/banner-ke-toan-pham-gia-1_result-2 (1).webp',
+        buttonText: 'Tìm Hiểu Thêm',
+        buttonLink: '/'
+      }
+    ];
+    
+    // Cập nhật localStorage với banner mặc định
+    localStorage.setItem('banners', JSON.stringify(defaultBanners));
+    localStorage.setItem('bannerSlides', JSON.stringify(defaultBanners));
+    localStorage.setItem('websiteBanners', JSON.stringify(defaultBanners));
+    
+    // Cập nhật state
+    setBanners(defaultBanners);
+    
+    // Không render gì ở đây vì sẽ render lại sau khi cập nhật state
+    return null;
   }
 
 

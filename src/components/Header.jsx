@@ -308,9 +308,23 @@ const Header = () => {
                     }}
                   />
                 ) : (
-                  <span className="text-4xl font-bold text-[#D4AF37] w-full md:w-auto">
-                    {companyInfo.companyName || "KẾ TOÁN SEN VÀNG"}
-                  </span>
+                  <img
+                    src="/image/logo.jpg"
+                    alt={companyInfo.companyName || "KẾ TOÁN SEN VÀNG"}
+                    className="h-30 w-auto object-contain max-h-30" /* Half of h-60 = h-30 */
+                    style={{
+                      maxHeight: '7.5rem', /* Half of 15rem = 7.5rem */
+                      width: 'auto',
+                      minWidth: '250px' /* Half of 500px = 250px */
+                    }}
+                    onError={(e) => {
+                      console.log('Error loading default logo');
+                      // Fallback to text if default image also fails
+                      e.target.style.display = 'none';
+                      const textElement = e.target.parentElement.querySelector('span');
+                      if (textElement) textElement.style.display = 'block';
+                    }}
+                  />
                 )}
               </Link>
             </div>
