@@ -35,19 +35,20 @@ const corsOptions = {
   origin: function (origin, callback) {
     // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
-    
+
     // List of allowed origins
     const allowedOrigins = [
-      'https://senvang-olive.vercel.app',  // Your Vercel domain
-      'https://senvang-jef9.onrender.com', // Your Render domain
-      'http://localhost:5173',            // Vite dev server
-      'http://localhost:3000',            // Common dev port
-      'http://localhost:3001',            // Another common dev port
-      'http://localhost:8080',            // Another common dev port
-      process.env.CLIENT_URL,              // From environment variable
-      config.clientUrl                     // From config file
+      'https://senvang-eight.vercel.app',   // Your current Vercel domain
+      'https://senvang-olive.vercel.app',   // Your Vercel domain
+      'https://senvang-jef9.onrender.com',  // Your Render domain
+      'http://localhost:5173',             // Vite dev server
+      'http://localhost:3000',             // Common dev port
+      'http://localhost:3001',             // Another common dev port
+      'http://localhost:8080',             // Another common dev port
+      process.env.CLIENT_URL,               // From environment variable
+      config.clientUrl                      // From config file
     ].filter(Boolean); // Remove any undefined values
-    
+
     if (allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
