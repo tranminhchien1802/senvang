@@ -70,20 +70,21 @@ export const apiCallWithFallback = async (apiCallFn, fallbackFn, options = {}) =
  */
 export const uploadImageWithFallback = async (file, endpoint, token, fallbackFn) => {
   const { USE_BACKEND_API, ENABLE_CORS_FALLBACK } = await import('../config/appConfig');
-  
+
   if (!USE_BACKEND_API) {
     // Use only fallback
+    console.log('Backend API disabled, using fallback for image upload');
     return await fallbackFn();
   }
-  
+
   try {
     const formData = new FormData();
     formData.append('image', file);
     formData.append('type', 'logo');
-    
+
     const { getApiUrl } = await import('../config/backendConfig');
     const apiUrl = getApiUrl(endpoint);
-    
+
     const response = await fetchWithTimeout(apiUrl, {
       method: 'POST',
       headers: {
@@ -92,17 +93,17 @@ export const uploadImageWithFallback = async (file, endpoint, token, fallbackFn)
       },
       body: formData
     });
-    
+
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
       throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
     }
-    
+
     const result = await response.json();
     return result;
   } catch (error) {
     console.warn('Image upload failed, using fallback:', error.message);
-    
+
     if (ENABLE_CORS_FALLBACK) {
       try {
         return await fallbackFn();
@@ -111,7 +112,7 @@ export const uploadImageWithFallback = async (file, endpoint, token, fallbackFn)
         throw error; // Re-throw original error
       }
     }
-    
+
     throw error;
   }
 };

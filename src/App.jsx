@@ -48,13 +48,19 @@ function App() {
     // Start polling for data updates from server
     const startDataSync = async () => {
       try {
-        const { startPollingForUpdates } = await import('./utils/dataSyncUtils');
+        const { USE_BACKEND_API } = await import('./config/appConfig');
         
-        // Start polling for banner updates
-        startPollingForUpdates('/banners/active', 'banners', 5000);
-        
-        // Start polling for settings updates
-        startPollingForUpdates('/settings/generalSettings', 'settings', 5000);
+        if (USE_BACKEND_API) {
+          const { startPollingForUpdates } = await import('./utils/dataSyncUtils');
+          
+          // Start polling for banner updates
+          startPollingForUpdates('/banners/active', 'banners', 5000);
+          
+          // Start polling for settings updates
+          startPollingForUpdates('/settings/generalSettings', 'settings', 5000);
+        } else {
+          console.log('Backend API disabled, skipping server data sync');
+        }
       } catch (error) {
         console.error('Error starting data sync:', error);
       }
