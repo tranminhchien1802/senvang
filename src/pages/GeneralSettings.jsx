@@ -75,41 +75,28 @@ const GeneralSettings = () => {
           return;
         }
 
-        // Upload to server
-        const formData = new FormData();
-        formData.append('image', file);
-        formData.append('type', 'logo');
-
         const token = localStorage.getItem('adminToken') || localStorage.getItem('token');
         if (!token) {
           alert('Bạn cần đăng nhập để thay đổi logo');
           return;
         }
 
-        // Import the backend config
-        const { getApiUrl } = await import('../config/backendConfig');
+        // Use the new API utility with fallback
+        const { uploadImageWithFallback } = await import('../utils/apiWithTimeout');
+        const { imageUploadFallback } = await import('../utils/apiFallback');
         
-        const response = await fetch(getApiUrl('/upload/image'), {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'x-auth-token': token
-          },
-          body: formData
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || 'Lỗi khi upload ảnh lên server');
-        }
-
-        const result = await response.json();
+        const result = await uploadImageWithFallback(
+          file,
+          '/upload/image',
+          token,
+          () => imageUploadFallback.uploadImage(file)
+        );
         
         if (result.success) {
-          // Update state with the server URL
+          // Update state with the server URL or base64
           setCompanyInfo(prev => ({
             ...prev,
-            logo: result.url, // Use the server URL
+            logo: result.url, // Use the server URL or base64 result
             logoPreview: result.url // Use the same for preview
           }));
           
@@ -129,50 +116,16 @@ const GeneralSettings = () => {
           } catch (e) {
             console.warn('Could not update master data with logo:', e);
           }
+          
+          if (result.message && result.message.includes('locally')) {
+            alert('Upload logo thất bại trên server, sử dụng logo cục bộ. Vui lòng kiểm tra kết nối mạng.');
+          }
         } else {
           throw new Error(result.message || 'Lỗi khi upload ảnh');
         }
       } catch (error) {
         console.error('Error handling logo change:', error);
-        // Try fallback mechanism if backend upload fails
-        try {
-          const { imageUploadFallback } = await import('../utils/apiFallback');
-          const result = await imageUploadFallback.uploadImage(file);
-          
-          if (result.success) {
-            // Update state with the base64 image
-            setCompanyInfo(prev => ({
-              ...prev,
-              logo: result.url, // Use the base64 result
-              logoPreview: result.url // Use the same for preview
-            }));
-            
-            // Also update in localStorage
-            const settings = JSON.parse(localStorage.getItem('generalSettings') || '{}');
-            settings.logo = result.url;
-            localStorage.setItem('generalSettings', JSON.stringify(settings));
-            
-            // Update master data as well
-            try {
-              const masterDataStr = localStorage.getItem('master_website_data_v2');
-              let masterData = masterDataStr ? JSON.parse(masterDataStr) : {};
-              if (!masterData.settings) masterData.settings = {};
-              masterData.settings.logo = result.url;
-              masterData.timestamp = Date.now();
-              localStorage.setItem('master_website_data_v2', JSON.stringify(masterData));
-            } catch (e) {
-              console.warn('Could not update master data with logo:', e);
-            }
-            
-            alert('Upload logo thất bại trên server, sử dụng logo cục bộ. Vui lòng kiểm tra kết nối mạng.');
-          } else {
-            console.error('Error using fallback for logo upload:', result.error);
-            alert('Lỗi khi xử lý file logo: ' + error.message);
-          }
-        } catch (fallbackError) {
-          console.error('Error using fallback for logo upload:', fallbackError);
-          alert('Lỗi khi xử lý file logo: ' + error.message);
-        }
+        alert('Lỗi khi xử lý file logo: ' + error.message);
       }
     }
   };
