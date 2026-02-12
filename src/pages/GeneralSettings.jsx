@@ -68,24 +68,69 @@ const GeneralSettings = () => {
     const file = e.target.files[0];
     if (file) {
       try {
-        // Use the new image storage utility
-        const imageStorageModule = await import('../utils/imageStorage');
-        const result = await imageStorageModule.saveLogoImage(file);
+        // Validate file
+        const validation = await import('../utils/imageStorage').then(module => module.validateImageFile(file));
+        if (!validation.valid) {
+          alert(validation.error);
+          return;
+        }
+
+        // Upload to server
+        const formData = new FormData();
+        formData.append('image', file);
+        formData.append('type', 'logo');
+
+        const token = localStorage.getItem('adminToken') || localStorage.getItem('token');
+        if (!token) {
+          alert('Bạn cần đăng nhập để thay đổi logo');
+          return;
+        }
+
+        // Import the backend config
+        const { getApiUrl } = await import('../config/backendConfig');
+        
+        const response = await fetch(getApiUrl('/upload/image'), {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'x-auth-token': token
+          },
+          body: formData
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'Lỗi khi upload ảnh lên server');
+        }
+
+        const result = await response.json();
         
         if (result.success) {
-          // Update state with the new logo
-          const reader = new FileReader();
-          reader.onloadend = () => {
-            setCompanyInfo(prev => ({
-              ...prev,
-              logo: reader.result, // Use the base64 result
-              logoPreview: reader.result // Use the same for preview
-            }));
-          };
-          reader.readAsDataURL(file);
+          // Update state with the server URL
+          setCompanyInfo(prev => ({
+            ...prev,
+            logo: result.url, // Use the server URL
+            logoPreview: result.url // Use the same for preview
+          }));
+          
+          // Also update in localStorage
+          const settings = JSON.parse(localStorage.getItem('generalSettings') || '{}');
+          settings.logo = result.url;
+          localStorage.setItem('generalSettings', JSON.stringify(settings));
+          
+          // Update master data as well
+          try {
+            const masterDataStr = localStorage.getItem('master_website_data_v2');
+            let masterData = masterDataStr ? JSON.parse(masterDataStr) : {};
+            if (!masterData.settings) masterData.settings = {};
+            masterData.settings.logo = result.url;
+            masterData.timestamp = Date.now();
+            localStorage.setItem('master_website_data_v2', JSON.stringify(masterData));
+          } catch (e) {
+            console.warn('Could not update master data with logo:', e);
+          }
         } else {
-          console.error('Failed to save logo:', result.error);
-          alert('Lỗi khi lưu logo: ' + result.error);
+          throw new Error(result.message || 'Lỗi khi upload ảnh');
         }
       } catch (error) {
         console.error('Error handling logo change:', error);

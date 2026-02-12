@@ -105,33 +105,58 @@ const BannerManager = () => {
     setUploading(true);
 
     try {
-      // Use the new image storage utility
-      const imageStorageModule = await import('../../utils/imageStorage');
-      const result = await imageStorageModule.saveBannerImage(Date.now().toString(), file);
+      // Validate file
+      const validation = await import('../../utils/imageStorage').then(module => module.validateImageFile(file));
+      if (!validation.valid) {
+        alert(validation.error);
+        setUploading(false);
+        return;
+      }
+
+      // Upload to server
+      const formData = new FormData();
+      formData.append('image', file);
+      formData.append('type', 'banners');
+
+      const token = localStorage.getItem('adminToken') || localStorage.getItem('token');
+      if (!token) {
+        alert('Bạn cần đăng nhập để upload ảnh');
+        setUploading(false);
+        return;
+      }
+
+      // Import the backend config
+      const { getApiUrl } = await import('../../config/backendConfig');
+      
+      const response = await fetch(getApiUrl('/upload/image'), {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'x-auth-token': token
+        },
+        body: formData
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Lỗi khi upload ảnh lên server');
+      }
+
+      const result = await response.json();
       
       if (result.success) {
-        // Read the file to get the base64 data for immediate use
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          setBannerForm({
-            ...bannerForm,
-            image: event.target.result
-          });
-          setUploading(false);
-        };
-        reader.onerror = () => {
-          alert('Error reading image file. Please try again.');
-          setUploading(false);
-        };
-        reader.readAsDataURL(file);
-      } else {
-        console.error('Failed to save banner image:', result.error);
-        alert('Error saving image: ' + result.error);
+        // Update form with the server URL
+        setBannerForm({
+          ...bannerForm,
+          image: result.url
+        });
         setUploading(false);
+      } else {
+        throw new Error(result.message || 'Lỗi khi upload ảnh');
       }
     } catch (error) {
       console.error('Error uploading image:', error);
-      alert('Error uploading image. Please try again.');
+      alert('Error uploading image: ' + error.message);
       setUploading(false);
     }
   };
