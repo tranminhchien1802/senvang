@@ -142,7 +142,7 @@ const BannerSlider = () => {
 
 
   return (
-    <div className="relative w-full overflow-hidden rounded-lg" style={{ height: 'auto', aspectRatio: '16/6' }}>
+    <div className="relative w-full overflow-hidden rounded-lg" style={{ height: 'auto', aspectRatio: '16/5' }}>
       {/* Banner slides */}
       <div className="relative w-full h-full">
         {banners.map((banner, index) => (

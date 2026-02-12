@@ -286,9 +286,9 @@ const Header = () => {
                   alt={companyInfo.companyName || "KẾ TOÁN SEN VÀNG"}
                   className="h-30 w-auto object-contain max-h-30" /* Half of h-60 = h-30 */
                   style={{
-                    maxHeight: '7.5rem', /* Half of 15rem = 7.5rem */
+                    maxHeight: '9rem', /* Tăng từ 7.5rem lên 9rem (+15px) */
                     width: 'auto',
-                    minWidth: '250px' /* Half of 500px = 250px */
+                    minWidth: '300px' /* Tăng từ 250px lên 300px (+50px) */
                   }}
                   onError={(e) => {
                     console.log('Error loading default logo');
