@@ -339,7 +339,7 @@ const Header = () => {
             {/* --- LOGO --- */}
             <div className="flex-shrink-0 flex items-center" style={{ padding: '5px 0' }}>
               <Link to="/" className="relative group flex items-center">
-                {companyInfo.logo ? (
+                {companyInfo.logo && companyInfo.logo.trim() ? (
                   <img
                     src={companyInfo.logo}
                     alt={companyInfo.companyName || "KẾ TOÁN SEN VÀNG"}
@@ -348,6 +348,21 @@ const Header = () => {
                       maxHeight: '7.5rem', /* Half of 15rem = 7.5rem */
                       width: 'auto',
                       minWidth: '250px' /* Half of 500px = 250px */
+                    }}
+                    onError={(e) => {
+                      console.log('Error loading logo:', companyInfo.logo.substring(0, 50) + '...');
+                      console.log('Logo type:', typeof companyInfo.logo);
+                      console.log('Is base64?', companyInfo.logo.startsWith('data:image'));
+                      // Fallback to text if image fails to load
+                      e.target.style.display = 'none';
+                      const textElement = e.target.parentElement.querySelector('span');
+                      if (textElement) textElement.style.display = 'block';
+                    }}
+                    onLoad={(e) => {
+                      console.log('Logo loaded successfully:', companyInfo.logo.substring(0, 50) + '...');
+                      // Hide text fallback when image loads successfully
+                      const textElement = e.target.parentElement.querySelector('span');
+                      if (textElement) textElement.style.display = 'none';
                     }}
                   />
                 ) : (

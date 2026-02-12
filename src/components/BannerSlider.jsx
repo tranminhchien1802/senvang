@@ -206,10 +206,10 @@ const BannerSlider = () => {
             }`}
           >
             {/* Background container with blurred image */}
-            <div 
+            <div
               className="w-full h-full absolute inset-0"
               style={{
-                backgroundImage: `url(${banner.image})`,
+                backgroundImage: banner.image ? `url(${banner.image})` : 'linear-gradient(45deg, #4b9cdb, #6a5acd)',
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
                 backdropFilter: 'blur(20px)',
@@ -219,23 +219,23 @@ const BannerSlider = () => {
             ></div>
             
             {/* Main image */}
-            {banner.image && (
+            {banner.image && banner.image.trim() && (
               <img
                 src={banner.image}
                 alt={banner.title || 'Banner image'}
-                className="w-full h-full object-contain absolute inset-0"
+                className="w-full h-full object-cover absolute inset-0"
                 style={{ zIndex: 1 }} /* Higher z-index to appear above background */
                 onError={(e) => {
-                  console.log('Error loading image:', banner.image);
+                  console.log('Error loading image:', banner.image ? banner.image.substring(0, 50) + '...' : 'no image');
                   console.log('Image type:', typeof banner.image);
-                  console.log('Is base64?', banner.image.startsWith('data:image'));
+                  console.log('Is base64?', banner.image && banner.image.startsWith('data:image'));
                   e.target.style.display = 'none';
                   // Show fallback when image fails to load
                   const fallbackDiv = document.querySelector(`.banner-fallback-${banner.id || index}`);
                   if (fallbackDiv) fallbackDiv.style.display = 'flex';
                 }}
                 onLoad={(e) => {
-                  console.log('Image loaded successfully:', banner.image.substring(0, 50) + '...');
+                  console.log('Image loaded successfully:', banner.image ? banner.image.substring(0, 50) + '...' : 'no image');
                   // Hide fallback when image loads successfully
                   const fallbackDiv = document.querySelector(`.banner-fallback-${banner.id || index}`);
                   if (fallbackDiv) fallbackDiv.style.display = 'none';
@@ -243,12 +243,12 @@ const BannerSlider = () => {
               />
             )}
             {/* Fallback background when no image or image fails to load */}
-            {!banner.image && (
+            {(!banner.image || !banner.image.trim()) && (
               <div className={`w-full h-full absolute inset-0 bg-gradient-to-r from-blue-400 to-purple-500 flex items-center justify-center banner-fallback-${banner.id || index}`}
                 style={{ zIndex: 1 }}>
                 <div className="text-center text-white">
-                  <h2 className="text-3xl font-bold mb-2">{banner.title}</h2>
-                  <p className="text-lg mb-4">{banner.description}</p>
+                  <h2 className="text-3xl font-bold mb-2">{banner.title || 'Banner không có tiêu đề'}</h2>
+                  <p className="text-lg mb-4">{banner.description || 'Chưa có mô tả'}</p>
                 </div>
               </div>
             )}
