@@ -156,8 +156,29 @@ const BannerManager = () => {
       }
     } catch (error) {
       console.error('Error uploading image:', error);
-      alert('Error uploading image: ' + error.message);
-      setUploading(false);
+      // Try fallback mechanism if backend upload fails
+      try {
+        const { imageUploadFallback } = await import('../utils/apiFallback');
+        const result = await imageUploadFallback.uploadImage(file);
+        
+        if (result.success) {
+          // Update form with the base64 image
+          setBannerForm({
+            ...bannerForm,
+            image: result.url
+          });
+          setUploading(false);
+          alert('Upload ảnh thất bại trên server, sử dụng ảnh cục bộ. Vui lòng kiểm tra kết nối mạng.');
+        } else {
+          console.error('Error using fallback for image upload:', result.error);
+          alert('Error uploading image: ' + error.message);
+          setUploading(false);
+        }
+      } catch (fallbackError) {
+        console.error('Error using fallback for image upload:', fallbackError);
+        alert('Error uploading image: ' + error.message);
+        setUploading(false);
+      }
     }
   };
 
@@ -196,7 +217,18 @@ const BannerManager = () => {
           }
         } catch (backendError) {
           console.error('Error updating banner on backend:', backendError);
-          // Continue with local update even if backend fails
+          // Use fallback mechanism
+          try {
+            const { bannerOperationsFallback } = await import('../utils/apiFallback');
+            const fallbackResult = bannerOperationsFallback.updateBanner(editingBanner.id, bannerForm);
+            if (fallbackResult.success) {
+              console.log('Banner updated using fallback mechanism');
+            } else {
+              console.error('Error using fallback for banner update:', fallbackResult.error);
+            }
+          } catch (fallbackError) {
+            console.error('Error using fallback for banner update:', fallbackError);
+          }
         }
       } else {
         // Add new banner
@@ -232,7 +264,18 @@ const BannerManager = () => {
           }
         } catch (backendError) {
           console.error('Error creating banner on backend:', backendError);
-          // Continue with local update even if backend fails
+          // Use fallback mechanism
+          try {
+            const { bannerOperationsFallback } = await import('../utils/apiFallback');
+            const fallbackResult = bannerOperationsFallback.saveBanner(bannerForm);
+            if (fallbackResult.success) {
+              console.log('Banner saved using fallback mechanism');
+            } else {
+              console.error('Error using fallback for banner save:', fallbackResult.error);
+            }
+          } catch (fallbackError) {
+            console.error('Error using fallback for banner save:', fallbackError);
+          }
         }
       }
 

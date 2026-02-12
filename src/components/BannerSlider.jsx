@@ -51,9 +51,22 @@ const BannerSlider = () => {
         }
       } catch (error) {
         console.warn('Error fetching banners from backend:', error);
-        // Fallback to localStorage if backend is not available
-        const localBanners = JSON.parse(localStorage.getItem('banners') || '[]');
-        backendBanners = localBanners;
+        // Use fallback mechanism
+        try {
+          const { bannerOperationsFallback } = await import('../utils/apiFallback');
+          const fallbackResult = bannerOperationsFallback.getBanners();
+          if (fallbackResult.success) {
+            backendBanners = fallbackResult.data;
+          } else {
+            // If fallback also fails, use empty array
+            backendBanners = [];
+          }
+        } catch (fallbackError) {
+          console.warn('Error using fallback for banners:', fallbackError);
+          // Final fallback to localStorage
+          const localBanners = JSON.parse(localStorage.getItem('banners') || '[]');
+          backendBanners = localBanners;
+        }
       }
 
       // Try multiple storage keys to ensure we get the latest data

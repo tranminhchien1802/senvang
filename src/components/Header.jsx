@@ -68,9 +68,22 @@ const Header = () => {
         }
       } catch (error) {
         console.warn('Error fetching settings from backend:', error);
-        // Fallback to localStorage if backend is not available
-        const localSettings = JSON.parse(localStorage.getItem('generalSettings') || '{}');
-        backendSettings = localSettings;
+        // Use fallback mechanism
+        try {
+          const { settingsOperationsFallback } = await import('../utils/apiFallback');
+          const fallbackResult = settingsOperationsFallback.getSettings('generalSettings');
+          if (fallbackResult.success) {
+            backendSettings = fallbackResult.data;
+          } else {
+            // If fallback also fails, use empty object
+            backendSettings = {};
+          }
+        } catch (fallbackError) {
+          console.warn('Error using fallback for settings:', fallbackError);
+          // Final fallback to localStorage
+          const localSettings = JSON.parse(localStorage.getItem('generalSettings') || '{}');
+          backendSettings = localSettings;
+        }
       }
 
       // Try multiple storage keys to ensure we get the latest data

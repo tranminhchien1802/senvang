@@ -134,7 +134,45 @@ const GeneralSettings = () => {
         }
       } catch (error) {
         console.error('Error handling logo change:', error);
-        alert('Lỗi khi xử lý file logo: ' + error.message);
+        // Try fallback mechanism if backend upload fails
+        try {
+          const { imageUploadFallback } = await import('../utils/apiFallback');
+          const result = await imageUploadFallback.uploadImage(file);
+          
+          if (result.success) {
+            // Update state with the base64 image
+            setCompanyInfo(prev => ({
+              ...prev,
+              logo: result.url, // Use the base64 result
+              logoPreview: result.url // Use the same for preview
+            }));
+            
+            // Also update in localStorage
+            const settings = JSON.parse(localStorage.getItem('generalSettings') || '{}');
+            settings.logo = result.url;
+            localStorage.setItem('generalSettings', JSON.stringify(settings));
+            
+            // Update master data as well
+            try {
+              const masterDataStr = localStorage.getItem('master_website_data_v2');
+              let masterData = masterDataStr ? JSON.parse(masterDataStr) : {};
+              if (!masterData.settings) masterData.settings = {};
+              masterData.settings.logo = result.url;
+              masterData.timestamp = Date.now();
+              localStorage.setItem('master_website_data_v2', JSON.stringify(masterData));
+            } catch (e) {
+              console.warn('Could not update master data with logo:', e);
+            }
+            
+            alert('Upload logo thất bại trên server, sử dụng logo cục bộ. Vui lòng kiểm tra kết nối mạng.');
+          } else {
+            console.error('Error using fallback for logo upload:', result.error);
+            alert('Lỗi khi xử lý file logo: ' + error.message);
+          }
+        } catch (fallbackError) {
+          console.error('Error using fallback for logo upload:', fallbackError);
+          alert('Lỗi khi xử lý file logo: ' + error.message);
+        }
       }
     }
   };
@@ -208,29 +246,50 @@ const GeneralSettings = () => {
       }
     } catch (error) {
       console.error('Error saving settings to backend:', error);
-      // Still save to localStorage as fallback even if backend fails
-      localStorage.setItem('generalSettings', JSON.stringify(settingsToSave));
-      
-      // Also update master data
+      // Use fallback mechanism
       try {
-        const masterDataStr = localStorage.getItem('master_website_data_v2');
-        let masterData = masterDataStr ? JSON.parse(masterDataStr) : {};
-        if (!masterData.settings) masterData.settings = {};
-        masterData.settings = { ...masterData.settings, ...settingsToSave }; // Merge to preserve other data
-        masterData.timestamp = Date.now();
-        localStorage.setItem('master_website_data_v2', JSON.stringify(masterData));
-      } catch (e) {
-        console.warn('Could not update master data:', e);
-      }
+        const { settingsOperationsFallback } = await import('../utils/apiFallback');
+        const fallbackResult = settingsOperationsFallback.saveSettings('generalSettings', settingsToSave);
+        
+        if (fallbackResult.success) {
+          // Dispatch event to notify other components
+          window.dispatchEvent(new CustomEvent('settingsUpdated', { detail: settingsToSave }));
+          
+          // Dispatch general sync event
+          window.dispatchEvent(new CustomEvent('forceDataSync'));
+          
+          // Show a warning to the user that changes were saved locally but not to server
+          alert('Cập nhật cài đặt thành công (lưu cục bộ). Vui lòng kiểm tra kết nối mạng và thử lại để đồng bộ lên server.');
+        } else {
+          console.error('Error using fallback for settings:', fallbackResult.error);
+          throw fallbackResult.error;
+        }
+      } catch (fallbackError) {
+        console.error('Error using fallback for settings:', fallbackError);
+        // Final fallback - just save to localStorage
+        localStorage.setItem('generalSettings', JSON.stringify(settingsToSave));
+        
+        // Also update master data
+        try {
+          const masterDataStr = localStorage.getItem('master_website_data_v2');
+          let masterData = masterDataStr ? JSON.parse(masterDataStr) : {};
+          if (!masterData.settings) masterData.settings = {};
+          masterData.settings = { ...masterData.settings, ...settingsToSave }; // Merge to preserve other data
+          masterData.timestamp = Date.now();
+          localStorage.setItem('master_website_data_v2', JSON.stringify(masterData));
+        } catch (e) {
+          console.warn('Could not update master data:', e);
+        }
 
-      // Dispatch event to notify other components
-      window.dispatchEvent(new CustomEvent('settingsUpdated', { detail: settingsToSave }));
-      
-      // Dispatch general sync event
-      window.dispatchEvent(new CustomEvent('forceDataSync'));
-      
-      // Show a warning to the user that changes were saved locally but not to server
-      alert('Cập nhật cài đặt thành công (lưu cục bộ). Vui lòng kiểm tra kết nối mạng và thử lại để đồng bộ lên server.');
+        // Dispatch event to notify other components
+        window.dispatchEvent(new CustomEvent('settingsUpdated', { detail: settingsToSave }));
+        
+        // Dispatch general sync event
+        window.dispatchEvent(new CustomEvent('forceDataSync'));
+        
+        // Show a warning to the user that changes were saved locally but not to server
+        alert('Cập nhật cài đặt thành công (lưu cục bộ). Vui lòng kiểm tra kết nối mạng và thử lại để đồng bộ lên server.');
+      }
     }
 
     // Dispatch event to notify other components
