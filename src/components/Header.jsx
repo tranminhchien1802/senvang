@@ -68,6 +68,9 @@ const Header = () => {
         }
       } catch (error) {
         console.warn('Error fetching settings from backend:', error);
+        // Fallback to localStorage if backend is not available
+        const localSettings = JSON.parse(localStorage.getItem('generalSettings') || '{}');
+        backendSettings = localSettings;
       }
 
       // Try multiple storage keys to ensure we get the latest data

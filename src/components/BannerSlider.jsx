@@ -51,6 +51,9 @@ const BannerSlider = () => {
         }
       } catch (error) {
         console.warn('Error fetching banners from backend:', error);
+        // Fallback to localStorage if backend is not available
+        const localBanners = JSON.parse(localStorage.getItem('banners') || '[]');
+        backendBanners = localBanners;
       }
 
       // Try multiple storage keys to ensure we get the latest data

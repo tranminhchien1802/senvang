@@ -163,7 +163,29 @@ const GeneralSettings = () => {
       }
     } catch (error) {
       console.error('Error saving settings to backend:', error);
-      // Don't show error to user since we have fallback to localStorage
+      // Still save to localStorage as fallback even if backend fails
+      localStorage.setItem('generalSettings', JSON.stringify(settingsToSave));
+      
+      // Also update master data
+      try {
+        const masterDataStr = localStorage.getItem('master_website_data_v2');
+        let masterData = masterDataStr ? JSON.parse(masterDataStr) : {};
+        if (!masterData.settings) masterData.settings = {};
+        masterData.settings = { ...masterData.settings, ...settingsToSave }; // Merge to preserve other data
+        masterData.timestamp = Date.now();
+        localStorage.setItem('master_website_data_v2', JSON.stringify(masterData));
+      } catch (e) {
+        console.warn('Could not update master data:', e);
+      }
+
+      // Dispatch event to notify other components
+      window.dispatchEvent(new CustomEvent('settingsUpdated', { detail: settingsToSave }));
+      
+      // Dispatch general sync event
+      window.dispatchEvent(new CustomEvent('forceDataSync'));
+      
+      // Show a warning to the user that changes were saved locally but not to server
+      alert('Cập nhật cài đặt thành công (lưu cục bộ). Vui lòng kiểm tra kết nối mạng và thử lại để đồng bộ lên server.');
     }
 
     // Dispatch event to notify other components
