@@ -118,23 +118,39 @@ const GeneralSettings = () => {
     try {
       const token = localStorage.getItem('adminToken') || localStorage.getItem('token');
       if (token) {
-        const response = await fetch('/api/settings', {
-          method: 'POST',
+        // First try to update existing setting
+        let response = await fetch(`/api/settings/generalSettings`, {
+          method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`,
             'x-auth-token': token
           },
           body: JSON.stringify({
-            key: 'generalSettings',
             value: settingsToSave
           })
         });
 
         if (!response.ok) {
-          const errorData = await response.json();
-          console.error('Error saving settings to backend:', errorData);
-          throw new Error(errorData.message || 'Lỗi khi lưu cài đặt lên server');
+          // If PUT fails, try POST to create new setting
+          response = await fetch('/api/settings', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`,
+              'x-auth-token': token
+            },
+            body: JSON.stringify({
+              key: 'generalSettings',
+              value: settingsToSave
+            })
+          });
+        }
+
+        if (!response.ok) {
+          const errorText = await response.text(); // Use text() instead of json() to avoid parsing errors
+          console.error('Error saving settings to backend:', errorText);
+          throw new Error(`Lỗi khi lưu cài đặt lên server: ${response.status} - ${errorText}`);
         }
 
         const result = await response.json();

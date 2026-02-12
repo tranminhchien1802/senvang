@@ -42,9 +42,25 @@ const Header = () => {
       try {
         const response = await fetch('/api/settings/generalSettings');
         if (response.ok) {
-          const result = await response.json();
-          if (result.success && result.data) {
-            backendSettings = result.data;
+          // Handle both JSON and text responses
+          const contentType = response.headers.get('content-type');
+          let result;
+          if (contentType && contentType.includes('application/json')) {
+            result = await response.json();
+            if (result.success && result.data) {
+              backendSettings = result.data;
+            }
+          } else {
+            // If response is not JSON, try to parse as JSON
+            const text = await response.text();
+            try {
+              result = JSON.parse(text);
+              if (result.success && result.data) {
+                backendSettings = result.data;
+              }
+            } catch (parseError) {
+              console.warn('Non-JSON response from backend:', text);
+            }
           }
         }
       } catch (error) {

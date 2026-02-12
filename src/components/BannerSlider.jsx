@@ -15,14 +15,35 @@ const BannerSlider = () => {
       try {
         const response = await fetch('/api/banners/active');
         if (response.ok) {
-          const result = await response.json();
-          if (result.success && Array.isArray(result.data)) {
-            backendBanners = result.data;
-            
-            // Update localStorage with backend data for offline access
-            localStorage.setItem('banners', JSON.stringify(result.data));
-            localStorage.setItem('bannerSlides', JSON.stringify(result.data));
-            localStorage.setItem('websiteBanners', JSON.stringify(result.data));
+          // Handle both JSON and text responses
+          const contentType = response.headers.get('content-type');
+          let result;
+          if (contentType && contentType.includes('application/json')) {
+            result = await response.json();
+            if (result.success && Array.isArray(result.data)) {
+              backendBanners = result.data;
+              
+              // Update localStorage with backend data for offline access
+              localStorage.setItem('banners', JSON.stringify(result.data));
+              localStorage.setItem('bannerSlides', JSON.stringify(result.data));
+              localStorage.setItem('websiteBanners', JSON.stringify(result.data));
+            }
+          } else {
+            // If response is not JSON, try to parse as JSON
+            const text = await response.text();
+            try {
+              result = JSON.parse(text);
+              if (result.success && Array.isArray(result.data)) {
+                backendBanners = result.data;
+                
+                // Update localStorage with backend data for offline access
+                localStorage.setItem('banners', JSON.stringify(result.data));
+                localStorage.setItem('bannerSlides', JSON.stringify(result.data));
+                localStorage.setItem('websiteBanners', JSON.stringify(result.data));
+              }
+            } catch (parseError) {
+              console.warn('Non-JSON response from backend:', text);
+            }
           }
         }
       } catch (error) {
