@@ -269,13 +269,13 @@ const Header = () => {
 
   return (
     // Header chính: Thêm transition để mượt mà khi đổi màu/kích thước
-    <header className="fixed top-0 left-0 right-0 z-50">
+    <header className="fixed top-0 left-0 right-0 z-50" style={{ marginBottom: '0' }}>
       {/* Logo Area - Hàng riêng */}
       <div className={`w-full transition-all duration-300 ${
         isScrolled
           ? 'bg-white/95 backdrop-blur-md py-1' // Khi cuộn: Nền trắng trong suốt, nhỏ gọn
           : 'bg-white py-3' // Mặc định: Nền trắng, cao hơn để tạo không gian cho logo lớn
-      }`}>
+      }`} style={{ margin: '0', padding: '0' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-start"> {/* Căn trái logo trên cả mobile và desktop */}
             {/* --- LOGO --- */}

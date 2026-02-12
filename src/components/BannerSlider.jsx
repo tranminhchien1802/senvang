@@ -106,7 +106,7 @@ const BannerSlider = () => {
         id: 'default-1',
         title: 'DỊCH VỤ KẾ TOÁN CHUYÊN NGHIỆP',
         description: 'Hơn 10 năm kinh nghiệm đồng hành cùng 5000+ doanh nghiệp khởi sự thành công',
-        image: '/image/banner-1.jpg',
+        image: '/image/banner1.png',
         buttonText: 'Xem Các Dịch Vụ',
         buttonLink: '/dich-vu'
       },
@@ -114,7 +114,7 @@ const BannerSlider = () => {
         id: 'default-2',
         title: 'THÀNH LẬP DOANH NGHIỆP',
         description: 'Dễ dàng – Hiệu quả – Chất lượng. Đồng hành tận tâm và chuyên nghiệp',
-        image: '/image/banner-dich-vu-ke-toan-binh-duong.png',
+        image: '/image/banner2.webp',
         buttonText: 'Liên Hệ Tư Vấn',
         buttonLink: '/lien-he'
       },
@@ -122,7 +122,7 @@ const BannerSlider = () => {
         id: 'default-3',
         title: 'GIẢI PHÁP TÀI CHÍNH TOÀN DIỆN',
         description: 'Tư vấn chiến lược thuế, quản lý kế toán chuyên nghiệp',
-        image: '/image/banner-ke-toan-pham-gia-1_result-2 (1).webp',
+        image: '/image/baner3.jpg',
         buttonText: 'Tìm Hiểu Thêm',
         buttonLink: '/'
       }
