@@ -118,13 +118,11 @@ const GeneralSettings = () => {
     try {
       const token = localStorage.getItem('adminToken') || localStorage.getItem('token');
       if (token) {
-        // Determine the correct API URL based on environment
-        const apiUrl = typeof window !== 'undefined' && window.location.hostname !== 'localhost' 
-          ? 'https://senvang-backend-production.up.railway.app/api' // Production backend
-          : 'http://localhost:5000/api'; // Local backend
+        // Import the backend config
+        const { getApiUrl } = await import('../config/backendConfig');
         
         // First try to update existing setting
-        let response = await fetch(`${apiUrl}/settings/generalSettings`, {
+        let response = await fetch(getApiUrl('/settings/generalSettings'), {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -138,7 +136,7 @@ const GeneralSettings = () => {
 
         if (!response.ok) {
           // If PUT fails, try POST to create new setting
-          response = await fetch(`${apiUrl}/settings`, {
+          response = await fetch(getApiUrl('/settings'), {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
