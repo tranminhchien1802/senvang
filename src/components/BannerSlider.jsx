@@ -115,10 +115,17 @@ const BannerSlider = () => {
       setRefreshTrigger(prev => prev + 1); // Force refresh component
     };
 
-    // Also periodically check for updates (every 10 seconds) to sync with backend
+    // Also listen for banner updates from server polling
+    const handleServerBannerUpdate = (e) => {
+      console.log('Server banner update received:', e.detail); // Debug log
+      setBanners(e.detail || []);
+      setRefreshTrigger(prev => prev + 1); // Force refresh component
+    };
+
+    // Also periodically check for updates (every 5 seconds) to sync with backend
     const interval = setInterval(() => {
       loadBanners(); // Refresh from backend periodically
-    }, 10000);
+    }, 5000);
 
     // Listen for force data sync events
     const handleForceSync = () => {
@@ -129,12 +136,14 @@ const BannerSlider = () => {
     window.addEventListener('storage', handleStorageChange);
     window.addEventListener('refreshBanners', handleRefreshEvent);
     window.addEventListener('bannersUpdated', handleBannerUpdate);
+    window.addEventListener('bannersDataUpdated', handleServerBannerUpdate);
     window.addEventListener('forceDataSync', handleForceSync);
 
     return () => {
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('refreshBanners', handleRefreshEvent);
       window.removeEventListener('bannersUpdated', handleBannerUpdate);
+      window.removeEventListener('bannersDataUpdated', handleServerBannerUpdate);
       window.removeEventListener('forceDataSync', handleForceSync);
       clearInterval(interval);
     };

@@ -44,6 +44,23 @@ function App() {
     ensureDataSync();
     // Initialize improved data sync
     initializeDataSync();
+    
+    // Start polling for data updates from server
+    const startDataSync = async () => {
+      try {
+        const { startPollingForUpdates } = await import('./utils/dataSyncUtils');
+        
+        // Start polling for banner updates
+        startPollingForUpdates('/banners/active', 'banners', 5000);
+        
+        // Start polling for settings updates
+        startPollingForUpdates('/settings/generalSettings', 'settings', 5000);
+      } catch (error) {
+        console.error('Error starting data sync:', error);
+      }
+    };
+    
+    startDataSync();
   }, []);
 
   return (

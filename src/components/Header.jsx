@@ -134,7 +134,17 @@ const Header = () => {
       });
     };
 
+    // Listen for server settings updates
+    const handleServerSettingsUpdate = (e) => {
+      console.log('Server settings update received:', e.detail); // Debug log
+      setCompanyInfo({
+        companyName: e.detail.companyName || 'KẾ TOÁN SEN VÀNG',
+        logo: e.detail.logo || ''
+      });
+    };
+
     window.addEventListener('settingsUpdated', handleSettingsUpdate);
+    window.addEventListener('settingsDataUpdated', handleServerSettingsUpdate);
 
     // Also listen for forceDataSync events
     const handleForceSync = () => {
@@ -143,13 +153,14 @@ const Header = () => {
 
     window.addEventListener('forceDataSync', handleForceSync);
 
-    // Also periodically check for updates (every 10 seconds) to sync with backend
+    // Also periodically check for updates (every 5 seconds) to sync with backend
     const interval = setInterval(() => {
       loadCompanyInfo(); // Refresh from backend periodically
-    }, 10000);
+    }, 5000);
 
     return () => {
       window.removeEventListener('settingsUpdated', handleSettingsUpdate);
+      window.removeEventListener('settingsDataUpdated', handleServerSettingsUpdate);
       window.removeEventListener('forceDataSync', handleForceSync);
       clearInterval(interval);
     };
