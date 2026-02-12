@@ -24,11 +24,9 @@ const GeneralSettings = () => {
                          JSON.parse(localStorage.getItem('master_website_data_v2')?.settings || '{}') ||
                          {};
                          
-      // Nếu không có logo, sử dụng logo mặc định
-      if (!savedSettings.logo) {
-        savedSettings.logo = '/image/logo.jpg';
-        localStorage.setItem('generalSettings', JSON.stringify(savedSettings));
-      }
+      // Luôn sử dụng logo từ file ảnh thay vì lưu trong localStorage
+      savedSettings.logo = '/image/logo.jpg';
+      localStorage.setItem('generalSettings', JSON.stringify(savedSettings));
       
       setCompanyInfo(prev => ({
         ...prev,
@@ -47,11 +45,9 @@ const GeneralSettings = () => {
                                JSON.parse(localStorage.getItem('master_website_data_v2')?.settings || '{}') ||
                                {};
                                
-          // Nếu không có logo, sử dụng logo mặc định
-          if (!updatedSettings.logo) {
-            updatedSettings.logo = '/image/logo.jpg';
-            localStorage.setItem('generalSettings', JSON.stringify(updatedSettings));
-          }
+          // Luôn sử dụng logo từ file ảnh thay vì lưu trong localStorage
+          updatedSettings.logo = '/image/logo.jpg';
+          localStorage.setItem('generalSettings', JSON.stringify(updatedSettings));
           
           setCompanyInfo(prev => ({
             ...prev,
