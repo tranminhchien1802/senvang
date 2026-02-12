@@ -107,7 +107,7 @@ const GeneralSettings = () => {
       const masterDataStr = localStorage.getItem('master_website_data_v2');
       let masterData = masterDataStr ? JSON.parse(masterDataStr) : {};
       if (!masterData.settings) masterData.settings = {};
-      masterData.settings = settingsToSave;
+      masterData.settings = { ...masterData.settings, ...settingsToSave }; // Merge to preserve other data
       masterData.timestamp = Date.now();
       localStorage.setItem('master_website_data_v2', JSON.stringify(masterData));
     } catch (e) {

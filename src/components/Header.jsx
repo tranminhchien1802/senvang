@@ -38,10 +38,33 @@ const Header = () => {
   useEffect(() => {
     const loadCompanyInfo = () => {
       // Try multiple storage keys to ensure we get the latest data
-      let savedSettings = JSON.parse(localStorage.getItem('generalSettings')) ||
-                         JSON.parse(localStorage.getItem('master_website_data_v2')?.settings || '{}') ||
-                         {};
+      let savedSettings = {};
       
+      // First try generalSettings
+      const generalSettingsStr = localStorage.getItem('generalSettings');
+      if (generalSettingsStr) {
+        try {
+          savedSettings = JSON.parse(generalSettingsStr);
+        } catch (e) {
+          console.warn('Error parsing generalSettings:', e);
+        }
+      }
+      
+      // Then try master data as fallback
+      if (!savedSettings.logo && !savedSettings.companyName) {
+        const masterDataStr = localStorage.getItem('master_website_data_v2');
+        if (masterDataStr) {
+          try {
+            const masterData = JSON.parse(masterDataStr);
+            if (masterData.settings) {
+              savedSettings = { ...savedSettings, ...masterData.settings };
+            }
+          } catch (e) {
+            console.warn('Error parsing master_website_data_v2:', e);
+          }
+        }
+      }
+
       setCompanyInfo({
         companyName: savedSettings.companyName || 'KẾ TOÁN SEN VÀNG',
         logo: savedSettings.logo || ''
@@ -52,7 +75,7 @@ const Header = () => {
 
     // Listen for settings updates from other components
     const handleSettingsUpdate = (e) => {
-      const settings = e.detail || JSON.parse(localStorage.getItem('generalSettings') || '{}');
+      const settings = e.detail || {};
       setCompanyInfo({
         companyName: settings.companyName || 'KẾ TOÁN SEN VÀNG',
         logo: settings.logo || ''
@@ -60,6 +83,13 @@ const Header = () => {
     };
 
     window.addEventListener('settingsUpdated', handleSettingsUpdate);
+
+    // Also listen for forceDataSync events
+    const handleForceSync = () => {
+      loadCompanyInfo();
+    };
+
+    window.addEventListener('forceDataSync', handleForceSync);
 
     // Also periodically check for updates (every 2 seconds) to catch any missed changes
     const interval = setInterval(() => {
@@ -74,6 +104,7 @@ const Header = () => {
 
     return () => {
       window.removeEventListener('settingsUpdated', handleSettingsUpdate);
+      window.removeEventListener('forceDataSync', handleForceSync);
       clearInterval(interval);
     };
   }, []);
