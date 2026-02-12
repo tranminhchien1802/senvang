@@ -156,45 +156,28 @@ const BannerManager = () => {
       }
     } catch (error) {
       console.error('Error uploading image:', error);
-      // Use the new API utility with fallback
-      try {
-        const token = localStorage.getItem('adminToken') || localStorage.getItem('token');
-        if (!token) {
-          alert('Bạn cần đăng nhập để upload ảnh');
-          setUploading(false);
-          return;
-        }
-
-        // Use the new API utility with fallback
-        const { uploadImageWithFallback } = await import('../../utils/apiWithTimeout');
-        const { imageUploadFallback } = await import('../../utils/apiFallback');
+      // Đọc file ảnh và lưu trực tiếp vào form
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const imageData = event.target.result;
         
-        const result = await uploadImageWithFallback(
-          file,
-          '/upload/image',
-          token,
-          () => imageUploadFallback.uploadImage(file)
-        );
-        
-        if (result.success) {
-          // Update form with the server URL or base64
-          setBannerForm({
-            ...bannerForm,
-            image: result.url
-          });
-          setUploading(false);
-          
-          if (result.message && result.message.includes('locally')) {
-            alert('Upload ảnh thất bại trên server, sử dụng ảnh cục bộ. Vui lòng kiểm tra kết nối mạng.');
-          }
-        } else {
-          throw new Error(result.message || 'Lỗi khi upload ảnh');
-        }
-      } catch (uploadError) {
-        console.error('Error uploading image:', uploadError);
-        alert('Error uploading image: ' + uploadError.message);
+        // Cập nhật form với ảnh base64
+        setBannerForm({
+          ...bannerForm,
+          image: imageData
+        });
         setUploading(false);
-      }
+        
+        alert('Upload ảnh thành công (lưu cục bộ)!');
+      };
+      
+      reader.onerror = () => {
+        console.error('Error reading image file');
+        alert('Lỗi khi đọc file ảnh');
+        setUploading(false);
+      };
+      
+      reader.readAsDataURL(file);
     }
   };
 

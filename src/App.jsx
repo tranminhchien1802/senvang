@@ -45,28 +45,30 @@ function App() {
     // Initialize improved data sync
     initializeDataSync();
     
-    // Start polling for data updates from server
-    const startDataSync = async () => {
-      try {
-        const { USE_BACKEND_API } = await import('./config/appConfig');
-        
-        if (USE_BACKEND_API) {
-          const { startPollingForUpdates } = await import('./utils/dataSyncUtils');
-          
-          // Start polling for banner updates
-          startPollingForUpdates('/banners/active', 'banners', 5000);
-          
-          // Start polling for settings updates
-          startPollingForUpdates('/settings/generalSettings', 'settings', 5000);
-        } else {
-          console.log('Backend API disabled, skipping server data sync');
+    // Simple storage listener for cross-tab synchronization
+    const handleStorageChange = (e) => {
+      if (e.key === 'companyLogo' || e.key === 'generalSettings' || 
+          e.key === 'banners' || e.key === 'bannerSlides' || e.key === 'websiteBanners') {
+        // Dispatch custom events to notify components of changes
+        if (e.key === 'companyLogo' || e.key === 'generalSettings') {
+          window.dispatchEvent(new CustomEvent('settingsUpdated', { 
+            detail: JSON.parse(localStorage.getItem('generalSettings') || '{}') 
+          }));
         }
-      } catch (error) {
-        console.error('Error starting data sync:', error);
+        
+        if (e.key === 'banners' || e.key === 'bannerSlides' || e.key === 'websiteBanners') {
+          window.dispatchEvent(new CustomEvent('bannersUpdated', { 
+            detail: JSON.parse(localStorage.getItem('banners') || '[]') 
+          }));
+        }
       }
     };
     
-    startDataSync();
+    window.addEventListener('storage', handleStorageChange);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
   }, []);
 
   return (

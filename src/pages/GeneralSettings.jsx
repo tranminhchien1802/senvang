@@ -69,60 +69,45 @@ const GeneralSettings = () => {
     if (file) {
       try {
         // Validate file
-        const validation = await import('../utils/imageStorage').then(module => module.validateImageFile(file));
+        const imageStorageModule = await import('../utils/imageStorage');
+        const validation = imageStorageModule.validateImageFile(file);
         if (!validation.valid) {
           alert(validation.error);
           return;
         }
 
-        const token = localStorage.getItem('adminToken') || localStorage.getItem('token');
-        if (!token) {
-          alert('Bạn cần đăng nhập để thay đổi logo');
-          return;
-        }
-
-        // Use the new API utility with fallback
-        const { uploadImageWithFallback } = await import('../utils/apiWithTimeout');
-        const { imageUploadFallback } = await import('../utils/apiFallback');
+        // Đọc file ảnh
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const logoData = event.target.result;
+          
+          // Lưu logo sử dụng cơ chế đơn giản
+          import('../utils/simpleStorageSync').then(({ saveLogo }) => {
+            const result = saveLogo(logoData);
+            
+            if (result.success) {
+              // Cập nhật state
+              setCompanyInfo(prev => ({
+                ...prev,
+                logo: logoData,
+                logoPreview: logoData
+              }));
+              
+              alert('Cập nhật logo thành công!');
+            } else {
+              alert('Lỗi khi lưu logo: ' + result.message);
+            }
+          }).catch(err => {
+            console.error('Error importing simpleStorageSync:', err);
+            alert('Lỗi khi lưu logo');
+          });
+        };
         
-        const result = await uploadImageWithFallback(
-          file,
-          '/upload/image',
-          token,
-          () => imageUploadFallback.uploadImage(file)
-        );
+        reader.onerror = () => {
+          alert('Lỗi khi đọc file ảnh');
+        };
         
-        if (result.success) {
-          // Update state with the server URL or base64
-          setCompanyInfo(prev => ({
-            ...prev,
-            logo: result.url, // Use the server URL or base64 result
-            logoPreview: result.url // Use the same for preview
-          }));
-          
-          // Also update in localStorage
-          const settings = JSON.parse(localStorage.getItem('generalSettings') || '{}');
-          settings.logo = result.url;
-          localStorage.setItem('generalSettings', JSON.stringify(settings));
-          
-          // Update master data as well
-          try {
-            const masterDataStr = localStorage.getItem('master_website_data_v2');
-            let masterData = masterDataStr ? JSON.parse(masterDataStr) : {};
-            if (!masterData.settings) masterData.settings = {};
-            masterData.settings.logo = result.url;
-            masterData.timestamp = Date.now();
-            localStorage.setItem('master_website_data_v2', JSON.stringify(masterData));
-          } catch (e) {
-            console.warn('Could not update master data with logo:', e);
-          }
-          
-          if (result.message && result.message.includes('locally')) {
-            alert('Upload logo thất bại trên server, sử dụng logo cục bộ. Vui lòng kiểm tra kết nối mạng.');
-          }
-        } else {
-          throw new Error(result.message || 'Lỗi khi upload ảnh');
-        }
+        reader.readAsDataURL(file);
       } catch (error) {
         console.error('Error handling logo change:', error);
         alert('Lỗi khi xử lý file logo: ' + error.message);

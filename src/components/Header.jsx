@@ -34,59 +34,10 @@ const Header = () => {
   const [isUserLoggedIn, setIsUserLoggedIn] = useState(!!localStorage.getItem('token'));
   const location = useLocation();
 
-  // Load company info from localStorage with improved sync
+  // Load company info from localStorage with simple sync
   useEffect(() => {
-    const loadCompanyInfo = async () => {
-      // First try to get from backend
-      let backendSettings = null;
-      try {
-        // Import the backend config
-        const { getApiUrl } = await import('../config/backendConfig');
-        
-        const response = await fetch(getApiUrl('/settings/generalSettings'));
-        if (response.ok) {
-          // Handle both JSON and text responses
-          const contentType = response.headers.get('content-type');
-          let result;
-          if (contentType && contentType.includes('application/json')) {
-            result = await response.json();
-            if (result.success && result.data) {
-              backendSettings = result.data;
-            }
-          } else {
-            // If response is not JSON, try to parse as JSON
-            const text = await response.text();
-            try {
-              result = JSON.parse(text);
-              if (result.success && result.data) {
-                backendSettings = result.data;
-              }
-            } catch (parseError) {
-              console.warn('Non-JSON response from backend:', text);
-            }
-          }
-        }
-      } catch (error) {
-        console.warn('Error fetching settings from backend:', error);
-        // Use fallback mechanism
-        try {
-          const { settingsOperationsFallback } = await import('../utils/apiFallback');
-          const fallbackResult = settingsOperationsFallback.getSettings('generalSettings');
-          if (fallbackResult.success) {
-            backendSettings = fallbackResult.data;
-          } else {
-            // If fallback also fails, use empty object
-            backendSettings = {};
-          }
-        } catch (fallbackError) {
-          console.warn('Error using fallback for settings:', fallbackError);
-          // Final fallback to localStorage
-          const localSettings = JSON.parse(localStorage.getItem('generalSettings') || '{}');
-          backendSettings = localSettings;
-        }
-      }
-
-      // Try multiple storage keys to ensure we get the latest data
+    const loadCompanyInfo = () => {
+      // Load from localStorage - this is the primary source now
       let savedSettings = {};
       
       // First try generalSettings from localStorage
@@ -114,12 +65,9 @@ const Header = () => {
         }
       }
 
-      // Use backend settings if available, otherwise use local settings
-      const finalSettings = backendSettings || savedSettings;
-
       setCompanyInfo({
-        companyName: finalSettings.companyName || 'KẾ TOÁN SEN VÀNG',
-        logo: finalSettings.logo || ''
+        companyName: savedSettings.companyName || 'KẾ TOÁN SEN VÀNG',
+        logo: savedSettings.logo || ''
       });
     };
 
@@ -134,35 +82,29 @@ const Header = () => {
       });
     };
 
-    // Listen for server settings updates
-    const handleServerSettingsUpdate = (e) => {
-      console.log('Server settings update received:', e.detail); // Debug log
-      setCompanyInfo({
-        companyName: e.detail.companyName || 'KẾ TOÁN SEN VÀNG',
-        logo: e.detail.logo || ''
-      });
+    // Listen for storage changes to update settings when they change in admin
+    const handleStorageChange = (e) => {
+      // Reload when settings-related keys change
+      if (e.key === 'generalSettings' || e.key === 'master_website_data_v2') {
+        setTimeout(() => {
+          loadCompanyInfo();
+        }, 100);
+      }
     };
-
-    window.addEventListener('settingsUpdated', handleSettingsUpdate);
-    window.addEventListener('settingsDataUpdated', handleServerSettingsUpdate);
 
     // Also listen for forceDataSync events
     const handleForceSync = () => {
       loadCompanyInfo();
     };
 
+    window.addEventListener('settingsUpdated', handleSettingsUpdate);
+    window.addEventListener('storage', handleStorageChange);
     window.addEventListener('forceDataSync', handleForceSync);
-
-    // Also periodically check for updates (every 5 seconds) to sync with backend
-    const interval = setInterval(() => {
-      loadCompanyInfo(); // Refresh from backend periodically
-    }, 5000);
 
     return () => {
       window.removeEventListener('settingsUpdated', handleSettingsUpdate);
-      window.removeEventListener('settingsDataUpdated', handleServerSettingsUpdate);
+      window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('forceDataSync', handleForceSync);
-      clearInterval(interval);
     };
   }, []);
 
