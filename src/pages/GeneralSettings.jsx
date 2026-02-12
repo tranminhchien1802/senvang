@@ -95,10 +95,10 @@ const GeneralSettings = () => {
   };
 
 
-  const handleSave = (e) => {
+  const handleSave = async (e) => {
     e.preventDefault();
 
-    // Save to localStorage
+    // Save to localStorage as fallback
     const { logoPreview, ...settingsToSave } = companyInfo;
     localStorage.setItem('generalSettings', JSON.stringify(settingsToSave));
 
@@ -112,6 +112,39 @@ const GeneralSettings = () => {
       localStorage.setItem('master_website_data_v2', JSON.stringify(masterData));
     } catch (e) {
       console.warn('Could not update master data:', e);
+    }
+
+    // Try to save to backend
+    try {
+      const token = localStorage.getItem('adminToken') || localStorage.getItem('token');
+      if (token) {
+        const response = await fetch('/api/settings', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+            'x-auth-token': token
+          },
+          body: JSON.stringify({
+            key: 'generalSettings',
+            value: settingsToSave
+          })
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.error('Error saving settings to backend:', errorData);
+          throw new Error(errorData.message || 'Lỗi khi lưu cài đặt lên server');
+        }
+
+        const result = await response.json();
+        console.log('Settings saved to backend successfully:', result);
+      } else {
+        console.log('No admin token found, skipping backend save');
+      }
+    } catch (error) {
+      console.error('Error saving settings to backend:', error);
+      // Don't show error to user since we have fallback to localStorage
     }
 
     // Dispatch event to notify other components

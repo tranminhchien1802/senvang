@@ -9,7 +9,26 @@ const BannerSlider = () => {
 
   // Load banners from localStorage with improved sync
   useEffect(() => {
-    const loadBanners = () => {
+    const loadBanners = async () => {
+      // First try to get from backend
+      let backendBanners = null;
+      try {
+        const response = await fetch('/api/banners/active');
+        if (response.ok) {
+          const result = await response.json();
+          if (result.success && Array.isArray(result.data)) {
+            backendBanners = result.data;
+            
+            // Update localStorage with backend data for offline access
+            localStorage.setItem('banners', JSON.stringify(result.data));
+            localStorage.setItem('bannerSlides', JSON.stringify(result.data));
+            localStorage.setItem('websiteBanners', JSON.stringify(result.data));
+          }
+        }
+      } catch (error) {
+        console.warn('Error fetching banners from backend:', error);
+      }
+
       // Try multiple storage keys to ensure we get the latest data
       let savedBanners = JSON.parse(localStorage.getItem('banners')) ||
                         JSON.parse(localStorage.getItem('bannerSlides')) ||
@@ -17,7 +36,10 @@ const BannerSlider = () => {
                         JSON.parse(localStorage.getItem('master_website_data_v2')?.banners || '[]') ||
                         [];
       console.log('Loaded banners from localStorage:', savedBanners); // Debug log
-      setBanners(savedBanners);
+      
+      // Use backend banners if available, otherwise use local banners
+      const finalBanners = backendBanners || savedBanners;
+      setBanners(finalBanners);
     };
 
     loadBanners();
@@ -43,14 +65,7 @@ const BannerSlider = () => {
 
     // Listen for custom refresh events
     const handleRefreshEvent = () => {
-      const freshBanners = JSON.parse(localStorage.getItem('banners')) ||
-                          JSON.parse(localStorage.getItem('bannerSlides')) ||
-                          JSON.parse(localStorage.getItem('websiteBanners')) ||
-                          JSON.parse(localStorage.getItem('master_website_data_v2')?.banners || '[]') ||
-                          [];
-      console.log('Refresh event triggered, banners loaded:', freshBanners); // Debug log
-      setBanners(freshBanners);
-      setRefreshTrigger(prev => prev + 1); // Force refresh component
+      loadBanners(); // Reload from backend when refresh event occurs
     };
 
     // Listen for banner update events from bannerSync utility
@@ -60,19 +75,10 @@ const BannerSlider = () => {
       setRefreshTrigger(prev => prev + 1); // Force refresh component
     };
 
-    // Also periodically check for updates (every 1.5 seconds) to catch any missed changes
+    // Also periodically check for updates (every 10 seconds) to sync with backend
     const interval = setInterval(() => {
-      const freshBanners = JSON.parse(localStorage.getItem('banners')) ||
-                          JSON.parse(localStorage.getItem('bannerSlides')) ||
-                          JSON.parse(localStorage.getItem('websiteBanners')) ||
-                          JSON.parse(localStorage.getItem('master_website_data_v2')?.banners || '[]') ||
-                          [];
-      if (freshBanners.length !== banners.length) {
-        console.log('Periodic check - banners changed:', freshBanners); // Debug log
-        setBanners(freshBanners);
-        setRefreshTrigger(prev => prev + 1); // Force refresh component
-      }
-    }, 1500);
+      loadBanners(); // Refresh from backend periodically
+    }, 10000);
 
     // Listen for force data sync events
     const handleForceSync = () => {

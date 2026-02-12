@@ -136,6 +136,7 @@ app.use('/api/users', require('./routers/User'));
 app.use('/api/admin', require('./routers/Admin'));
 app.use('/api/orders', require('./routers/Order'));
 app.use('/api/banners', require('./routers/banners'));
+app.use('/api/settings', require('./routers/Settings'));
 
 // Health check endpoint
 app.get('/health', (req, res) => {

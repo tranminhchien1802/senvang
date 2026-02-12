@@ -136,50 +136,109 @@ const BannerManager = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (editingBanner) {
-      // Update existing banner
-      const updatedBanners = banners.map(banner =>
-        banner.id === editingBanner.id ? { ...banner, ...bannerForm } : banner
-      );
-      setBanners(updatedBanners);
-    } else {
-      // Add new banner
-      const newBanner = {
-        ...bannerForm,
-        id: Date.now().toString(),
+    try {
+      if (editingBanner) {
+        // Update existing banner
+        const updatedBanners = banners.map(banner =>
+          banner.id === editingBanner.id ? { ...banner, ...bannerForm } : banner
+        );
+        setBanners(updatedBanners);
+
+        // Update in backend if available
+        try {
+          const token = localStorage.getItem('adminToken') || localStorage.getItem('token');
+          if (token) {
+            const response = await fetch(`/api/banners/${editingBanner.id}`, {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+                'x-auth-token': token
+              },
+              body: JSON.stringify(bannerForm)
+            });
+
+            if (!response.ok) {
+              const errorData = await response.json();
+              throw new Error(errorData.message || 'Lỗi khi cập nhật banner trên server');
+            }
+
+            const result = await response.json();
+            console.log('Banner updated on backend successfully:', result);
+          }
+        } catch (backendError) {
+          console.error('Error updating banner on backend:', backendError);
+          // Continue with local update even if backend fails
+        }
+      } else {
+        // Add new banner
+        const newBanner = {
+          ...bannerForm,
+          id: Date.now().toString(),
+          order: banners.length + 1
+        };
+        const updatedBanners = [...banners, newBanner];
+        setBanners(updatedBanners);
+
+        // Save to backend if available
+        try {
+          const token = localStorage.getItem('adminToken') || localStorage.getItem('token');
+          if (token) {
+            const response = await fetch('/api/banners', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+                'x-auth-token': token
+              },
+              body: JSON.stringify(bannerForm)
+            });
+
+            if (!response.ok) {
+              const errorData = await response.json();
+              throw new Error(errorData.message || 'Lỗi khi tạo banner trên server');
+            }
+
+            const result = await response.json();
+            console.log('Banner created on backend successfully:', result);
+          }
+        } catch (backendError) {
+          console.error('Error creating banner on backend:', backendError);
+          // Continue with local update even if backend fails
+        }
+      }
+
+      // Save to localStorage as fallback
+      const updatedBanners = editingBanner
+        ? banners.map(banner => banner.id === editingBanner.id ? { ...banner, ...bannerForm } : banner)
+        : [...banners, { ...bannerForm, id: Date.now().toString(), order: banners.length + 1 }];
+      localStorage.setItem('websiteBanners', JSON.stringify(updatedBanners));
+
+      // Also update other banner storage keys for consistency
+      localStorage.setItem('banners', JSON.stringify(updatedBanners));
+      localStorage.setItem('bannerSlides', JSON.stringify(updatedBanners));
+
+      // Refresh banners to ensure all components have the latest data
+      refreshBanners();
+
+      // Reset form and close
+      setBannerForm({
+        title: '',
+        description: '',
+        image: '',
+        buttonText: '',
+        buttonLink: '',
         order: banners.length + 1
-      };
-      const updatedBanners = [...banners, newBanner];
-      setBanners(updatedBanners);
+      });
+      setShowForm(false);
+      setEditingBanner(null);
+    } catch (error) {
+      console.error('Error handling banner submission:', error);
+      alert('Lỗi khi xử lý banner: ' + error.message);
     }
-
-    // Save to localStorage
-    const updatedBanners = editingBanner
-      ? banners.map(banner => banner.id === editingBanner.id ? { ...banner, ...bannerForm } : banner)
-      : [...banners, { ...bannerForm, id: Date.now().toString(), order: banners.length + 1 }];
-    localStorage.setItem('websiteBanners', JSON.stringify(updatedBanners));
-    
-    // Also update other banner storage keys for consistency
-    localStorage.setItem('banners', JSON.stringify(updatedBanners));
-    localStorage.setItem('bannerSlides', JSON.stringify(updatedBanners));
-
-    // Refresh banners to ensure all components have the latest data
-    refreshBanners();
-
-    // Reset form and close
-    setBannerForm({
-      title: '',
-      description: '',
-      image: '',
-      buttonText: '',
-      buttonLink: '',
-      order: banners.length + 1
-    });
-    setShowForm(false);
-    setEditingBanner(null);
   };
 
   const startEdit = (banner) => {

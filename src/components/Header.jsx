@@ -36,11 +36,25 @@ const Header = () => {
 
   // Load company info from localStorage with improved sync
   useEffect(() => {
-    const loadCompanyInfo = () => {
+    const loadCompanyInfo = async () => {
+      // First try to get from backend
+      let backendSettings = null;
+      try {
+        const response = await fetch('/api/settings/generalSettings');
+        if (response.ok) {
+          const result = await response.json();
+          if (result.success && result.data) {
+            backendSettings = result.data;
+          }
+        }
+      } catch (error) {
+        console.warn('Error fetching settings from backend:', error);
+      }
+
       // Try multiple storage keys to ensure we get the latest data
       let savedSettings = {};
       
-      // First try generalSettings
+      // First try generalSettings from localStorage
       const generalSettingsStr = localStorage.getItem('generalSettings');
       if (generalSettingsStr) {
         try {
@@ -65,9 +79,12 @@ const Header = () => {
         }
       }
 
+      // Use backend settings if available, otherwise use local settings
+      const finalSettings = backendSettings || savedSettings;
+
       setCompanyInfo({
-        companyName: savedSettings.companyName || 'KẾ TOÁN SEN VÀNG',
-        logo: savedSettings.logo || ''
+        companyName: finalSettings.companyName || 'KẾ TOÁN SEN VÀNG',
+        logo: finalSettings.logo || ''
       });
     };
 
@@ -91,16 +108,10 @@ const Header = () => {
 
     window.addEventListener('forceDataSync', handleForceSync);
 
-    // Also periodically check for updates (every 2 seconds) to catch any missed changes
+    // Also periodically check for updates (every 10 seconds) to sync with backend
     const interval = setInterval(() => {
-      const currentSettings = JSON.parse(localStorage.getItem('generalSettings') || '{}');
-      if (currentSettings.logo !== companyInfo.logo || currentSettings.companyName !== companyInfo.companyName) {
-        setCompanyInfo({
-          companyName: currentSettings.companyName || 'KẾ TOÁN SEN VÀNG',
-          logo: currentSettings.logo || ''
-        });
-      }
-    }, 2000);
+      loadCompanyInfo(); // Refresh from backend periodically
+    }, 10000);
 
     return () => {
       window.removeEventListener('settingsUpdated', handleSettingsUpdate);
