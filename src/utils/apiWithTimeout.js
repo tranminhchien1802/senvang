@@ -81,7 +81,7 @@ export const uploadImageWithFallback = async (file, endpoint, token, fallbackFn)
     formData.append('image', file);
     formData.append('type', 'logo');
     
-    const { getApiUrl } = await import('./backendConfig');
+    const { getApiUrl } = await import('../config/backendConfig');
     const apiUrl = getApiUrl(endpoint);
     
     const response = await fetchWithTimeout(apiUrl, {
@@ -128,7 +128,7 @@ export const getDataWithFallback = async (endpoint, fallbackFn) => {
   }
   
   try {
-    const { getApiUrl } = await import('./backendConfig');
+    const { getApiUrl } = await import('../config/backendConfig');
     const apiUrl = getApiUrl(endpoint);
     
     const response = await fetchWithTimeout(apiUrl);
