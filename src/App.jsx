@@ -81,8 +81,8 @@ function App() {
         <Route path="/" element={
           <>
             <Header />
-            <div className="flex flex-col min-h-screen" style={{ marginTop: '-1px' }}>
-              <main className="flex-grow bg-white pt-20">
+            <div className="flex flex-col min-h-screen">
+              <main className="flex-grow bg-white pt-24">
                 <TrangChu />
               </main>
               <Footer />
@@ -93,8 +93,8 @@ function App() {
         <Route path="/dang-ky-kinh-doanh" element={
           <>
             <Header />
-            <div className="flex flex-col min-h-screen" style={{ marginTop: '-1px' }}>
-              <main className="flex-grow bg-white pt-20">
+            <div className="flex flex-col min-h-screen">
+              <main className="flex-grow bg-white pt-32">
                 <DangKyKinhDoanh />
               </main>
               <Footer />
@@ -105,8 +105,8 @@ function App() {
         <Route path="/ke-toan-doanh-nghiep" element={
           <>
             <Header />
-            <div className="flex flex-col min-h-screen" style={{ marginTop: '-1px' }}>
-              <main className="flex-grow bg-white pt-20">
+            <div className="flex flex-col min-h-screen">
+              <main className="flex-grow bg-white pt-24">
                 <KeToanDoanhNghiep />
               </main>
               <Footer />
@@ -117,8 +117,8 @@ function App() {
         <Route path="/thue-ho-kinh-doanh" element={
           <>
             <Header />
-            <div className="flex flex-col min-h-screen" style={{ marginTop: '-1px' }}>
-              <main className="flex-grow bg-white pt-20">
+            <div className="flex flex-col min-h-screen">
+              <main className="flex-grow bg-white pt-32">
                 <ThueHoKinhDoanh />
               </main>
               <Footer />
@@ -129,8 +129,8 @@ function App() {
         <Route path="/thiet-ke-web" element={
           <>
             <Header />
-            <div className="flex flex-col min-h-screen" style={{ marginTop: '-1px' }}>
-              <main className="flex-grow bg-white pt-20">
+            <div className="flex flex-col min-h-screen">
+              <main className="flex-grow bg-white pt-24">
                 <DichVuThietKeWeb />
               </main>
               <Footer />
@@ -141,8 +141,8 @@ function App() {
         <Route path="/kien-thuc" element={
           <>
             <Header />
-            <div className="flex flex-col min-h-screen" style={{ marginTop: '-1px' }}>
-              <main className="flex-grow bg-white pt-20">
+            <div className="flex flex-col min-h-screen">
+              <main className="flex-grow bg-white pt-24">
                 <KnowledgePage />
               </main>
               <Footer />
@@ -153,8 +153,8 @@ function App() {
         <Route path="/ContactForm" element={
           <>
             <Header />
-            <div className="flex flex-col min-h-screen" style={{ marginTop: '-1px' }}>
-              <main className="flex-grow bg-white pt-20">
+            <div className="flex flex-col min-h-screen">
+              <main className="flex-grow bg-white pt-32">
                 <ContactForm />
               </main>
               <Footer />
