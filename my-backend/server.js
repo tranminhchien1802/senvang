@@ -24,32 +24,13 @@ const { passport } = require('./config/passport');
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Import security headers middleware
-const securityHeaders = require('./middleware/securityHeaders');
-app.use(securityHeaders);
-
-// Import and use custom CORS handler
+// Import and use custom CORS handler (must be first)
 const corsHandler = require('./middleware/corsHandler');
 app.use(corsHandler);
 
-// COOP headers for Google OAuth popup
-app.use((req, res, next) => {
-  // Allow Google OAuth popup to communicate with parent window
-  res.setHeader("Cross-Origin-Opener-Policy", "same-origin-allow-popups");
-  res.setHeader("Cross-Origin-Embedder-Policy", "require-corp");
-  res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
-  next();
-});
-
-// Additional headers to support OAuth flows
-app.use((req, res, next) => {
-  // Allow cross-origin requests for OAuth
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, x-auth-token");
-  res.setHeader("Access-Control-Allow-Credentials", "true");
-  next();
-});
+// Import security headers middleware
+const securityHeaders = require('./middleware/securityHeaders');
+app.use(securityHeaders);
 
 app.use(express.json());
 

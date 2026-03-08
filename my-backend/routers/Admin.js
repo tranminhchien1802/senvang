@@ -86,7 +86,20 @@ router.post('/register', async (req, res) => {
 // Admin Login
 router.post('/login', async (req, res) => {
   try {
+    console.log('=== ADMIN LOGIN REQUEST ===');
+    console.log('Request method:', req.method);
+    console.log('Request body:', req.body);
+    console.log('Request headers:', req.headers);
+    
     const { email, password } = req.body;
+
+    // Validate input
+    if (!email || !password) {
+      return res.status(400).json({ 
+        msg: 'Vui lòng cung cấp email và mật khẩu',
+        received: { email: !!email, password: !!password }
+      });
+    }
 
     // Check if admin exists
     const admin = await Admin.findOne({ email });
@@ -104,6 +117,8 @@ router.post('/login', async (req, res) => {
     const payload = { adminId: admin._id };
     const token = jwt.sign(payload, process.env.JWT_SECRET || 'default_secret', { expiresIn: '7d' });
 
+    console.log('Login successful for:', email);
+    
     res.json({
       msg: 'Login successful',
       token,
@@ -114,8 +129,12 @@ router.post('/login', async (req, res) => {
       }
     });
   } catch (err) {
-    console.error(err.message);
-    res.status(500).json({ msg: 'Server error' });
+    console.error('Admin login error:', err.message);
+    console.error('Stack:', err.stack);
+    res.status(500).json({ 
+      msg: 'Server error', 
+      error: err.message 
+    });
   }
 });
 

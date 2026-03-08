@@ -26,10 +26,19 @@ const AdminLogin = () => {
         })
       });
 
+      // Check if response is JSON
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        console.error('Response is not JSON. Content-Type:', contentType);
+        const text = await response.text();
+        console.error('Response text:', text);
+        throw new Error(`Server trả về phản hồi không hợp lệ (HTTP ${response.status})`);
+      }
+
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.msg || 'Đăng nhập thất bại');
+        throw new Error(data.msg || data.error || 'Đăng nhập thất bại');
       }
 
       if (!data.token) {
@@ -42,7 +51,7 @@ const AdminLogin = () => {
       localStorage.setItem('userName', data.admin?.username || email);
       localStorage.setItem('userEmail', data.admin?.email || email);
       localStorage.setItem('adminId', data.admin?.id || '');
-      
+
       // Store login activity in localStorage
       const loginActivity = {
         name: data.admin?.username || 'Admin',
@@ -61,10 +70,14 @@ const AdminLogin = () => {
       window.dispatchEvent(new Event('userLoggedIn'));
       alert('Đăng nhập thành công!');
       navigate('/admin');
-      
+
     } catch (error) {
       console.error('Login error:', error);
-      alert('Lỗi đăng nhập: ' + error.message + '\n\nVui lòng kiểm tra lại email và mật khẩu.');
+      if (error.name === 'SyntaxError' && error.message.includes('json')) {
+        alert('Lỗi: Server trả về phản hồi không hợp lệ. Vui lòng kiểm tra backend.');
+      } else {
+        alert('Lỗi đăng nhập: ' + error.message + '\n\nVui lòng kiểm tra lại email và mật khẩu.');
+      }
     } finally {
       setLoading(false);
     }
