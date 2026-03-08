@@ -2,20 +2,23 @@
 const getApiBaseUrl = () => {
   if (typeof window !== 'undefined') {
     // Client-side (browser)
-    // Use environment variable if available (for production with external backend)
-    // Otherwise use localhost for development
-    // When running both frontend and backend locally, use the same origin
-    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-      // Use backend URL for local development if available, otherwise use relative path
-      return 'http://localhost:5000'; // Use backend URL for local development
-    } else {
-      // For production, use relative path to leverage server proxy
-      return ''; // Use relative path to leverage server proxy configuration
+    const hostname = window.location.hostname;
+    
+    // Production on Vercel
+    if (hostname.includes('vercel.app') || hostname === 'ketoansenvang.net' || hostname === 'www.ketoansenvang.net') {
+      // Use the same domain for API (Vercel will route to backend)
+      return window.location.origin;
     }
-  } else {
-    // Server-side (Node.js) - this shouldn't be reached in a typical React app
+    
+    // Local development
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+      return 'http://localhost:5000';
+    }
+    
+    // Default
     return '';
   }
+  return '';
 };
 
 export const API_BASE_URL = getApiBaseUrl();
