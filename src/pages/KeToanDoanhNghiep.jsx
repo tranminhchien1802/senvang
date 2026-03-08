@@ -227,7 +227,7 @@ const KeToanDoanhNghiep = () => {
                 style={{
                   backgroundColor: 'white',
                   borderRadius: '0.5rem',
-                  overflow: 'hidden',
+                  overflow: 'visible',
                   boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
                   border: pkg.isPopular ? '2px solid #D4AF37' : '1px solid #e2e8f0',
                   position: pkg.isPopular ? 'relative' : 'static'
@@ -253,7 +253,7 @@ const KeToanDoanhNghiep = () => {
 
                 <div className="p-6 bg-white text-gray-800 flex flex-col h-full" style={{ padding: '1.5rem', backgroundColor: 'white', color: '#333' }}>
                   <div className="flex-grow">
-                    <h3 className="text-xl font-bold text-center text-gray-800 mb-2" style={{ fontSize: '1.25rem', color: '#333', marginBottom: '0.5rem', textAlign: 'center' }}>
+                    <h3 className="text-xl font-bold text-center text-gray-800 mb-2" style={{ fontSize: '1.25rem', color: '#333', marginBottom: '0.5rem', textAlign: 'center', wordBreak: 'break-word' }}>
                       {pkg.title}
                     </h3>
 

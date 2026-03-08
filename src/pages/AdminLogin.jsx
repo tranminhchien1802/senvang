@@ -14,7 +14,7 @@ const AdminLogin = () => {
     setLoading(true);
 
     try {
-      // Try backend login first
+      // Backend login ONLY - no fallback
       const response = await fetch(API_ENDPOINTS.ADMIN.LOGIN, {
         method: 'POST',
         headers: {
@@ -28,47 +28,43 @@ const AdminLogin = () => {
 
       const data = await response.json();
 
-      if (response.ok && data.token) {
-        // Store the real JWT token from backend
-        localStorage.setItem('adminToken', data.token);
-        localStorage.setItem('userName', data.user?.name || email);
-        localStorage.setItem('userEmail', data.user?.email || email);
-        alert('Đăng nhập thành công!');
-        navigate('/admin');
-      } else {
-        throw new Error(data.msg || 'Lỗi đăng nhập backend');
+      if (!response.ok) {
+        throw new Error(data.msg || 'Đăng nhập thất bại');
       }
-    } catch (error) {
-      console.error('Backend login failed:', error);
+
+      if (!data.token) {
+        throw new Error('Không nhận được token từ server');
+      }
+
+      // Store the real JWT token from backend
+      localStorage.setItem('adminToken', data.token);
+      localStorage.setItem('token', data.token); // Also store as 'token' for compatibility
+      localStorage.setItem('userName', data.admin?.username || email);
+      localStorage.setItem('userEmail', data.admin?.email || email);
+      localStorage.setItem('adminId', data.admin?.id || '');
       
-      // Fallback to localStorage admin credentials
-      if ((email === 'chien180203@gmail.com' || email === 'ketoansenvang.net@gmail.com') && password === '123') {
-        // Admin login successful
-        localStorage.setItem('adminToken', 'local-admin-token-' + Date.now());
-        localStorage.setItem('userName', 'Admin');
-        localStorage.setItem('userEmail', email);
-        
-        // Store login activity in localStorage
-        const loginActivity = {
-          name: 'Admin',
-          email: email,
-          loginTime: new Date().toISOString(),
-          id: Date.now().toString(),
-          provider: 'admin',
-          ip: 'local',
-          userAgent: navigator.userAgent
-        };
+      // Store login activity in localStorage
+      const loginActivity = {
+        name: data.admin?.username || 'Admin',
+        email: data.admin?.email || email,
+        loginTime: new Date().toISOString(),
+        id: Date.now().toString(),
+        provider: 'backend',
+        ip: 'local',
+        userAgent: navigator.userAgent
+      };
 
-        const existingActivities = JSON.parse(localStorage.getItem('loginActivities')) || [];
-        const updatedActivities = [loginActivity, ...existingActivities];
-        localStorage.setItem('loginActivities', JSON.stringify(updatedActivities));
+      const existingActivities = JSON.parse(localStorage.getItem('loginActivities')) || [];
+      const updatedActivities = [loginActivity, ...existingActivities];
+      localStorage.setItem('loginActivities', JSON.stringify(updatedActivities));
 
-        window.dispatchEvent(new Event('userLoggedIn'));
-        alert('Đăng nhập thành công!');
-        navigate('/admin');
-      } else {
-        alert('Email hoặc mật khẩu không đúng!');
-      }
+      window.dispatchEvent(new Event('userLoggedIn'));
+      alert('Đăng nhập thành công!');
+      navigate('/admin');
+      
+    } catch (error) {
+      console.error('Login error:', error);
+      alert('Lỗi đăng nhập: ' + error.message + '\n\nVui lòng kiểm tra lại email và mật khẩu.');
     } finally {
       setLoading(false);
     }

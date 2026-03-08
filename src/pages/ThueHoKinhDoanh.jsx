@@ -154,15 +154,15 @@ const ThueHoKinhDoanh = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {packages.map((pkg) => (
-              <div key={pkg.id} className={`bg-white rounded-xl shadow-lg overflow-hidden border-2 ${pkg.popular ? 'border-[#D4AF37] relative' : 'border-gray-200'}`}>
+              <div key={pkg.id} className={`bg-white rounded-xl shadow-lg overflow-hidden border-2 ${pkg.popular ? 'border-[#D4AF37] relative' : 'border-gray-200'}`} style={{ overflow: 'visible' }}>
                 {pkg.popular && (
-                  <div className="absolute top-0 right-0 bg-[#D4AF37] text-white text-xs font-bold px-4 py-1 rounded-bl-lg uppercase">
+                  <div className="absolute top-0 right-0 bg-[#D4AF37] text-white text-xs font-bold px-4 py-1 rounded-bl-lg uppercase" style={{ zIndex: 10 }}>
                     Phổ biến
                   </div>
                 )}
                 <div className="p-6 text-gray-800 flex flex-col h-full">
                   <div className="flex-grow">
-                    <h3 className="text-xl font-bold text-center text-gray-800 mb-2">{pkg.name}</h3>
+                    <h3 className="text-xl font-bold text-center text-gray-800 mb-2" style={{ wordBreak: 'break-word' }}>{pkg.name}</h3>
                     <div className="text-center mb-4">
                       <span className="text-3xl font-bold text-red-600">{pkg.price}</span>
                     </div>

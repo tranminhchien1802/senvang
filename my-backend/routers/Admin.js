@@ -637,4 +637,62 @@ router.post('/send-customer-order-confirmation', async (req, res) => {
   }
 });
 
+// Change admin password (Admin only)
+router.put('/change-password', verifyAdmin, async (req, res) => {
+  try {
+    const { currentPassword, newPassword, confirmPassword } = req.body;
+
+    // Validate required fields
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      return res.status(400).json({ 
+        msg: 'Vui lòng nhập đầy đủ mật khẩu hiện tại, mật khẩu mới và xác nhận mật khẩu' 
+      });
+    }
+
+    // Validate new password length
+    if (newPassword.length < 6) {
+      return res.status(400).json({ 
+        msg: 'Mật khẩu mới phải có ít nhất 6 ký tự' 
+      });
+    }
+
+    // Validate confirm password
+    if (newPassword !== confirmPassword) {
+      return res.status(400).json({ 
+        msg: 'Mật khẩu xác nhận không khớp với mật khẩu mới' 
+      });
+    }
+
+    // Find current admin
+    const admin = await Admin.findById(req.admin._id);
+    if (!admin) {
+      return res.status(404).json({ msg: 'Admin không tồn tại' });
+    }
+
+    // Verify current password
+    const isMatch = await admin.comparePassword(currentPassword);
+    if (!isMatch) {
+      return res.status(401).json({ msg: 'Mật khẩu hiện tại không đúng' });
+    }
+
+    // Update password (will be hashed by pre-save hook)
+    admin.password = newPassword;
+    await admin.save();
+
+    console.log(`Password changed successfully for admin: ${admin.email}`);
+
+    res.json({ 
+      msg: 'Đổi mật khẩu thành công',
+      admin: {
+        id: admin._id,
+        username: admin.username,
+        email: admin.email
+      }
+    });
+  } catch (err) {
+    console.error('Error changing password:', err.message);
+    res.status(500).json({ msg: `Lỗi máy chủ: ${err.message}` });
+  }
+});
+
 module.exports = router;

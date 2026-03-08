@@ -12,10 +12,14 @@ const ArticleManager = () => {
     isMain: false,      // Là bài viết chính
     isNotification: false,
     isFeatured: false,
-    color: '#005a9e' // Default color
+    url: '' // Trường URL liên kết
   });
   const [editingId, setEditingId] = useState(null);
   const [showForm, setShowForm] = useState(false);
+  
+  // Drag and Drop state
+  const [draggedItemIndex, setDraggedItemIndex] = useState(null);
+  const [dragOverItemIndex, setDragOverItemIndex] = useState(null);
 
   // Load articles from localStorage
   useEffect(() => {
@@ -39,7 +43,7 @@ const ArticleManager = () => {
         isMain: false,
         isNotification: false,
         isFeatured: false,
-        color: '#005a9e'
+        url: ''
       };
       
       savedArticles = [newArticle, ...savedArticles]; // Add to the beginning
@@ -91,7 +95,7 @@ const ArticleManager = () => {
       category: 'Bài viết',
       isNotification: false,
       isFeatured: false,
-      color: '#005a9e'
+      url: ''
     });
     setEditingId(null);
     setShowForm(false);
@@ -117,6 +121,57 @@ const ArticleManager = () => {
     } else {
       setShowForm(true);
     }
+  };
+
+  // Drag and Drop handlers
+  const handleDragStart = (e, index) => {
+    setDraggedItemIndex(index);
+    e.dataTransfer.effectAllowed = 'move';
+    // Set a transparent drag image or custom drag image
+    e.dataTransfer.setData('text/plain', index);
+  };
+
+  const handleDragOver = (e, index) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    if (dragOverItemIndex !== index) {
+      setDragOverItemIndex(index);
+    }
+  };
+
+  const handleDragLeave = () => {
+    setDragOverItemIndex(null);
+  };
+
+  const handleDrop = (e, dropIndex) => {
+    e.preventDefault();
+    setDragOverItemIndex(null);
+    
+    if (draggedItemIndex === null || draggedItemIndex === dropIndex) {
+      setDraggedItemIndex(null);
+      return;
+    }
+
+    // Create a copy of articles array
+    const updatedArticles = [...articles];
+    
+    // Remove the dragged item
+    const [draggedItem] = updatedArticles.splice(draggedItemIndex, 1);
+    
+    // Insert it at the new position
+    updatedArticles.splice(dropIndex, 0, draggedItem);
+    
+    // Update state
+    setArticles(updatedArticles);
+    setDraggedItemIndex(null);
+    
+    // Save to localStorage
+    localStorage.setItem('knowledgeArticles', JSON.stringify(updatedArticles));
+  };
+
+  const handleDragEnd = () => {
+    setDraggedItemIndex(null);
+    setDragOverItemIndex(null);
   };
 
   return (
@@ -187,18 +242,16 @@ const ArticleManager = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Màu sắc chủ đạo
+                    URL liên kết (tùy chọn)
                   </label>
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="color"
-                      name="color"
-                      value={formData.color}
-                      onChange={handleChange}
-                      className="w-12 h-10 border border-gray-300 rounded cursor-pointer"
-                    />
-                    <span className="text-sm text-gray-600">{formData.color}</span>
-                  </div>
+                  <input
+                    type="url"
+                    name="url"
+                    value={formData.url}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
+                    placeholder="https://example.com/bai-viet"
+                  />
                 </div>
 
                 <div className="md:col-span-2">
@@ -302,15 +355,20 @@ const ArticleManager = () => {
             <h2 className="text-lg font-semibold text-gray-800">
               Danh sách bài viết & thông báo ({articles.length})
             </h2>
+            <p className="text-sm text-gray-500 mt-1">
+              💡 Kéo thả để thay đổi vị trí các bài viết
+            </p>
           </div>
 
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kéo thả</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">STT</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tiêu đề</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Danh mục</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">URL</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Loại</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ngày</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hành động</th>
@@ -319,7 +377,23 @@ const ArticleManager = () => {
               <tbody className="bg-white divide-y divide-gray-200">
                 {articles.length > 0 ? (
                   articles.map((article, index) => (
-                    <tr key={article.id} className="hover:bg-gray-50">
+                    <tr
+                      key={article.id}
+                      draggable
+                      onDragStart={(e) => handleDragStart(e, index)}
+                      onDragOver={(e) => handleDragOver(e, index)}
+                      onDragLeave={handleDragLeave}
+                      onDrop={(e) => handleDrop(e, index)}
+                      onDragEnd={handleDragEnd}
+                      className={`hover:bg-gray-50 cursor-move transition-colors duration-200 ${
+                        draggedItemIndex === index ? 'opacity-50 bg-yellow-50' : ''
+                      } ${
+                        dragOverItemIndex === index && draggedItemIndex !== index ? 'border-t-2 border-b-2 border-[#D4AF37]' : ''
+                      }`}
+                    >
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
+                        <span className="text-lg">⋮⋮</span>
+                      </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {index + 1}
                       </td>
@@ -332,16 +406,23 @@ const ArticleManager = () => {
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span
-                          className="px-2 py-1 text-xs font-medium rounded-full"
-                          style={{
-                            backgroundColor: `${article.color}20`,
-                            color: article.color,
-                            border: `1px solid ${article.color}`
-                          }}
-                        >
+                        <span className="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">
                           {article.category}
                         </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {article.url ? (
+                          <a
+                            href={article.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-600 hover:text-blue-900 text-sm truncate block max-w-xs"
+                          >
+                            🔗 {article.url}
+                          </a>
+                        ) : (
+                          <span className="text-gray-400 text-sm">Không có</span>
+                        )}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex space-x-1">
@@ -385,7 +466,7 @@ const ArticleManager = () => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="6" className="px-6 py-12 text-center text-gray-500">
+                    <td colSpan="8" className="px-6 py-12 text-center text-gray-500">
                       Chưa có bài viết hoặc thông báo nào
                     </td>
                   </tr>

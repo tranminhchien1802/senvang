@@ -38,9 +38,11 @@ export const API_ENDPOINTS = {
     UPDATE: `${API_BASE_URL}/api/users/update`
   },
   ADMIN: {
+    LOGIN: `${API_BASE_URL}/api/admin/login`,
     ORDERS: `${API_BASE_URL}/api/admin/orders`,
     USERS: `${API_BASE_URL}/api/admin/users`,
-    SEND_ORDER_CONFIRMATION: `${API_BASE_URL}/api/admin/send-order-confirmation`
+    SEND_ORDER_CONFIRMATION: `${API_BASE_URL}/api/admin/send-order-confirmation`,
+    CHANGE_PASSWORD: `${API_BASE_URL}/api/admin/change-password`
   },
   EMAIL: {
     SEND_CUSTOMER_ORDER_CONFIRMATION: `${API_BASE_URL}/api/admin/send-customer-order-confirmation`
