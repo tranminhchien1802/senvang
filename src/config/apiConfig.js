@@ -4,10 +4,10 @@ const getApiBaseUrl = () => {
     // Client-side (browser)
     const hostname = window.location.hostname;
 
-    // Production on Vercel - Use Railway backend
+    // Production on Vercel
     if (hostname.includes('vercel.app') || hostname === 'ketoansenvang.net' || hostname === 'www.ketoansenvang.net') {
-      // Use existing Railway backend
-      return 'https://senvang-backend-production.up.railway.app';
+      // Use Render backend
+      return 'https://senvang-jef9.onrender.com';
     }
 
     // Local development
