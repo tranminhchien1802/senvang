@@ -75,6 +75,8 @@ const AdminLogin = () => {
       console.error('Login error:', error);
       if (error.name === 'SyntaxError' && error.message.includes('json')) {
         alert('Lỗi: Server trả về phản hồi không hợp lệ. Vui lòng kiểm tra backend.');
+      } else if (error.message.includes('MONGODB_URI') || error.message.includes('cấu hình MongoDB')) {
+        alert('Lỗi cấu hình server: Thiếu MONGODB_URI\n\nVui lòng liên hệ quản trị viên để thiết lập environment variables trên Vercel.');
       } else {
         alert('Lỗi đăng nhập: ' + error.message + '\n\nVui lòng kiểm tra lại email và mật khẩu.');
       }

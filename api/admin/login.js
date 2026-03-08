@@ -45,10 +45,25 @@ module.exports = async (req, res) => {
   try {
     const mongoose = require('mongoose');
     
+    console.log('=== ADMIN LOGIN FUNCTION INVOKED ===');
+    console.log('Request method:', req.method);
+    console.log('Request body:', JSON.stringify(req.body));
+    console.log('Environment check:');
+    console.log('  MONGODB_URI:', process.env.MONGODB_URI ? 'SET (length: ' + process.env.MONGODB_URI.length + ')' : 'NOT SET');
+    console.log('  JWT_SECRET:', process.env.JWT_SECRET ? 'SET' : 'NOT SET');
+    console.log('  NODE_ENV:', process.env.NODE_ENV || 'NOT SET');
+    
     // Connect to MongoDB
     if (!process.env.MONGODB_URI) {
-      console.error('MONGODB_URI not set');
-      return res.status(500).json({ msg: 'Server configuration error' });
+      console.error('❌ MONGODB_URI is NOT SET in environment variables!');
+      return res.status(500).json({ 
+        msg: 'Thiếu cấu hình MongoDB. Vui lòng kiểm tra MONGODB_URI trong environment variables.',
+        debug: {
+          MONGODB_URI: process.env.MONGODB_URI ? 'SET' : 'NOT SET',
+          JWT_SECRET: process.env.JWT_SECRET ? 'SET' : 'NOT SET',
+          NODE_ENV: process.env.NODE_ENV || 'NOT SET'
+        }
+      });
     }
     
     await mongoose.connect(process.env.MONGODB_URI);
@@ -68,11 +83,13 @@ module.exports = async (req, res) => {
     const admin = await Admin.findOne({ email });
     
     if (!admin) {
+      console.log('Admin not found for email:', email);
       return res.status(400).json({ msg: 'Invalid credentials' });
     }
     
     const isMatch = await admin.comparePassword(password);
     if (!isMatch) {
+      console.log('Password mismatch for email:', email);
       return res.status(400).json({ msg: 'Invalid credentials' });
     }
     
@@ -95,7 +112,7 @@ module.exports = async (req, res) => {
       }
     });
   } catch (err) {
-    console.error('Login error:', err.message);
+    console.error('❌ Login error:', err.message);
     console.error('Stack:', err.stack);
     
     // Try to disconnect MongoDB on error
@@ -109,7 +126,7 @@ module.exports = async (req, res) => {
     }
     
     res.status(500).json({ 
-      msg: 'Server error',
+      msg: 'Server error: ' + err.message,
       error: err.message 
     });
   }
