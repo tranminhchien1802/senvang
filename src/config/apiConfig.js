@@ -4,10 +4,10 @@ const getApiBaseUrl = () => {
     // Client-side (browser)
     const hostname = window.location.hostname;
 
-    // Production on Vercel
+    // Production on Vercel - Use Vercel serverless functions
     if (hostname.includes('vercel.app') || hostname === 'ketoansenvang.net' || hostname === 'www.ketoansenvang.net') {
-      // Use Render backend
-      return 'https://senvang-jef9.onrender.com';
+      // Use same domain (Vercel will route /api/* to serverless functions)
+      return window.location.origin;
     }
 
     // Local development
