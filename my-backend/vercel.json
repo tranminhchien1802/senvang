@@ -2,11 +2,15 @@
   "version": 2,
   "builds": [
     {
-      "src": "api/index.js",
+      "src": "api/admin.js",
       "use": "@vercel/node"
     }
   ],
   "routes": [
+    {
+      "src": "/api/admin/(.*)",
+      "dest": "/api/admin.js"
+    },
     {
       "src": "/api/(.*)",
       "dest": "/api/index.js"
