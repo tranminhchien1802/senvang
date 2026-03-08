@@ -15,7 +15,6 @@ yarn-error.log*
 public/uploads/
 *.md
 .git/
-.vercelignore
 my-backend/node_modules/
 my-backend/.env
 my-backend/*.log

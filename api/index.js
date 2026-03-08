@@ -26,15 +26,25 @@ const connectDB = async () => {
 };
 connectDB();
 
-// CORS
+// CORS - must allow all origins for admin panel
 app.use(cors({
   origin: '*',
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization', 'x-auth-token']
 }));
 
 // Parse JSON
 app.use(express.json());
+
+// Debug logging middleware
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
+  console.log('Headers:', JSON.stringify(req.headers, null, 2));
+  if (req.method === 'POST' && req.body) {
+    console.log('Body:', JSON.stringify(req.body, null, 2));
+  }
+  next();
+});
 
 // Import all routes with error handling
 try {
@@ -46,6 +56,8 @@ try {
   const settingsRouter = require('../my-backend/routers/Settings');
   const uploadRouter = require('../my-backend/routers/upload');
 
+  console.log('✅ All routes loaded successfully');
+
   // Use routes
   app.use('/api/auth', authRouter);
   app.use('/api/users', userRouter);
@@ -55,7 +67,7 @@ try {
   app.use('/api/settings', settingsRouter);
   app.use('/api/upload', uploadRouter);
 } catch (err) {
-  console.error('Error loading routes:', err.message);
+  console.error('❌ Error loading routes:', err.message);
   console.error('Stack:', err.stack);
 }
 
@@ -79,14 +91,15 @@ app.get('/api/debug', (req, res) => {
 
 // 404 handler for API routes
 app.use('/api/*', (req, res) => {
+  console.log('⚠️ API endpoint not found:', req.path);
   res.status(404).json({ message: 'API endpoint not found', path: req.path });
 });
 
 // Error handling
 app.use((err, req, res, next) => {
   console.error('Server error:', err.stack);
-  res.status(500).json({ 
-    message: 'Internal server error', 
+  res.status(500).json({
+    message: 'Internal server error',
     error: process.env.NODE_ENV === 'development' ? err.message : {}
   });
 });
@@ -94,12 +107,16 @@ app.use((err, req, res, next) => {
 // Export for Vercel
 module.exports = async (req, res) => {
   try {
+    console.log('=== Serverless function invoked ===');
+    console.log('Method:', req.method);
+    console.log('Path:', req.path);
+    console.log('URL:', req.url);
     return app(req, res);
   } catch (err) {
     console.error('Serverless error:', err);
-    res.status(500).json({ 
+    res.status(500).json({
       message: 'Serverless function error',
-      error: err.message 
+      error: err.message
     });
   }
 };

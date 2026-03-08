@@ -7,7 +7,7 @@
     "dev": "vite",
     "dev:fullstack": "concurrently \"npm run dev\" \"cd my-backend && npm run dev\"",
     "build": "vite build",
-    "build:backend": "cd my-backend && npm run build",
+    "build:backend": "echo 'Backend serverless functions ready'",
     "lint": "eslint .",
     "preview": "vite preview",
     "start": "vite preview",
