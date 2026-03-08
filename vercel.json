@@ -1,14 +1,9 @@
 {
-  "buildCommand": "npm run build && npm run build:backend",
+  "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "devCommand": "npm run dev",
-  "installCommand": "npm install && cd my-backend && npm install",
+  "installCommand": "npm install",
   "framework": "vite",
-  "functions": {
-    "api/**/*.js": {
-      "maxDuration": 10
-    }
-  },
   "rewrites": [
     {
       "source": "/api/(.*)",
